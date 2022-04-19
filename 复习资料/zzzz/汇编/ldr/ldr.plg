@@ -1,0 +1,92 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+D:\keil\test1\ldr\ldr.uvproj
+Project File Date:  <unknown>
+
+<h2>Output:</h2>
+Build target 'Target 1'
+assembling ldr.S...
+linking...
+ldr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=16 RO-data=0 RW-data=0 ZI-data=0  
+ldr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"ldr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+assembling ldr.S...
+linking...
+ldr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=16 RO-data=0 RW-data=0 ZI-data=0  
+ldr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"ldr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+ldr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=16 RO-data=0 RW-data=0 ZI-data=0  
+ldr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"ldr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+assembling ldr.S...
+ldr.S(10): error: A1106E: Missing comma
+ldr.S:    10 00000010  ldr r0
+ldr.S: 1 Error, 0 Warnings
+Target not created
+Build target 'Target 1'
+assembling ldr.S...
+ldr.S(10): error: A1106E: Missing comma
+ldr.S:    10 00000010  ldr r0
+ldr.S: 1 Error, 0 Warnings
+Target not created
+Build target 'Target 1'
+assembling ldr.S...
+ldr.S(10): error: A1106E: Missing comma
+ldr.S:    10 00000010  ldr r0
+ldr.S: 1 Error, 0 Warnings
+Target not created
+Build target 'Target 1'
+assembling ldr.S...
+linking...
+ldr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=16 RO-data=0 RW-data=0 ZI-data=0  
+ldr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"ldr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+ldr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=16 RO-data=0 RW-data=0 ZI-data=0  
+ldr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"ldr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+assembling ldr.S...
+linking...
+ldr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=16 RO-data=0 RW-data=0 ZI-data=0  
+ldr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"ldr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+ldr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=16 RO-data=0 RW-data=0 ZI-data=0  
+ldr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"ldr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+ldr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=16 RO-data=0 RW-data=0 ZI-data=0  
+ldr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"ldr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+assembling ldr.S...
+linking...
+ldr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=28 RO-data=0 RW-data=0 ZI-data=0  
+ldr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"ldr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+ldr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=28 RO-data=0 RW-data=0 ZI-data=0  
+ldr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"ldr.axf" - 0 Error(s), 1 Warning(s).

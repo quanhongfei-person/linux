@@ -1,0 +1,4 @@
+--cpu ARM920T "ldr.o" --strict --scatter "ldr.sct" 
+--autoat --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\ldr.map" -o "ldr.axf"

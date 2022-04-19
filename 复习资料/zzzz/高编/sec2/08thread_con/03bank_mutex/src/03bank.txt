@@ -1,0 +1,55 @@
+/*
+ ============================================================================
+ Name        : 03bank.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include<pthread.h>
+#include<unistd.h>
+int count = 3;
+pthread_mutex_t mutex;
+void* th(void* arg)
+{
+	while(1)
+	{
+		pthread_mutex_lock(&mutex);
+	if(count>0)
+	{
+		count--;
+		pthread_mutex_unlock(&mutex);
+		printf("申请到一个窗口，开始办业务！\n");
+		sleep(rand()%5);
+		pthread_mutex_lock(&mutex);
+		count++;
+		pthread_mutex_unlock(&mutex);
+		printf("业务办完了，释放资源！\n");
+		break;
+	}
+	else
+	{
+		pthread_mutex_unlock(&mutex);
+
+	}
+	}
+	return NULL;
+}
+
+int main(void) {
+
+	int  i = 0;
+	pthread_t tid[10]={0};
+	pthread_mutex_init(&mutex,NULL);
+	for(i =0 ;i<10;i++)
+		pthread_create(&tid[i],NULL,th,NULL);
+	for(i=0;i<10;i++)
+		pthread_join(tid[i],NULL);
+	pthread_mutex_destroy(&mutex);
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

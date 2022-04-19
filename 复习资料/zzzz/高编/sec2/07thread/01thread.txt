@@ -1,0 +1,26 @@
+#include<stdio.h>
+#include<pthread.h>
+#include<stdlib.h>
+void* th1(void* arg)
+{
+
+	while(1)
+	{
+	
+	printf("+++++++++\n");
+	sleep(1);
+	}
+	pthread_exit(NULL);
+}
+int main(int argc, const char *argv[])
+{
+	pthread_t tid;
+	pthread_create(&tid,NULL,th1,NULL);
+	while(1)
+	{
+	
+		printf("---------------");
+		sleep(2);
+	}
+	return 0;
+}

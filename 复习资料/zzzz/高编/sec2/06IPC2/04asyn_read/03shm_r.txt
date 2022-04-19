@@ -1,0 +1,49 @@
+#include<stdio.h>
+#include<unistd.h>
+#include<string.h>
+#include <sys/ipc.h>
+       #include <sys/shm.h>
+#include<stdlib.h>
+
+void handle(int num)
+{
+
+}
+int main(int argc, const char *argv[])
+{
+	signal(10,handle);
+	
+	key_t key = ftok("./",'!');
+	if(-1 == key)
+	{
+		perror("ftok");
+		exit(1);
+	}
+
+	int shmid = shmget(key,4096,IPC_CREAT|0666);
+	if(-1 == shmid )
+	{
+		perror("shmget");
+		exit(1);
+	}
+	void * p;
+	p = shmat(shmid,NULL,0);
+	if((void *) -1  == p)
+	{
+		perror("shmat");
+		exit(1);
+	}
+
+
+	pid_t pid = getpid();
+	memcpy(p,&pid,sizeof(pid));
+	pause();
+	printf("mem:%s\n",(char*)p);
+	shmdt(p);
+
+
+	shmctl(shmid,IPC_RMID,NULL);
+
+
+	return 0;
+}

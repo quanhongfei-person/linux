@@ -1,0 +1,98 @@
+/*
+ ============================================================================
+ Name        : 10pool.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include<pthread.h>
+#include<unistd.h>
+#include<string.h>
+#include<sys/sem.h>
+#include <semaphore.h>
+
+#define MAX_THREAD 3
+#define MAX_QUEUE 100
+sem_t sem_task;
+typedef struct __TASK__
+{
+	char train_station[256];
+	int spent_time;
+}TASK;
+TASK queue[MAX_QUEUE]={0};
+pthread_mutex_t mutex;
+int current_task=0;
+void* th(void* arg)
+{
+	pthread_detach(pthread_self());
+	while(1)
+	{
+		sem_wait(&sem_task);
+		
+		pthread_mutex_lock(&mutex);
+		int i = current_task++ ;
+		printf("tid:%lu 正在处理去%s地方的票\n",pthread_self(),queue[i].train_station);
+		int t = queue[i].spent_time;
+		pthread_mutex_unlock(&mutex);
+		sleep(t);
+		pthread_mutex_lock(&mutex);
+		printf("tid:%lu 去%s地方的票处理结束\n",pthread_self(),queue[i].train_station);
+		//queue[i].spent_time = -1;
+
+		pthread_mutex_unlock(&mutex);
+
+
+	}
+
+	return NULL;
+
+}
+int main(void)
+{
+	int i = 0 ;
+	pthread_t tid[MAX_THREAD]={0};
+	int count = MAX_THREAD;
+	pthread_mutex_init(&mutex,NULL);
+	sem_init(&sem_task,0,0);
+	for(i=0;i<count;i++)
+		pthread_create(&tid[i],NULL,th,NULL);
+	//xi'an 10
+	i = 0 ;
+	while(1)
+	{
+		char buf[256]={0};
+		printf("你要去那么里\n");
+		fgets(buf,256,stdin);
+		buf[strlen(buf)-1]='\0';
+		pthread_mutex_lock(&mutex);
+		strcpy(queue[i].train_station,buf);
+		pthread_mutex_unlock(&mutex);
+		printf("售票消耗到时间\n");
+		bzero(buf,256);
+		fgets(buf,256,stdin);
+		 int t = atoi(buf);
+		 pthread_mutex_lock(&mutex);
+		 queue[i].spent_time = t;
+		 pthread_mutex_unlock(&mutex);
+
+
+		 i++;
+		 if(i>MAX_QUEUE)i = 0;
+
+		 sem_post(&sem_task);
+
+
+
+
+	}
+	sem_destroy(&sem_task);
+	pthread_mutex_destroy(&mutex);
+
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

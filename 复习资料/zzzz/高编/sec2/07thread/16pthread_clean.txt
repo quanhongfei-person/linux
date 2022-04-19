@@ -1,0 +1,30 @@
+#include<stdio.h>
+#include<pthread.h>
+#include<stdlib.h>
+
+void clean(void* arg)
+{
+
+	printf("清理函数在运行，%s\n",(char*)arg);
+}
+void* th1(void* arg)
+{
+	char buf[]="清理函数到参数";
+	pthread_cleanup_push(clean,buf);
+	int i = 3;
+	while(i--)
+	{
+	
+	printf("+++++++++\n");
+	sleep(1);
+	}
+	pthread_cleanup_pop(1);
+	pthread_exit(NULL);
+}
+int main(int argc, const char *argv[])
+{
+	pthread_t tid;
+	pthread_create(&tid,NULL,th1,NULL);
+	pthread_join(tid,NULL);
+	return 0;
+}

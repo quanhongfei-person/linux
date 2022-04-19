@@ -1,0 +1,20 @@
+
+
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+
+int main(int argc, const char *argv[])
+{
+	int ret = symlink("./01ps.c","soft2");
+	if(-1 == ret)
+	{
+		perror("symlink failure..\n");
+		exit(1);
+	}
+	else
+	{
+		printf("软链接创建成功\n");
+	}
+	return 0;
+}

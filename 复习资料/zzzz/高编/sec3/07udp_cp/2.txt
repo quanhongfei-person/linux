@@ -1,0 +1,54 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include  <netinet/ip.h>
+#include<time.h>
+#include<fcntl.h>
+typedef struct sockaddr* SA;
+int main(int argc, const char *argv[])
+{
+	int conn = socket(AF_INET,SOCK_DGRAM,0);
+	if(-1 == conn)
+	{
+		perror("conn");
+		exit(1);
+	}
+	struct sockaddr_in ser,cli;
+	bzero(&ser,sizeof(ser));
+	bzero(&cli,sizeof(cli));
+
+	ser.sin_addr.s_addr = INADDR_ANY;
+	ser.sin_port = htons(50000);
+	ser.sin_family = AF_INET;
+	int ret = bind(conn,(SA)&ser,sizeof(ser));
+	if(-1 == ret)
+	{
+		perror("bind");
+		exit(1);
+	}
+	int src=open("./1.flv",O_RDONLY);
+	if(-1==src) exit(1);
+	int current_size = 0;
+	char buf[4096]={0};
+	int len=sizeof(cli);
+	recvfrom(conn,buf,1024,0,(SA)&cli,&len);
+	while(1)
+	{
+		bzero(buf,4096);
+		int aa=read(src,buf,4096);
+		if(0==aa) break;
+		current_size+=aa;
+		sendto(conn,buf,aa,0,(SA)&cli,sizeof(cli));
+		printf("\r%d",current_size);fflush(stdout);
+		usleep(1000);
+	}
+	strcpy(buf,"baibai");
+	sendto(conn,buf,strlen(buf),0,(SA)&cli,sizeof(cli));
+	close(src);
+	close(conn);
+	return 0;
+}

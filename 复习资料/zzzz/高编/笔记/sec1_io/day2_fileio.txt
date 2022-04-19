@@ -1,0 +1,297 @@
+文件io
+	操作系统为了方便用户使用系统功能而对外提供的一组系统函数。称之为 系统调用  其中有个  文件IO
+	一般都是对设备文件操作,当然也可以对普通文件进行操作。
+		
+		一个基于Linux内核的没有缓存的IO机制
+		
+		
+		
+		特性：
+		.1 没有缓存区
+		.2 操作对象不在是流，而是文件描述符
+		.3文件描述符
+		很小的非负的整数	int 
+		内核每打开一个文件就会获得一个文件描述符
+		
+		  每个程序在启动的时候操作系统默认为其打开
+		  三个描述符与流对象匹配：
+		  0 ==>STDIN_FILENO === stdin
+		  1 ==>STDOUT_FILENO == stdout
+		  2 ==>STDERR_FILENO == stderr
+		  stdin,stdout,stderr,===>FILE*
+		ansi c 
+		 unistd.h ===>POSIX 标准库
+fopen	fgetc/s/fread	 			  system-v  标准
+open，  read,			write,close, lseek,
+
+2.函数接口
+		1.open
+		open("1.c",O_WRONLY|O_CREAT,0666 );
+		int open(const char *pathname, int flags);
+		功能:
+			获得一个文件描述符
+		参数:
+			pathname:文件名
+			flags:
+				O_RDONLY
+				O_WRONLY
+				O_RDWR
+			O_CREAT, 创建文件 
+			O_EXCL,需要和O_CREAT同时使用，表示新建的文件不能存在，成功，否则open就会失败
+			O_NOCTTY,不是终端设备
+			O_TRUNC文件内容清空
+			O_APPEND追加
+			O_ASYNC异步io，什么时候io不确定，
+			O_NONBLOCK非阻塞 
+			
+				
+		返回值:
+			成功返回文件描述符
+			失败返回-1
+		2.write
+		ssize_t write(int fd,  const  void *buf, size_t count);
+		功能:
+			通过文件描述符向文件中写一串数据
+		参数:
+			fd:文件描述符
+			buf:要写入文件的字符串的首地址
+			count:要写入字符的个数
+		返回值:
+			成功返回实际写入的个数
+			失败返回-1
+	
+		3.read
+		ssize_t read(int fd, void *buf, size_t count);
+		功能:
+			通过文件描述符读取文件中的数据
+		参数:
+			fd:文件描述符
+			buf:存放数据空间的首地址
+			count:要读到数据的个数
+		返回值:
+			成功返回读到数据的个数
+			失败返回-1
+			读到文件结尾返回0
+	练习：
+	1、使用以上文件IO方式测试该模式下的操作过程是否真没有缓存
+		终端上是否可以验证直接输出。
+		文件中是否可以验证文件直接读写。
+		
+	2、用以上文件io函数完成一个自己的封装的简单printf函数。
+			如果有'\n' 则该函数直接输出
+			如果没有'\n'则缓存并能到达数组满的时候一次输出。
+		
+		int myprintf(const char * str)
+		{
+			 char buff[1024]
+			//文件io
+		}
+		
+		myprintf("hello\nworld\n");
+		hello
+		world
+		
+		
+	作业：
+	使用文件io方式完成任意两个文件的比较功能，测试两个文件是否相等。
+	
+	使用read，write复制文件。
+		fseek  ftell 
+		
+		4.lseek  fseek, rewind ftell
+		off_t lseek(int fd, off_t offset, int whence);
+		功能:
+			定位光标的位置
+		参数:
+			fd:文件描述符
+			offset:偏移量
+						正:向后偏移
+						负:向前偏移
+						零:不偏移
+			whence:
+				SEEK_SET
+				SEEK_CUR
+				SEEK_END
+		返回值:
+			成功返回偏移量
+			失败返回-1
+			lseek(fd,0,SEEK_END);
+	fifo，socket，，，
+练习：
+	使用以上lseek函数测试其功能，并验证是否与fseek一样
+	有部分不支持的特性。
+
+	1、不支持O_APPEND的追加模式，无法生成空洞文件。
+	2、lseek函数执行失败,文件指针还在偏移前的位置。
+	3、lseek函数在设备文件上偏移无效。
+
+	阻塞：程序因为某种条件没有被触发，而导致
+	
+	'0'   '\0'
+面试题：
+	文件IO的文件描述符最大值是多少？ ==>1024 个，范围0-1023 《==ulimit -a	
+			
+			
+			fcntl 
+			文件控制
+			dup,dup2
+			文件描述符复制，大多做重定向使用。
+ 
+void sync(void);
+功能，只是将所有修改过的块缓冲区排入写队列，就返回。并不等待实际的写入完成。定期（30s，update守护进程完成）会写入
+
+int fsync(int fd);
+功能，对单一的文件起作用，并等待写入磁盘。
+int fdatasync(int fd);
+功能：类似fsync，，除了数据写入外，还会更新文件的相关属性
+			
+			
+fileno      FILE* fp -> int fd
+int fileno(FILE *stream);
+功能:
+	获得一个文件流指针中的文件描述符
+参数:
+	stream:文件流指针
+返回值:
+	成功返回文件描述符
+	失败返回-1
+
+2.fdopen	int fd -> FILE *fp
+ FILE *fdopen(int fd, const char *mode);
+ 功能:
+	将文件描述符转化为文件流指针
+ 参数:
+	fd:已经打开的文件描述符
+	mode:
+		"r"
+		"r+"
+		"w"
+		"w+"
+		"a"
+		"a+"
+ 返回值:
+	成功返回文件流指针
+	失败返回NULL	
+
+freopen:
+
+FILE *freopen(const char *path, const char *mode, FILE *stream);
+功能：将一个已经打开的文件流对象再次以其他文件+mode的方式
+      重新打开。
+
+参数：path 要重新打开的文件名称+路径
+      mode 要打开的文件方式
+	  stream 已经打开的文件流对象。
+返回值：成功 新的文件流对象
+		失败 NULL；
+eg:
+	printf("hello \n");
+	freopen("./abc","w",stdout); ///输出重定向
+	printf("world \n");
+	freopen("/dev/tty","w",stdout);  ///还原标准输出
+
+		文件IO 练习：
+  用文件IO方式完成任意文件的拷贝。
+  
+ 
+ 文件IO与标准IO的比较：
+
+文件IO 用于底层设备相关的开发，但是
+效率和安全性以及移植性没有标准IO方便。
+
+如果是纯上层开发，优先选择使用标准IO 。
+
+
+
+作业：
+	用文件IO 向终端输出100以内所有偶数数字。
+	
+	标准io         文件io
+	fopen           open
+	fputc/fgetc     write
+	fputs/fgets		read
+	fread/fwrite
+	
+	fclose			close
+
+	fseek			lseek
+	ftell	
+	rewind
+	
+	
+	fdopen fd -> FILE*
+	fileno FILE* -> fd
+
+			
+	
+	tel
+	struct info
+	{
+		char name[256];
+		char addr[256];
+		char phone[15];
+	};
+	+-----------------------+
+	| 1,add
+	|2,search
+	|3.exit
+	+-----------------------+		
+	1
+	scanf();
+	fgets();
+	
+	switch (chose)
+	case '1':
+	add();
+	break;
+	case '2':
+	search();
+	break;
+	case 3:
+	return ;
+	
+	
+	
+	
+	add()
+	{
+		fopen(tel,"a");
+		fgets(name);
+		fgets(age);
+		fgets(phone);
+		fgets(addr);
+		fwrite//fputs();
+		fclose();
+	
+	}
+	search()
+	{
+		fgets(wantname);
+		fopen(tel,"r");
+		fgets(buf);
+
+		if(buf.name == wantname)
+			{
+				printf(name,age,phone,addr);
+			}
+	
+			
+	}
+	
+	张三 fgets()	name;
+	西安	fgets(); addr,
+	110		fgets(); phone;
+	22,		int age;
+	strcat();
+	张1：西安：110:22
+	张3：西安：110
+	张4：西安：110
+	张5：西安：110
+	
+	
+	
+	sprintf(buf,"%s:%s:%s:%d\n",name,addr,phone,age);
+	fprintf(fp,"%s:%s:%s\n",info.name,info.addr,info.phone);
+	
+	fprintf();
+	sprintf();

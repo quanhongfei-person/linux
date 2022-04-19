@@ -1,0 +1,206 @@
+shm，sem，msg
+
+	system v ：  共享内存（效率高）  信号量集
+
+	IPC对象操作通用框架：
+	0x12345678  fotk
+	key值 ==> 申请 ==》读写 ==》关闭 ==》卸载
+
+
+	key值：===》唯一键值
+	创建方式有三种：
+
+	1、IPC_PRIVATE 固定的私有键值，其值等于 0x0
+		一般用于有亲缘关系的进程间使用。
+
+	2、ftok()创建临时键值。
+	#include <sys/types.h>
+	#include <sys/ipc.h>
+				"/etc"						'!'
+	key_t ftok(const char *pathname, int proj_id);
+	功能：通过该函数可以将pathname指定的路径用来以
+		  proj_id生成唯一的临时键值。
+	参数：pathname 路径+名称===》任意文件，只要不会
+		  被删除重建即可。
+		  proj_id  整形的数字，一般用ASCII码的单字符
+		  表示与参数1的运算。
+
+	返回值：成功 返回唯一键值
+			失败  -1；
+
+		 
+	3、自定义的私有键值： 0x88888888 
+		一般企业使用较多，多用吉祥数字+项目编号生成。
+
+	不论以上那种方式，必须保证键值的唯一性。
+
+
+	共享内存 ===》效率最高的进程间通信方式
+
+	操作流程：
+	 key ==》申请对象 ==》映射对象==》读写对象
+		 ==》撤销映射 ==》删除对象
+		
+
+	1、申请对象：shmget()
+	#include <sys/ipc.h>
+	#include <sys/shm.h>
+		share memory get 				IPC_CREAT|0666
+	int shmget(key_t key, size_t size, int shmflg);
+	功能：使用唯一键值key向内核提出共享内存使用申请
+	参数：key  唯一键值
+		  size  要申请的共享内存大小
+		  shmflg 申请的共享内存访问权限，八进制表示
+		  如果是第一个申请，则用IPC_CREAT
+		  如果要检测是否存在，用IPC_EXCL
+	返回值：成功 返回共享内存id，一般用shmid表示
+			失败  -1；
+
+			share memory attach
+	映射对象：shmat()
+	void *shmat(int shmid, const void *shmaddr, int shmflg);
+	功能：将指定shmid对应的共享内存映射到本地内存。
+	参数：shmid 要映射的本地内存
+		  shmaddr 本地可用的地址，如果不确定则用NULL，表示
+				  由系统自动分配。
+		  shmflg  
+		  0,表示读写
+		  SHM_RDONLY，只读
+	返回值：成功 返回映射的地址，一般等于shmaddr
+			失败 (void*)-1
+
+
+	读写共享内存：类似堆区内存的直接读写：
+	char * p ;
+	
+	write(fd,p,);
+	read(fd,p,1024);
+	memcpy(p,buf,1024);strncpy();
+	memset();
+	memcmp(,);
+	
+	
+	
+	字符串： 	strcpy(p,"hello");
+	字符/数字： 直接赋值
+
+	练习：
+		使用共享内存完成两个进程间的进程间通信，
+		可以共享一个数字给对方。
+
+	1、共享内存数据的存储方式是拷贝还是剪切？
+		拷贝
+
+	2、共享内存的数据如果多次不同进程读写会怎么样？
+		同一操作对象，数据没有偏移情况下会覆盖。
+
+	撤销映射：shmdt
+	int shmdt(const void *shmaddr);
+	功能：将本地内存与共享内存断开映射关系。
+	参数：shmaddr 要断开的映射地址。
+	返回值：成功  0
+			失败  -1；
+
+
+	删除对象：shmctl
+	int shmctl(int shmid, int cmd, struct shmid_ds *buf);
+	功能：修改共享内存属性，也可以删除指定的共享内存对象。
+	参数：shmid 要删除的共享内存对象
+		  cmd IPC_RMID 删除对象的宏
+		  buff NULL 表示只删除对象。
+	返回值：成功 0
+			失败 -1
+
+	以上共享内存可能存在如下问题：
+	进程1 写入共享内存，如何通知进程2 读共享内存。
+
+
+	IPC对象之信号量集 ==>sem ===》为了解决共享内存的临界资源访问
+
+
+
+	操作流程:
+		key ==> 申请信号量集 ==》init==>PV操作 ===》删除信号量
+
+		semaphore
+	1、申请信号量  semget()
+	#include <sys/types.h>
+	#include <sys/ipc.h>
+	#include <sys/sem.h>
+
+	int semget(key_t key, int nsems, int semflg);
+	功能：通过唯一键值向内核提出信号量申请。
+	参数：key 唯一键值
+		  nsems 要申请的信号量个数
+		  semflg 申请的信号量的访问权限
+	返回值：成功 0
+			失败 -1；
+
+	2、pv操作；semop
+
+	p ==>sem_wait() ==>sem = sem-1;
+	v ==>sem_post() ==>sem = sem+1;
+
+	int semop(int semid, struct sembuf *sops, unsigned nsops);
+	功能：修改指定信号量集中信号量的值。
+	参数：semid 信号量集id
+		  sops ==》结构体如下：
+		  struct sembuf
+		  {
+			  unsigned short sem_num;  ///信号量集中信号量的编号，默认以0开始
+			  short			 sem_op;   ///信号量的PV操作，如果改值等于-1则表示p		
+																  等于1 则表示v
+																  等于0 则表示阻塞
+
+			  short 		 sem_flg;   ///信号量的操作方式 0 表示默认阻塞。
+			  IPC_NOWAIT and SEM_UNDO.
+		  };
+		  nsops 信号量的设置值个数。
+	返回值：成功 0
+			失败 -1
+
+	通常会将以上函数做如下自定义封装：
+
+	int my_sem_wait(int id,int sem)
+	{
+		struct sembuf mysem;
+		mysem.sem_num = sem;
+		mysem.sem_op  = -1;
+		mysem.flg	  = 0;
+
+		if(semop(id,&mysem,1) < 0)
+			return -1;
+		else
+			return 0;
+	}
+
+	int my_sem_post(int id,int sem)
+	{
+		struct sembuf mysem;
+		mysem.sem_num = sem;
+		mysem.sem_op  = 1;
+		mysem.flg	  = 0;
+
+		if(semop(id,&mysem,1) < 0)
+			return -1;
+		else
+			return 0;
+	}
+
+	3、信号量的删除
+	 int semctl(int semid, int semnum, int cmd, ...);
+	 功能：根据semid删除指定的信号量集
+	 参数：semid 要删除的信号量集
+		   semnum 要删除的信号量集中的信号量的编号
+		   cmd IPC_RMID 删除对象宏
+		   ...  可变长参数可以不写
+	返回值：成功 0
+			失败 -1；
+
+	=====================================================
+
+	练习：
+		设计两个进程，完成如下功能：
+		进程1 获取用户输入的信息并写入共享内存
+		进程2 获取共享内存信息并将其打印输出同时写文件
+		双方遇到 "exit" 退出。

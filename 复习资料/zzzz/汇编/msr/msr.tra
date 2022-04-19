@@ -1,0 +1,19 @@
+*** Creating Trace Output File 'msr.tra' Ok.
+### Preparing for ADS-LD.
+### Creating ADS-LD Command Line
+### List of Objects: adding '"msr.o"'
+### ADS-LD Command completed:
+--cpu ARM920T "msr.o" --strict --scatter "msr.sct" 
+--autoat --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\msr.map" -o "msr.axf"### Preparing Environment (PrepEnvAds)
+### ADS-LD Output File: 'msr.axf'
+### ADS-LD Command File: 'msr.lnp'
+### Checking for dirty Components...
+### Creating CmdFile 'msr.lnp', Handle=0x00000BF8
+### Writing '.lnp' file
+### ADS-LD Command file 'msr.lnp' is ready.
+### ADS-LD: About to start ADS-LD Thread.
+### ADS-LD: executed with 0 errors
+### Updating obj list
+### LDADS_file() completed.

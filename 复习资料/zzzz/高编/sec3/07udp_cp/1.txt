@@ -1,0 +1,45 @@
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include  <netinet/ip.h>
+#include<time.h>
+#include<fcntl.h>
+typedef struct sockaddr* SA;
+int main(int argc, const char *argv[])
+{
+	int conn = socket(AF_INET,SOCK_DGRAM,0);
+	if(-1 == conn)
+	{
+		perror("conn");
+		exit(1);
+	}
+	struct sockaddr_in ser;
+	bzero(&ser,sizeof(ser));
+
+	ser.sin_addr.s_addr = INADDR_ANY;
+	ser.sin_port = htons(50000);
+	ser.sin_family = AF_INET;
+	char buf[4096]="zhangkunkun";
+	sendto(conn,buf,strlen(buf)+1,0,(SA)&ser,sizeof(ser));
+	int dst=open("shuai.jpg",O_WRONLY|O_CREAT,0666);
+	if(-1==dst)  exit(1);
+	int current_size =  0;
+	while(1)
+	{
+		bzero(buf,4096);
+		ssize_t bb=recvfrom(conn,buf,4096,0,NULL,NULL);
+		if(0==strcmp(buf,"baibai"))  break;
+		write(dst,buf,bb);
+		current_size+= bb;
+		printf("\r%d",current_size);
+		fflush(stdout);
+	}
+	close(dst);
+	close(conn);
+	return 0;
+}

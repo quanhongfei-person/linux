@@ -1,0 +1,348 @@
+man pthread_mutex_init
+ping www.baidu.com
+sudo apt-get install manpages-posix manpages-posix-dev 
+
+
+vim /etc/network/interface
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+
+
+
+vim /etc/resolv.conf
+nameserver 8.8.8.8
+
+sudo /etc/init.d/networking restart
+
+ 
+ifconfig
+改软件源。。。
+sudo apt-get update 
+ 
+to
+线程控制：互斥与同步
+	
+	概念：
+	互斥 ===》在多线程中对临界资源的排他性访问。
+
+	互斥机制 ===》互斥锁  ===》保证临界资源的访问控制。
+
+	pthread_mutex_t   mutex;
+	互斥锁类型        互斥锁变量 内核对象
+
+	框架：
+	 定义互斥锁 ==》初始化锁 ==》加锁 ==》解锁 ==》销毁
+		****                      ***      ***
+
+	 1、定义：
+		pthread_mutex_t   mutex;
+
+	 2、初始化锁
+		int pthread_mutex_init(
+			pthread_mutex_t *mutex,
+			const pthread_mutexattr_t *attr);
+		功能：将已经定义好的互斥锁初始化。
+		参数：mutex 要初始化的互斥锁
+			  atrr  初始化的值，一般是NULL表示默认锁
+		返回值：成功 0
+				失败 非零
+	 3、加锁：
+		int pthread_mutex_lock(pthread_mutex_t *mutex);
+		功能：用指定的互斥锁开始加锁代码
+			  加锁后的代码到解锁部分的代码属于原子操作，
+			  在加锁期间其他进程/线程都不能操作该部分代码
+			  如果该函数在执行的时候，mutex已经被其他部分
+			  使用则代码阻塞。
+
+		参数： mutex 用来给代码加锁的互斥锁
+		返回值：成功 0
+				失败 非零
+
+	 4、解锁
+		int pthread_mutex_unlock(pthread_mutex_t *mutex);
+		功能：将指定的互斥锁解锁。
+			  解锁之后代码不再排他访问，一般加锁解锁同时出现。
+		参数：用来解锁的互斥锁
+		返回值：成功 0
+				失败 非零
+
+	 5、销毁
+		 int pthread_mutex_destroy(pthread_mutex_t *mutex);
+		 功能：使用互斥锁完毕后需要销毁互斥锁
+		 参数：mutex 要销毁的互斥锁
+		 返回值：成功  0
+				 失败  非零
+
+	 6、trylock
+		int pthread_mutex_trylock(pthread_mutex_t *mutex);
+		功能：类似加锁函数效果，唯一区别就是不阻塞。
+		参数：mutex 用来加锁的互斥锁
+		返回值：成功 0
+				失败 非零
+				E_AGAIN
+
+				
+	10线程，
+	count = 3，
+	th()
+	{
+	while(1)
+	{
+		if( cout >0 )
+		{	
+			//you
+			printf("get totile\n");
+			cout--;
+			break;
+		}
+		else
+		{
+			//sleep(1);
+		}
+	}
+	rand()%5
+		sleep(5)
+		printf("release totile\n")
+		coutt++;
+	}
+	main()
+	{
+		pthread_create*10;
+		pthread_join();*10
+	}
+				
+				
+	练习：
+		设计一个多线程程序，共享同一块字符数组，分别向该
+		数组中写入字符串，保证某一时刻只能有一个线程在操作
+		该数组，使用堆区/栈区互斥锁来保证排他性访问。
+		
+	练习2：
+	使用互斥锁完成如下功能：
+	设计多线程程序，同时对指定的文件进行写操作
+	要求每个线程写入的信息不能覆盖和交叉。
+	文件中的数据要是输入信息的总和不能丢失。
+	
+	
+	
+	线程的同步 ===》同步 
+  ===》有一定先后顺序的对资源的排他性访问。
+
+	原因：互斥锁可以控制排他访问但没有次序。
+
+	linux下的线程同步  ===》信号量机制 ===》semaphore.h   posix 
+	sem_open();
+	信号量的分类：
+	1、无名信号量 ==》线程间通信
+	2、有名信号量 ==》进程间通信
+
+	框架：
+	信号量的定义 ===》信号量的初始化 ==》信号量的PV操作
+	===》信号量的销毁。
+
+	semaphore 
+	1、信号量的定义 ：
+	   sem_t            sem;
+	   信号量的类型     信号量的变量
+
+	2、信号量的初始化：
+		int sem_init(sem_t *sem, int pshared, unsigned int value);
+		功能：将已经定义好的信号量赋值。
+		参数：sem 要初始化的信号量
+			  pshared = 0 ;表示线程间使用信号量
+					  !=0 ;表示进程间使用信号量
+			  value 信号量的初始值，一般无名信号量
+			  都是二值信号量，0 1 
+			  0 表示红灯，进程暂停阻塞
+			  1 表示绿灯，进程可以通过执行
+		返回值：成功  0
+				失败  -1；
+	3、信号量的PV 操作
+	   P ===》申请资源===》申请一个二值信号量 
+	   V ===》释放资源===》释放一个二值信号量
+
+	   P操作对应函数 ==》sem_wait();
+	   V操作对应函数 ==》sem_post();
+
+	int sem_wait(sem_t *sem);
+	功能：判断当前sem信号量是否有资源可用。
+		  如果sem有资源(==1)，则申请该资源，程序继续运行
+		  如果sem没有资源(==0)，则线程阻塞等待，一旦有资源
+		  则自动申请资源并继续运行程序。
+
+		  注意：sem 申请资源后会自动执行 sem = sem - 1;
+	参数：sem 要判断的信号量资源
+	返回值：成功 0 
+			失败 -1
+		
+	int sem_post(sem_t *sem);
+	功能：函数可以将指定的sem信号量资源释放
+		  并默认执行，sem = sem+1;
+		  线程在该函数上不会阻塞。
+	参数：sem 要释放资源的信号量
+	返回值：成功 0
+			失败 -1；
+
+	4、信号量的销毁
+	   int sem_destroy(sem_t *sem);
+	   功能：使用完毕将指定的信号量销毁
+	   参数：sem要销毁的信号量
+	   返回值：成功 0
+				失败  -1；
+
+	练习：
+		使用信号量完成如下功能：
+		1、尽可能的少用线程个数和信号量个数
+		2、一个线程获取用户输入信息
+		3、一个线程统计用户输入的信息长度并打印输出。
+		4、当用户输入quit程序结束。
+
+
+	作业：
+		用多线程程序设计一个火车票售票系统，
+		要求至少有两个售票窗口，每个售票窗口
+		不能重复买票，将100张车票均匀的从两个
+		窗口卖出即可。
+
+	./a.out 
+	窗口1 卖出车票 1
+	窗口2 卖出车票 2
+	窗口1 卖出车票 3
+	窗口2 卖出车票 4
+	.....
+	
+	pthread_attr_t attr;
+	int pthread_attr_init(pthread_attr_t *attr);
+
+  int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachst
+ate)
+功能：设置线程为分离的属性，线程自己在消亡的时候，释放相关的资源。
+	attr，出参，由该函数填充。
+	detachstate
+		PTHREAD_CREATE_DETACHED：
+		设置分离属性的标记
+		PTHREAD_CREATE_JOINABLE：
+		设置关联的属性：
+		
+		返回  0 成功
+		      >0 失败，以及错误号
+			  
+			  
+			  
+	int pthread_detach(pthread_t thread);
+	功能：设置线程为分离的属性，线程自己在消亡的时候，释放相关的资源。
+	参数：thread，需要设置分离属性的tid
+	
+
+		返回  0 成功
+		      >0 失败，以及错误号
+			  
+	pthread_yield();
+	功能：本线程放弃cpu的调度。
+	
+	
+	
+	
+	
+	
+	abcabcabcabc
+	AAABBBCCC
+	
+	3~5, 100
+	
+	
+	6线程， mallco 3 
+	int mem[3];//1. 0,
+	sem_mem 3;
+	int mymall0c()
+	{
+		wait(sem_mem);
+		for(i == 0;i<3;i++)
+		if( m[i] == 1) 
+		return i;
+	}
+	void myfree(id)
+	{
+		mem[id]=1;
+		sem_post(sem_mem);
+	}
+	void* th(void* age)	
+	{
+		int id = mymalloc();
+		printf(我拿到di i 个空间);
+		sleep(rand()%5);
+		
+		myfree(id);
+		
+	
+	
+	}
+	
+	main()
+	{
+	
+		pthread_create();//6
+		ptread_join();//6
+	}
+	
+	
+	
+	1,服务员， 3桌子
+	
+					20
+	1，前台，报菜单，  name，号。
+	当前叫号，10，
+	sturct（）
+	{
+		name【100】，
+		total_num;
+		call_num;
+		mutex_lock;
+	}
+	record;
+	customer)()
+	{
+		printf("eat...");
+		sleep();
+		printf("out");
+		sem_post();
+	}
+	
+	waiter（）
+	{
+		while(1)
+		{
+		wait(desk)
+		if ()//有人
+		pthread_create(aa);
+		else
+		{
+			
+		}
+	}
+	}
+	main（）
+	{
+	
+		pthread_create();//wait
+		
+		while（）
+		fgets,name, total++；
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+	

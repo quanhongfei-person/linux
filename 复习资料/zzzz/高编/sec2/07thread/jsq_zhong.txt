@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <string.h>
+typedef struct
+{
+	float num_1;
+	float num_2;
+	char a;
+	float sum;
+}PER;
+
+void *th1(void *arg)
+{
+	PER* temp =(PER*)arg;
+	if(temp->a=='*')
+	{
+		temp->sum =temp->num_1 * temp->num_2;
+	}
+	else if(temp->a=='/')
+	{
+		temp->sum =temp->num_1 / temp->num_2;
+	}
+	else if(temp->a=='+')
+	{
+		temp->sum =temp->num_1 + temp->num_2;
+	}
+	else if(temp->a=='-')
+	{
+		temp->sum =temp->num_1 - temp->num_2;
+	}
+	else
+	{
+		fprintf(stderr,"input error\n");
+		exit(1);
+	}
+	pthread_exit(temp);
+}
+
+int main(int argc, const char *argv[])
+{
+	pthread_t tid;
+	PER per;
+	char tr[256]={0};
+	printf("请输入计算式\n");
+	fflush(stdout);
+	
+	fgets(tr,256,stdin);
+	char *arg1=NULL,*arg2=NULL,*arg3=NULL;
+	arg1 = strtok(tr," ");
+	arg2 = strtok(NULL," ");
+	arg3 = strtok(NULL,"\n");
+	per.num_1=strtof(arg1,NULL);
+	per.num_2=strtof(arg3,NULL);
+	per.a=arg2[0];
+
+	pthread_create(&tid,NULL,th1,&per);
+	void *ret;
+	pthread_join(tid,&ret);
+	printf("result :%f\n",((PER*)ret)->sum);
+	
+	return 0;
+}

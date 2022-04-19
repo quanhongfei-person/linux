@@ -1,0 +1,1441 @@
+84.数据库mysql
+	0.数据库好处：
+		可以持久化数据到本地
+		结构化查询
+	1.数据库相关概念：
+		DB：database数据库
+		DBMS：数据库管理系统，又称为数据库软件或数据库产品，用于创建和管理DB
+		SQL：结构化查询语言，用于和数据库通信
+	2.数据库存储数据的特点
+		1.将数据放到表中，表再放到库中
+		2.一个数据库可以有多张表，每个表都有维一个名字
+		3.表具有一些特性
+		4.表由列组成，我们也成为“字段”
+		5.表中数据按行存储
+	3.MYSQL优点：
+		1.开源、免费、成本低
+		2.性能高、移植性好
+		3.体积小、便于安装
+	3.MySQL服务器开启和停止
+		方式一：计算机->右击管理->服务
+		方式二：
+			开启：管理员身份，命令行：net start mysql（服务器名）
+			停止：管理员身份，命令行：net stop mysql（服务器名）
+	4.mysql登录和注销（root用户）
+		方式一：通过mysql自带的客户端，仅限root用户
+		方式二：window命令行:mysql -h localhost -P 3306 -u root -p密码
+			-h：指定服务器主机名或ip
+			-P：指定mysql服务器端口号
+			-u:指定用户名
+			-p:指定用户密码
+		退出：exit
+	5.mysql常见命令
+		1.show databases；  查看当前所有数据库
+		2.use test；打开指定的库test
+		3.show tables；查看当前库的所有表
+		4.show tables from 库名;  查看其他库的所有表
+		5.select database(); 查看用户当前位于哪个库
+		5.desc 表名;  查看表的结构
+		6.select version；查看数据库版本
+	6.数据库语法规范
+		1.不区分大小写，但建议关键字大小写，表名、列名小写
+		2.每条命令以分号结尾
+		3.每天命令根据需要，可以进行换行
+		4.注释：单行注释：#开头或者-- 注释
+	7.DQL数据查询语言
+		0.查询语法
+			语法：select 查询列表 from 表名
+				查询列表可以是：表中的字段、常量值、表达式、函数
+				查询的结果是一个虚拟的表格
+				查询前先打开库 use employees；
+		1.基础查询		
+			1.查询表中单个字段：select last_name from employees；字段名也可以加反引号` last_name`表示
+			2.查询表中多个字段：select last_name，e_mail，salary from employees；
+			3.查询表中所有字段：select * from employees；
+			4.查询常量值 select 100；
+			5.查询字符常量值：select ‘join';   字符型或日期型的常量必须用单引号括起来
+			6.查询表达式：select 100*98；    显示结果：字段名为100*98，结果为9800
+			7.查询函数：select VERSION()；  函数有()
+			8.为字段起别名：便于理解；若要查询的字段有重名情况，使用别名可以区分开来
+				方式一：select 100*98 as result；  显示结果：字段名为result，结果为9800
+				             select last_name as 名，first_name as 姓 from employees；
+				方式二： select last_name 名，first_name 姓 from employees；
+				note：若别名中有特殊符号，比如空格、#等，要将别名用双引号括起来
+					select salary as "out put" from employees；
+			9.去重：distinct
+				举例：查询员工表中所有的部门编号department_id
+					select department_id  from employees；但结果中有重复的
+				去重：select distinct department_id  from employees；去掉重复的编号，只显示一次
+			10.+号的作用：
+				+号的作用：运算符
+					select 100+90；当两个操作数为数值型，则做加法运算
+					select '123'+90；当其中一方为字符型，试图将字符型转换为数值型，若转换成功，则继续做加法运算
+					select 'join'+90；当其中一方为字符型，试图将字符型转换为数值型，若转换失败，则将字符型数值转换为0，结果为90
+					select null+90；只要其中一方为null，结果肯定为null
+
+				举例：查询员工名和姓连接成一个字段，并显示为姓名一个字段
+					select CONCAT(last_name,first_name) as 姓名 from employees；
+						CONCAT(str1,str2,...)：CONCAT函数用来做字符串拼接，CONCAT('a','b','c') AS 结果;  显示结果：字段名，结果，结果为abc
+				          查询表employees的全部列，各个列中间用逗号隔开，列头显示为OUT_PUT
+					select CONCAT(`last_name` , `,` , `first_name` , `,` , ` IFNULL(commission_pct，0)`) AS OUT_PUT FROM employees;
+						IFNULL(字段名，0)：判断某字段是否为NULL，如果为null返回指定值0	
+						IFNULL(字段名)：判断某字段是否为NULL，为NULL，则返回1，否则返回0	
+		2.条件查询
+			0.语法：
+				select 查询列表 from 表名 where 筛选条件
+					筛选条件分类：
+						按条件表达式筛选：条件运算符：>、<、=、<>、！=、>=、<=、
+						按逻辑表达式筛选：&& 、|| 、！、and、or、not
+						模糊查询：like、between and、in、is null
+			1.按条件表达式筛选
+				案例1：查询工资大于12000的员工信息
+					select * from employees where salary>12000；
+				案例2：查询部门编号不等于90的员工名和部门编号
+					select last_name，department_id from employees where department_id<>90；
+			2.按逻辑表达式筛选
+				案例1：查询工资>=10000,<=12000的员工名、工资和奖金
+					select last_name，salary，commisssion_pct from employees where salary>=10000 and salary<=12000；
+				案例2：查询部门编号不是在90~110之间的，或工资高于15000的员工信息
+					select * from department_id<90 or department_id>110 or salary>15000;
+					select * from not(department_id>=90 and department_id<=110) or salary>15000;
+			3.模糊查询
+				1.like
+					特点：和通配符搭配使用：%：代表0个或任意多个字符；_：代表单个字符
+					          字符型和数值型都可以使用
+					案例1：查询员工名中包含字符a的员工信息
+						select * from employees where last_name like '%a%' ；
+						note：字符型的值必须用单引号
+					案例1：查询员工名中第二个字符为_的员工名
+						select last_name from employees where last_name like '_\_%' ；  其中\将第二个_转义为普通下划线
+						select last_name from employees where last_name like '_$_%'  ESCAPE '$';  可以将任意字符，比如用ESCAPE指定$为转义字符
+				2.between and
+					案例1：查询员工编号是在100~120之间的所有员工信息
+						select * from employees where employee_id between 100 and 120;
+						select * from employees where employee_id>=100 and employee_id<=120;
+					note：
+						1.提高语句简洁度
+						2.包含临界值
+						3.两个临界值不能交换位置
+				3.in关键字
+					含义：判断某字段的值是否属于in列表的某一项
+					特点：
+						1.使用in提高语句简洁度
+						2.in列表的值类型必须同一
+						3.in列表的值不支持通配符
+					案例1：查询员工工种编号是 IT_PROG、AD_VP、AD_PRES中的一个的员工名和工种编号
+						seect last_name，job_id from employees where job_id = 'IT_PROG' or job_id = 'AD_VP' or job_id = 'AD_PRES';
+						seect last_name，job_id from employees where job_id in('IT_PROG'，'AD_VP'，'AD_PRES');
+				4.is null/ is not null 
+					note：=、<>不能用于判断NULL值，is null/ is not null 用于判断null值
+					案例1：查询没有奖金的员工名和奖金率
+						seect last_name，commision_pct from employees where commision_pct is null； 奖金率为空，即没有奖金
+						seect last_name，commision_pct from employees where commision_pct is not null；  
+				补充：<=>安全等于
+					特点：可以判断null，也可以判断普通类型值
+						seect last_name，commision_pct from employees where commision_pct <=> null；
+						seect last_name，salary from employees where salary <=> 12000；
+				习题：
+					select * from employees；和select * from employees where commission_id like '%%' and last_name like '%%' 一样吗
+					不一样，如果判断的字段有NULL值
+					和select * from employees where commission_id like '%%' and last_name like '%%' 一样吗？一样
+				进阶：
+				1.排序查询：
+					语法：select 查询列表 from 表名 where 筛选条件 order by 排序列表【asc|desc】
+					特点：
+						1.asc：升序（不写默认），desc：降序
+					    	2.order by子句可以支持：单个字段、多个字段、表达式、函数、别名
+						3.order by子句一般放在查询语句最后边，limit子句除外
+					案例1 ：查询员工信息，要求工资从高到低（按字段排序）
+						select * from emlpoyees order by salary desc；
+					案例2：查询部门编号大于等于90的员工信息，要去按照入职时间先后进行排序（加条件筛选按字段排序）
+						select *  from employees where department_id>=90 order by hiredate (asc);
+					案例3：按年薪的高低显示员工的信息和年薪（按表达式排序）
+						select *,salary*12*(1+IFNULL(commision_pct,0)) as 年薪 from employees order by salary*12*(1+IFNULL(commision_pct,0)) desc；	
+					案例4：按年薪的高低显示员工的信息和年薪（按别名排序）
+						select *,salary*12*(1+IFNULL(commision_pct,0)) as 年薪 from employees order by 年薪 desc；
+					案例5：按姓名长度显示员工姓名和工资（按函数排序）
+						select LENGTH(last_name) as 字节长度，last_name，salary from emlpoyees order by LENGTH(last_name) desc；
+					案例6：查询员工信息，要求先按工资升序，再按员工编号降序（按多个字段排序）
+						select * from emlpoyees order by salary asc，employee_id desc；即在工资相同的情况下按照员工编号降序排序
+				2.常见函数
+					调用：select 函数名(实参列表) from 【表名】；
+					特点：
+						1函数名
+						2.函数功能
+					分类：
+						1.单行函数：如ifnull，concat，传进去一个值返回一个值
+							1.字符函数：对字符的处理，传入参数为字符
+							2.数学函数
+							3.日期函数
+							4.其他函数
+							5.流程控制函数
+						2.多行函数（统计函数、组函数）：做统计使用，传进去一组值，返回一个值
+					单行函数：
+					1.字符函数：
+						1.length() 函数：获取参数的字节个数
+							select length('join');    结果为4
+							select length('中国china');   结果为11，utf8字符集下一个汉字3个字节 
+						2.concat（）拼接字符串
+							select  concat(last_name, '_', first_name) as 姓名 from employees;    
+						3.upper、lower
+							select upper('join');    小写转大写
+							示例：将姓变大小，名变小写
+								select concat(upper(last_name),lower(first_name)) as 姓名 from employees；
+						4.substr、substring：截取字符
+							截取从指定索引处的后面所以字符：
+								select subtract('李莫愁爱上了陆展元'，7) as out_put;        	索引从1开始，结果为：陆展元
+							截取从指定索引处指定字符长度的字符
+								select subtract('李莫愁爱上了陆展元'，1，3) as out_put;         结果为：李莫愁    1位起始，3位长度
+							示例：姓名中首字符大写，其他字符小写，然后用_拼接
+								select concat(upper(substr(last_name,1,1)), '_', lower(substr(last_name,2))) as 名 from employees；
+						5.instr：返回子串第一次出现索引，如果找不到返回0
+							select instr('杨不悔爱上了殷六侠'，'殷六侠') as out_put;   结果为7
+						6.trim：驱去掉字符前后的空格或指定的字符	
+							select trim('    张翠山     ') as out_put；    去掉了空格
+							select trim('a' from 'aaaaaaa张翠山aaaaaaa张翠山aaaaa') as output;   结果为张翠山aaaaaaa张翠山
+						7.lpad：用指定的字符实现左填充指定字符
+							select lpad('殷素素'，'10', '*') as output；结果为：*******殷素素
+						8.rpad：用指定的字符实现右填充指定字符
+							select lpad('殷素素'，'12', 'ab') as output；结果为：殷素素ababababa
+						9.replace：指定字符替换成另一个字符
+							select replace('张无忌爱上了周芷若'，‘周芷若’，‘赵敏’) as out_put;  结果为：张无忌爱上了赵敏
+					2.数学函数
+						1.round：四舍五入
+							select round(1.25);  结果为1
+							select round(-1.25);   结果为-1
+							select round(1.567，2);   小数点后保留两位，结果为1.57
+						2.ceil：向上取整，返回大于等于该数的最小整数
+							select ceil(1.09);  结果为2
+							select ceil(-1.09);  结果为-1
+						3.floor：向下取整，返回小于等于该数的最大整数
+							select floor(9,99);  结果为9
+							select floor(-9.99);  结果为-10
+						4.truncate：截断
+							select truncate(1.65,1);  小数点后保留1位 ，结果为1.6
+						5.mod：取余
+							select mod(10,3);   结果为1
+					3.日期函数
+						1.now：返回当前系统日期+时间
+							select now( );
+						2.curdate：返回当前系统日期，不包含时间
+							select curdate( );
+						3.curtime：返回当前系统时间，不包含日期
+							select curtime( );
+						4.获取指定部分：年、月、日、时、分、秒
+							select year(now( )) as 年;   结果为2021
+							select year('1998-1-1') as 年;   结果为1998
+							select month(now()) as 月;   结果为9
+							select monthname(now()) as 月;   结果：september
+						5.str_to_date：将其他格式的字符转换成指定格式的日期
+							str_to_date('9-13-1999', '%m-%d-%Y')      1999-9-13（日期）
+								%y：两位的年份  %Y：四位的年份   %m：月份（01,02）  %c；月份（1,2）  %d：日(01,02)   %H：小时(24小时制)    %h：小时(12小时制)  %i：分钟  %s:秒
+							select str_to_date('1998-3-2', '%Y-%m-%d') as out_put；  结果为：1998-03-02  
+							示例：查询入职日期为1992-4-3的员工信息
+							select *  from employees where hiredate = str_to_date('4-3 1992','%c-%d %Y');    
+						6.date_format：将日期转化为字符 
+							date_format('2018/6/6','%Y年/%m/月%d日')    2018年6月6日（字符）	
+							select date_format(now(), '%y年/%m/月%d日') as out_put;    结果为：17年09月27日
+							示例：查询有奖金的员工名和入职日期（xx月/xx日  xx年）
+								select last_name，date_format(hiredate,'%m月/%d日 %Y年') as 入职日期 from employees where commision_pct  is not null；
+						7.datediff函数：求两个日期之间相差的天数
+							select datediff('2017-10-1','2017-9-29');  结果为2
+					4.其他函数
+						select version();
+						select database();   查看当前库
+						select user();    查看当前用户
+						select MD5(字符)  该字符的MD5加密形式
+						select password（‘字符’）加密
+					5.流程控制函数
+						1.if函数：if else的效果
+							select if(10>5,'大', '小')；   结果为：大
+							select last_name，commission_pct，if(commission_pct is null，'没奖金', '有奖金') as 备注 from employees；
+						2.case函数第一种情况：swith  case的效果
+							格式：case 要判断的字段或表达式
+						      	          when 常量1 then 要显示的值1或语句1[;] （then后面是语句才需要；）
+							          when 常量2 then 要显示的值2或语句2[;]
+								.......
+							           else   要显示的值n或语句n[;]
+							           end
+							示例：查询员工的工资，要求， 如果部门号为30，显示的工资为1.1倍
+										如果部门号为40，显示的工资为1.2倍
+										如果部门号为50，显示的工资为1.3倍
+										其他部门，显示的工资为原来工资
+								当case搭配select使用的时候，case要放在select后面，case整个部分都作为一个表达式来用，此时then后面就不能跟语句了，
+								select salary，department-id，
+								case department_id
+								when 30 then salary*1.1
+								when 40 then salary*1.2
+								when 50 then salary*1.3
+								else salary
+								end as 新工资
+								from employees；
+						3.case函数第二种情况：类似于多重if
+							格式：case 
+							          when 条件1 then 要显示的值1或语句1[;]
+							          when 条件2 then 要显示的值2或语句2[;]
+								......
+							          else  要显示的值n或语句n[;]
+							          end
+							案例：查询员工的工资情况，如果工资大于20000，显示A级别，如果工资大于15000，显示B级别，如果工资大于10000，显示c级别，否则，显示D级别
+								select salary，
+								case	
+								when salary>20000 then 'A'
+								when salary>15000 then 'B'
+								when salary>10000 then 'C'
+								else 'D'
+								end as 工资级别
+								from employees；
+				
+							
+					多行函数：
+						分类：
+							1.sum（）求和
+							2.avg（）平均值
+							3.max（）最大值	
+							4.min( )最小值
+							5.count（）计算个数
+						1.简单的使用
+							select sum(salary) from employees;   求出工资之和，只有一个值
+							select avg(salary) from employees;    求出工资平均值，只有一个值
+							select min(salary) from employees;    求出工资最小值，只有一个值
+							select max(salary) from employees;    求出工资最大值，只有一个值	
+							select count(salary) from employees;    求出个数，salary字段非空的值的个数，
+						2.参数有哪些类型
+							sum()、avg()参数：一把适用于处理数值型，不支持字符型、日期型
+							max()、min(）参数：支持任何类型，比如数值型、字符型、日期型
+							count()：支持任何类型，计算非空的个数
+						3是否忽略null值
+							以上分组函数都忽略null值
+						4.可以和distinct搭配实现去重的运算
+							select sum(distinct salary) sum(salary) from employees;    去重之后再求和，两个值不相同
+							select count(distinct salary) from employees;  计算有几种工资
+						5.count函数详细介绍
+							select count(salary) from employees;   统计该字段非空值的个数
+							select count(*) from employees;      统计表的总行数,只要一行中，有一个字段的值非空，则这行非空
+							select count(1) from employees;      其实是给表新加了一列，这列的值全部为1，然后统计1的个数，可以为任意常量值
+							示例：查询部门编号为90的员工个数
+								select count(*) from employees where department_id = 90;
+						6.和分组函数一同查询的字段有限制，要求是group by后的字段
+							select avg(salary), employee_id from employees;    结果显示错误，employee_id有很多值，而avg只有一个值
+				进阶5：分组查询
+					语法：select  查询列表（要求出现在group by的后面），分组函数 from 表明 where 子句 group by 子句 having 子句 order by 子句 
+						注意：查询列表必须特殊，要求是分组函数和group by后出现的字段
+					特点：
+						1.分组查询的筛选条件分类两类：
+							分组前筛选：数据源为原始表，放在group by之前，用where
+							分组后筛选：数据源为分组后的结果集，放在group by之后，用having
+							a.分组函数做条件，一定放在having子句中
+							b.能用分组前筛选的，优先考虑使用分组前筛选
+						2.group  by子句支持单个字段分组，多个字段分组（逗号隔开，没有顺序要求）、表达式或函数分组
+						3.也可以添加排序，放在最后
+`						
+					1.简单筛选
+						案例1：查询每个工种的最高工资
+							select max( job_id), job_id from employees order by job_id；
+						案例：查询每个位置上的部门个数
+							select count(*),location_id from departments group by location_id;
+					2.添加分组前的筛选条件(筛选条件在原始表中可以找到)
+						案例1：查询邮箱中包含a字符的，每个部门的平均工资
+							select avg(salary),department_id from employees where email like '%a%' group by department_id;
+						案例2：查询有奖金的每个领导手下员工的最高工资
+							select max(salary),manager_id from employees where commission_pct is not null order by manager_id;
+					3.添加分组后的复杂的筛选条件(筛选条件不在原始表，而是在新的表中，用having连接)
+						案例1：查询那个部门的员工个数大于2
+							a.查询每个部门的员工个数 
+								select count(*),department_id  from employees order by department_id；
+							b.根据a的结果进行筛选，查询那个部门的员工个数大于2
+								select count(*),department_id  from employees order by department_id having count(*)>2;
+						案例2：查询每个工种有奖金的员工的最高工资大于12000的工种编号和最高工资
+							a.查询每个工种有奖金的员工的最高工资
+								select max(salary),jod_id from employees where commission_pct is not null group by job_id;
+							b.根据a的结果筛选，查询哪个工资高于12000
+								select max(salary),jod_id from employees commission_pct is not null group by job_id having max(salary)>12000;
+						案例3：查询领导编号大于102的每个领导手下的最低工资大于5000的领导编号是哪个，以及其最低工资
+							a查询领导编号大于102的每个领导手下的员工最低工资
+								select min(salary),manager_id from employees where manager_id>102 order by manager_id；
+							b.根据a的结果筛选，查询哪个工资低于5000
+								select min(salary),manager_id from employees where manager_id>102 order by manager_id having min(salary)>5000；
+					4.按表达式或函数分组
+						示例1：按员工姓名的长度分组，查询每一组的员工个数，筛选员工个数大于5的有哪些	
+							a.查询每个长度的员工个数							
+								select count(*)，length(last_name) as len_name from employees order by length(last_name);
+							b.添加筛选条件
+								select count(*) as c，length(last_name) as len_name from employees order by length(last_name) having count(*)>5;
+								select count(*) as c，length(last_name) as len_name from employees order by len_name having c>5;
+					5.按多个字段分组
+						案例：查询每个部门每个工种的员工的平均工资
+							select avg(salary),department_id,job_id from employees group by department_id,job_id;   将department_id,job_id相等的放在一个组
+					6.添加排序
+						案例：查询部门编号不为空的每个部门每个工种的员工的平均工资高于10000的，并且按照平均工资的高低显示
+							select avg(salary),department_id,job_id from employees where department_id is not null group by department_id,job_id having avg(salary)>1000 order by avg(salary) desc; 
+			进阶6：连接查询（beauty、boy表） where+连接条件
+				含义：多表查询，当查询的字段来自于多个表时，就会用
+				笛卡尔乘积现象：表1 m行；表2 n行；结果有m*n行
+					原因：没有有效的的连接条件
+					示例1：
+						select beautyname，boyname from boy，beauty where beauty.boyfriend_id=boy.id;
+				语法：select 字段1，字段2  from 表名 where 连接条件 and 筛选条件 group by 分组条件 having 分组后的筛选条件 order by 子句；
+				分类：
+					按年代分类：
+						sql1992标准：仅支持内连接
+						sql1999标准【推荐】：支持内连+外连（处全外）+交叉
+					按功能分类：		
+						内连接：
+							等值连接
+							非等值连接
+							自连接
+						外连接：
+							左外连接
+							右外连接
+							全外连接
+						交叉连接
+				1.sql1992标准
+					1.等值连接：
+						特点：
+							1.多表等值连接的结果为多表的交集部分
+							2.n表连接，至少需要n-1个连接条件
+							3.多表的顺序没有关系
+							4.一般需要为表起别名
+							5.可以搭配前面的所有子句使用
+						示例1：查询女神名和对应的男神名
+					 		select beautyname，boyname from boy，beauty where beauty.boyfriend_id=boy.id;
+						示例2：查询员工名和对应的部门名
+							select last_name，department_name from employees,departments where employees.department_id=departments.department_id;
+					为表起别名
+						好处：区分多个重名字段、提高语句的简洁度
+						note：如果为表起了别名，则查询的字段就不能使用原来的表名限定
+							select last_name，employees.job_id, job_title from employees as e, jobs as j where e.`job_id`=j.`job_id`;   语法错误
+						示例1：查询员工名、工种号、工种名
+							select last_name，employees.job_id, job_title from employees,jobs where employees.`job_id`=jobs.`job_id`;
+							select e.last_name，e.job_id, j.job_title from employees as e, jobs as j where e.`job_id`=j.`job_id`;
+					两个表的顺序是否可以调换
+							可以
+					可以加筛选吗	and
+						案例1：查询有奖金的员工名和部门名
+							select last_name，department_name from employee as e，department as d where e.`department_id`=d.`department_id` and e.commission_pct is not null;
+						案例2：查询城市名中第二个字符为o的对应的部门名和城市名
+							select department_name，city from department as d，city_locations as l where d.`location_id`=l.`location_id` and city like '_o%';
+					可以加分组吗
+						案例1：查询每个城市的部门个数
+							select count(*) as 个数, city from  department as d，city_locations as l  where d.`location_id`=l.`location_id` group by city；
+						案例2：查询有奖金的每个部门的部门名和部门的领导编号以及该部门的最低工资
+							select min(salary)，department_name，d.manager_id from employees as e，department as d where e.'department_id`=d.`department_id`  and e.commission_pct is not null group by department_name,d.manager_id;
+					加排序
+						示例1：查询每个工种的工种名和员工个数，并且按员工个数降序显示 
+							select job_title，count(*) from employees as e, jobs as j where e.'job_id'=j.'job_id' group by job_title order by count(*) desc;
+					三表连接
+						示例：查询员工名、部门名和所在城市
+							select last_name，department_name，city from employees as e，departents as d，locations as l where e.'department_id`=d.'department_id` and d.'location_id'=l.'location_id';
+					2.非等值连接
+						案例1：查询员工的工资和工资级别
+							select salary grade_level from employees as e，job_grade as g where salary between g.`lowest_sal` and g.`highest_sal`;
+					3.自连接：一张表找了多遍
+						示例：查询员工名以及上级的名称
+							select e.employee_id，e.last_name（员工的编号和姓名），m.employee_id，m.last_name（领导的编号的姓名） from employees as e，employees as m where e.manager_id=m.`employee_id`；
+				2.sql1999标准
+					语法：
+						select 查询列表 from 表1 别名 【连接类型】join 表2 别名 on 连接条件 where 筛选条件 group by 分组 having 筛选 order by 子句
+					连接类型：
+						内连接：inner  左外：left 【outer】 右外：right 【outer】 全外：full 【outer】   交叉：cross【outer】
+					1.内连接：
+						语法：
+							select 查询列表 from 表1 别名 inner join 表2 别名 on 连接条件 where 筛选条件 group by 分组 having 筛选 order by 子句
+						等值连接：
+							特点：
+								1.inner可以省略
+								2.筛选条件放在where后面，连接条件放在on后面
+								3.添加排序、筛选、分组
+								4.inner join连接和sql1992中的等值连接实现的效果一样，都是查询多表的交集
+							案例1：查询员工名、部门名
+								select last_name，department_name from employees as e inner join department as d on e.'department_id'=d.'department_id';
+							案例2：查询名字中包含e的员工名和工种名（添加筛选）
+								select last_name，jod_title from employees as e inner join jobs as j on e.`job_id`=j.`job_id` where last_name like '%e%';
+							案例3：查询(每个城市)部门个数大于3的城市名和部门个数（添加分组+筛选）
+								select city，count(*) as 部门个数 from locations as  l inner join departments as d on d.'location_id'=j.'location_id'  group  by city having count(*)>3;
+							案例4：查询哪个部门员工个数大于3的部门名和员工个数，并按照个数降序（添加排序）
+								a查询每个部门的员工个数
+									select count(*)，department_name from employees as e  inner join departments as d on e.'department_id'=d.'department_id' group by department_name；
+								b筛选员工个数大于3 的记录
+									select department_name，count(*) from departments as d inner join employees as e on e.'department_id'=d.'department_id' group by department_name having count(*)>3 order by count(*) desc;
+							案例5：查询员工名、部门名、工种名、并按照部门名降序（三表连接）
+								select last_name，department_name，job_title from employees as e  inner join departments as d on e.'department_id'=d.'department_id' inner join jobs as j on e.	`job_id`=j.`job_id` order by department_name desc;
+						非等值连接:
+							案例1：查询员工的工资级别
+								select salary，grade_level from employees as e inner join job_grade as j on e.`salary` between j.'lower_sal' and j.`hignest_sal`;
+							案例2：查询每个工资级别的个数大于20的个数，并按工资级别降序
+								select salary，grade_level，count(*) from employees as e inner join job_grade as j on e.`salary` between j.'lower_sal' and j.`hignest_sal` group by grade_level having count(*)>20 order by grade_level desc;
+						自连接；
+							案例：查询姓名中包含字符k的员工的名字，上级的名字
+								select e.last_name，m.last_name from employee as e inner join employee as m on e.`manager_id`=m.`employee_id` where e.last_name like '%k%';
+					2.外连接
+						应用场景：用于查询一个表中有，另一个表中没有的记录
+						特点：
+							1.外连接的查询结果为主表中的所有记录，如果从表中有和主表匹配的，则显示匹配的结果，如果从表中没有和主表匹配的，则显示NULL，外连接的结果=内连接结果+主表中有而从表没有的记录
+							2.左外连接：left join左边的是主表   右外连接：right join右边的是主表 
+								一般，要查询的信息主要来自哪个表，哪个表就是主表
+							3.左外和右外如果交换两个表的顺序可以实现同样的效果
+							4.全外连接=内连接+表1中有表2没有的+表2中有表1没有的
+							5.一般用于查询除了交集部分的剩余不匹配的行
+						案例1：查询男朋友不再男神表的女神名
+							select b_name from beauty as b left join boys as bo on b.boyfriend_id=bo.boy_id where bo.boy_id is not null；  左外连接
+							select b_name from boys as bo roght join beauty as b on b.boyfriend_id=bo.boy_id where bo.boy_id is not null；  右外连接
+						案例2：查询哪个部门没有员工
+							思路：最终要查询的是没有员工的部门，部门表为主表
+							select d.* e.employee_id from departments as d left join eployees as e on d.department_id=e.department_id where e.employee_id is null;
+						全外连接：full join
+							select b.*, bo.*  from beauty as b full join boys as bo on b.boyfriend_id=bo.boy_id where bo.boy_id is not null；  
+		
+					3.交叉连接：cross join
+						特点：笛卡尔乘积
+				总结：内连接：A表与B表的交集
+				          左外：A并上A表与B表的交集      右外：B并上A表与B表的交集
+				          A去掉A表与B表的交集：左外连接+where 子句（B表即从表的主键列不为空）
+				          B去掉A表与B表的交集：右外连接+where 子句（A表即从表的主键列不为空）
+					案例：查询部门名为SAL和IT的员工信息
+						分析：有可能部门名为SAL和IT的部门没有员工，所以不能用内连接，部门表为主表
+						select e.*, d.department_name from departments as d left join emlpoyees as e on d.`department_id`=e.`department_id` where d.department_name in(SAL, IT)；	
+			进阶7：子查询
+				含义：嵌套在其他语句中的select查询语句，成为子查询或内查询
+					外部的查询语句：称为主查询或外查询
+				分类：
+					按子查询出现的位置:
+						select后面：标量子查询
+						from后面：表子查询
+						*where或having后面：标量子查询（单行）、列子查询（多行）、行子查询			
+						exist后面（相关子查询）：都可以
+					结果集的行列数不同
+						标量子查询：结果集有一行一列
+						列子查询：结果集有一列多行
+						行子查询：结果集有一行多列
+						表子查询：结果集一般为多行多列
+				1.where或having后
+					特点：
+						1.子查询放在小括号内
+						2.子查询一般放在条件的右侧
+						3.标量子查询，一般搭配单行操作符（条件运算符）使用，比如> 、<、 =、<> 、>= 、<=
+						   列子查询，一般搭配多行操作符使用，比如in/not in，any/some，all、
+						4.子查询的执行优先与主查询的执行，主查询的条件用到了子查询的结果
+					标量子查询（单行子查询）：
+						案例1：谁的工资比Abel高
+							思路：a查询Abel的工资，结果集为一行一列
+								select salary from employees where last_name='Abel'；
+							          b查询员工的信息，满足员工的工资大于a的结果
+								select * from employees where salary>（select salary from employees where last_name='Abel'）；
+						案例2：查询job_id与141号员工相等，salary比143号员工多的员工姓名，job_id和工资
+							a查询141号员工的job_id，结果为一行一列
+								select job_id from employees where employee_id=141；
+							b查询143号的员工的工资，结果为一行一列
+、								select salary from employees where employee_id=143；
+							c查询job_id等于a，工资大于b的员工姓名，job_id和工资
+								select last_name，job_id，salary from employees where job_id=(select job_id from employees where employee_id=141) and salary>(select salary from employees where employee_id=143);
+						案例3：查询公司工资最少的员工的last_name，job_id，salary
+							a.查询工资最少是多少 	
+								select min(salary) from employees；
+							b查询工资等于a的员工的last_name，job_id，salary
+								select last_name，job_id，salary from employees where salary=(select min(salary) from employees);
+						案例4：查询最低工资大于50号部门最低工资的部门id和其最低工资
+							a查询50号部门最低工资
+								select min(salary) from employees where department_id>50；
+							b查询每个部门的最低工资
+								select  min(salary)，department_id from employeesgroup by department_id;
+							c筛选b大于a的部门id和其最低工资
+								select  min(salary)，department_id from employeesgroup by department_id having min(salary)>(select min(salary) from employees where department_id>50);							
+					列子查询（多行子查询）：
+						多行操作符：
+							in/not in：等于列表中的任意一个
+							any/some：和子查询返回的某一值比较
+							all：和子查询返回的所有值比较
+						案例1：查询location_id是1400或1700的部门中所有的员工姓名
+							a查询location_id是1400或1700的部门编号，结果为一列多行
+								select diastinct department_id where departments where location_id in(1400,1700);
+							b查询员工姓名，要求部门号是a列表中某一个
+								select last_name from employees where department in(select diastinct department_id where departments where location_id in(1400,1700));   in可以替换为=any   not in可以替换为<>all
+								select last_name from employees where department=any(select diastinct department_id where departments where location_id in(1400,1700));
+						案例2：查询其他员工工种中比job_id为IT_PROT工种任一工资低的员工的员工号、姓名、job_id、salary 						
+							a查询job_id为IT_PROT部门的任一工资
+								select diatinct salary from employees where job_id='IT_PROT'
+							b查询员工号、姓名、job_id、salary，以及salart小于a中任意一个
+								select job_id，employee_id，last_name from employees where salary<any(select diatinct salary from employees where job_id='IT_PROT') and job_id <>'IT_PROT';
+								select job_id，employee_id，last_name from employees where salary<(select diatinct max(salary) from employees where job_id='IT_PROT') and job_id <>'IT_PROT';
+					          	案例3：查询其他员工工种中比job_id为IT_PROC工种的所有工资都低的员工的员工号、姓名、job_id、salary 
+							a查询job_id为IT_PROT部门的所有工资
+								select diatinct salary from employees where job_id='IT_PROT'；
+							b查询员工号、姓名、job_id、salary，以及salary小于a中所有记录
+								select job_id，employee_id，last_name from employees where salary <all(select diatinct salary from employees where job_id='IT_PROT') and job_id <>'IT_PROT';
+								select job_id，employee_id，last_name from employees where salary <(select diatinct min(salary) from employees where job_id='IT_PROT') and job_id <>'IT_PROT';
+					行子查询：
+						案例1：查询员工编号最小并且工资最高的员工信息
+							a查询最小工资员工编号
+								select min(employee_id) from employees;
+							b查询最大员工工资
+								select max(salary) from employees;
+							c查询员工编号最小并且工资最高的员工信息
+								select * from employees where employee_id=(select min(employee_id) from employees) and salary=(select max(salary) from employees);
+								select * from employees where (employee_id,salary)=(select min(employee_id),max(salary) from employees);    行子查询
+				2.select后面的查询
+					案例1：查询每个部门的员工个数
+						select d.*,(select count(*),department_id from employees as e where e.department_id=d.department_id) as 个数 from departments as d;
+					案例2：查询员工号为102的部门名
+						select （select department_name from departments as d inner join employees as e on d.department_id=e.department_id where job_id=102）部门名；
+				3.from后面
+					注意：
+						将子查询的结果充当一张表，要求必须起别名
+					案例1：查询每个部门的平均工资的工资等级
+						a查询每个部门的平均工资
+							select avg(salary),department_id from emlpoyees group by department_id;
+						b.连接a的结果集和job_grade，筛选条件为平均工资在lowest_sal和highest_sal之间
+							select ag_dep.*,g.grade_level  from (select avg(salary) as ag,department_id from emlpoyees group by department_id) as avg_dep inner join job_grades as g on avg_dep.ag between lowest_sal and highest_sal;
+				4.exist后面（相关子查询）
+					语法：
+						exists(完整的查询语句)，最终结果有两种1（存在） 0（不存在）
+					案例1：查询有员工的部门名
+						select department_name from departments as d where exist(select * from employees as e where d.department_id=e.department_id);
+						select department_name from departments as d where d.department_id in(select department_id from employees);
+					案例2：查询没有女朋友的男神信息
+						select bo.* from boys as boy where bo.boy_id not in(select boyfriend_id from beauty);	
+						select bo.* from boys as bo where not exists(select select boyfriend_id from beauty where bo.boy_id=beauty.boyfriend_id				
+				案例：查询各部门中工资比本部门平均工资高的员工的员工号、姓名和工资
+					a查询各部门的员工平均工资
+						select avg(salary),department_id from employees group by department_id;
+					b连接a的结果集和emlpoyees表，进行筛选
+						select last_name,salary,job_id,e.department_id from employees as e inner join (select avg(salary) as ag, department_id from employees group by department_id) as avg_dep on e.department_id=avg_dep.department_id where e.salary>avg_dep.ag;
+				案例：查询和姓名中包含字母u的员工在相同部门的员工的员工号和姓名
+					a查询包含字母u的员工的部门号
+						select distinct department_id from employees where last_name like '%u%';
+					b查询部门号在a中任意一个的员工的员工号和姓名
+						select job_id，last_name from employees where department_id in(select distinct department_id from employees where last_name like '%u%');
+				案例：查询管理者是king的员工姓名和编号
+					a查询姓名为King的员工编号
+						select employee_id from employees where last_name='king'；
+					b查询管理者编号为1的员工姓名和编号
+						select last_name，employee_id from employees where manager_id in(select employee_id from employees where last_name='king');
+				案例：查询平均工资最低的部门信息
+					方法一：
+					a.查询各部门的平均工资
+						select avg(salary),department_id from employees group by department_id;
+					b.在a中查询最低工资
+						select min(ag_dep.ag) from (select avg(salary) as ag,department_id from employees group by department_id) as ag_dep;
+					c.查询哪个部门的平均工资等于b		
+						select avg(salary),department_id from employees group by department_id having avg(salary)=(select min(ag_dep.ag) from (select avg(salary) as ag,department_id from employees group by department_id) as ag_dep);
+					b.查询部门信息
+						select * from departments as d where d.department_id=(select department_id from employees group by department_id having avg(salary)=(select min(ag_dep.ag) from (select avg(salary) as ag,department_id from employees group by department_id) as ag_dep));
+					方法二：
+					b.排序求出最低平均工资
+						select avg(salary),department_id from employees group by department_id order by avg(salary) limit 0,1;
+					c.查询部门信息
+						select * from departments where department_id=(select department_id from employees group by department_id order by avg(salary) limit 0,1);
+				案例：查询平均工资最低的部门信息
+					方式1：连接查询
+						select d.*, ag  from departments as d inner join (select avg(salary) as ag,department_id from employees group by department_id order by avg(salary) limit 0,1) as ag_dep on d.department_id=ag_dep.departemnt_id;
+				案例：查询公司中所有manager的详细信息
+					a查询公司所以manager的员工编号
+						select distinct manager_id from employees 
+					b查询详细信息，满足employee_id=manager_id
+						select * from employees where employee_id in(select distinct manager_id from employees);
+				案例：求各个部门中最高工资中最低的那个部门的最低工资是多少
+					a查询各部门的最高工资中工资最低的部门编号
+						select department_id from employees group by department_id order by max(salary) limit 0,1；
+					b.查询a结果中那个部门的最低工资
+						select min(salary),department_id from employees where department_id=(select department_id from employees group by department_id order by max(salary) limit 0,1);
+			进阶8：分页查询
+				应用场景：当要显示数据一页显示不全，需要分页提交sql请求
+				语法：
+					select 查询列表 from 表 【join type】表2 on 连接条件 where 筛选条件 group by 分组字段 having 分组后的筛选 order by 排序字段 limit offset，size；
+					offset：要显示条目的起始索引，这里是从0开始的
+					size：要显示的条目个数
+				特点：	
+					1.limit语句放在查询语句最后
+					2.公式：要显示的页数page，每页的条目数size，则limit size*(page-1)，
+				案例1：查询前5条员工信息
+					select * from employees limit 0,5；
+				案例2：查询第11条到25条
+					select * from employees limit 10,15；
+				案例3：有奖金的员工信息，并且工资较高的前10名显示出来
+					select * from employees where commission_pct is not null order  by salary desc limit 0，10；
+				note：查询语句执行顺序
+					from 表1->连接表2->on连接条件->where筛选->group by->having筛选->select->order by->limit
+			进阶9：联合查询union
+				含义：将多条查询语句的结果合并成一个结果
+				语法：查询语句1 union 查询语句2；
+				应用场景：
+					1.当查询结果来自多个表，且多个表之间没有任何关联，但查询信息一致时
+				注意事项：
+					1.要求多条查询语句的查询列数一致；
+					2.要求多条查询语句的查询的每一列的类型顺序一致
+					3.union关键字默认去重，union all不去重
+  	8.DML数据操作语言
+		数据操作语言：插入、修改、查询
+		1.插入语句：
+			方式1：
+			语法：
+				insert into 表名(字段名...) values(值1，值2，...);
+			注意事项：	
+			       1：插入的值的类型需要和列的类型一致或兼容
+				insert into beauty(id,name,sex,borndate,phone,photo,boyfriend_id) values(13,'唐艺昕','1990-4-23','18909876543',NULL,2);
+			       2：不可以为null的列必须插入值，可以为NUL的列如何插入值	
+				方式一：字段写了，NULL也要写
+					insert into beauty(id,name,sex,borndate,phone,photo,boyfriend_id) values(13,'唐艺昕','1990-4-23','18909876543',NULL,2);
+				方式二：字段和NULL都没有写
+					insert into beauty(id,name,sex,borndate,phone,,boyfriend_id) values(13,'唐艺昕','1990-4-23','18909876543',2);
+			      3：字段的顺序可以调换
+			      4：列数和值的个数必须一致
+			      5：可以省略字段，默认所有列，而且列的顺序和表中列的顺序一致
+			方式2:
+`			语法：
+				insert into 表名 set 列名=值，列名=值。。。
+			示例1：insert into beauty set id=15，name='刘涛'，phone='1123';
+			两种方式比较：
+				1.方式1支持插入多行
+					insert into 表名(字段名，。。。) values( ),values( ),...;
+				2.方式1支持子查询
+					insert into beauty(id,name,phone) select 26,'宋茜','118';    将查询语句的结果集插入到beauty表中
+		2.修改语句
+			1.修改单表中的记录
+				语法：
+					update 表名 set 列=值,列=值，...  where 筛选条件         如果字符和日期型数据加‘’
+				案例：修改beauty表中姓唐的女神的电话为1234567890
+					update beauty set phone='1234567890' where name like '唐%'；
+				案例2：修改boy表中的id为2的name为张飞，魅力值10
+					update boy set name='张飞', usercp=10 where id=2;
+			2.修改多表的记录
+				语法：
+					sql1992语法：
+						update 表名1 别名，表名2 别名  set 列=值,列=值，...  where 连接条件 and 筛选条件
+					sql1999语法
+						update 表名1 别名 inner|left|right join 表名2 别名  on 连接条件 set 列=值,列=值，...  where 筛选条件 
+				案例1：修改张无忌的女朋友的手机号为110
+					update boys as bo inner join beauty as b on bo.id=b.boyfriend_id set b.phone='110' where bo.name='张无忌'；
+				案例2：修改没有男朋友的女神的男朋友都为张飞
+					update beauty as b left join boys as bo on bo.id=b.boyfriend_id set b.boyfriend_id=2 where bo.id is null;
+			3.删除语句（按行删除）
+				方式1：
+					1.单表删除
+						语法：
+							delete from 表名 where 筛选条件 【limit 条目】
+						案例1：删除beauty表中手机号最后一位为9的女神信息
+							delete from beauty where phone like '%9';
+					2.多表删除（级联删除）
+						sql1999语法：
+							delete 表1的别名，（或）表2的别名 from 表1 别名 inner|left|right join 表2 别名 on 连接条件 where 筛选条件；
+						案例1：删除张无忌的女朋友的信息
+							delete b from beauty as b inner join boys as bo on bo.id=b.boyfriend_id where bo.boyname='张无忌'；
+						案例2：删除黄晓明以及他女朋友的信息
+							delete b，bo from beauty as b inner join boys as bo on bo.id=b.boyfriend_id where bo.boyname='黄晓明'；
+				方式2：
+					语法：
+						truncate table 表名；  不允许有筛选条件，将整个表的数据全部删除
+				*区别：
+					1.delete可以加where条件，truncate不可以
+					2.truncate的效率略高
+					3.加入要删除表中有自增长列，如果用delete删除后，再插入数据，自增长列的值从断点开始，而truncate删除后，在插入数据，自增长列的值从1开始
+					4.truncate删除没有返回值，而delete有返回受影响的行数
+					5.truncate删除不能回滚，而delete删除可以回滚		
+	9.DDL数据定义语言
+		1.库的管理：
+			1.创建create
+				语法：
+					create database 库名；
+				案例：创建books库，如果有就不创建，如果没有则创建
+					create database if not exists books；
+			2.修改库
+				修改库名：
+					rename database books to 新的库名
+				修改字符集：
+					alter database books character set 新的字符集；
+			3.删除库
+				drop database if exists 库名；  存在则删除，不存在则不处理
+		2.表的管理
+			1.创建create
+				语法：
+					create table  if not exists  表名（列名 列的类型【 (长度) 约束】，列名 列的类型【 (长度) 约束】，...）;
+				案例1：创建book表
+					create table book(id int, bname varchar(20), price double, author_id int, publishdate datetime);
+				案例2：创建author表
+					create table author(id int, au_name varchar(20), nation varchar(10));
+			2.修改表alter
+				语法：
+					alter table 表名 add|drop|modify|change column 列名 【列类型 约束】；
+				修改列名：
+					alter table book change column publishdate pubdate datetime（类型）；
+				修改列的类型或约束
+					alter table book modify column pubdate timestamp（类型）；
+				添加新列
+					alter table author add column annual double 【first|after 字段名】；
+				删除列
+					alter table author drop column annual；
+				修改表名	
+					alter table author rename to book_author；			
+			3.删除drop
+				语法：
+					drop table  if exists 表名；
+			4.表的复制
+				仅仅复制表的结果
+					create table anthor_copy like author；
+				复制表的结构和数据
+					create table anthor_copy select * from author；
+				只复制部分数据
+					create table anthor_copy select id，au_name from author where nation='中国'；
+				复制表的部分结构
+					create table anthor_copy select id，au_name from author where 0；
+				案例：在test库中，将库my_employee中的表departments中的数据复制到test库的新表dept2中
+					create table dept2 select * from my_employee.departments
+			5.数据类型
+				数值型：
+					整形：tinyint（1个字节）、smallint（2个字节）、mediumint（3）、int|integer（4）、bigint（8）
+						特点：
+							1.如果不设置无符号还是有符号，默认是有符号的，如果想设置无符号，需要添加unsigned关键字
+							2.如果插入的数据超出了整形的范围，会报out of range异常，并且插入的是临界值
+							3.如果不设置长度，会有默认的长度，这个长度代表显示结果的最大宽度，如果不够，会有0在左边填充，但必须搭配zerofill使用，且默认变为无符号型；
+						1.如何设置无符号和有符号
+							案例1：create table tab_int (t1 int);     
+							            insert into tab_int values(-123456);    插入成功，说明t1为有符号int型
+							案例2：create table tab_int (t1 int，t2 int unsigned);     指定t2位无符号类型
+						2.如果插入的数据超出了整形的范围，
+							案例：create table tab_int (t1 int，t2 int unsigned);  
+							           insert into tab_int values(2147483648，4294967296);   t1和t2的值都超过了最大临界值，   会出警告错误
+						3.如果不设置长度，会有默认的长度
+							案例：create table tab_int (t1 int(7) zerofile，t2 int(7) zerofile);     
+							
+					小数：
+						分类：
+							定点数：dec(m,d)、decimal(m,d)
+							浮点型：float(m.d)、double(m,d)
+						特点：
+							1.m和d：m代表整数部位和小数部位的位数，d代表小数点后的位数，如果超过范围，则插入临界值
+							2.m和d都可以省略，但是如果是dec定点型，m默认为10，d默认为0，如果是float和double，则会根据插入数值的精度来决定精度
+							3.定点型的精确度较高一点，如果要求插入数值的精度较高如货币运算则考虑使用
+						原则：
+							所选择的类型越简单越好，，能保存的数据越小越好
+				字符型：
+					较短的文本：char(m)、varchar(m)，
+						枚举型：enum
+							create table tab_enum(c1 enum('a','b','c'));
+							insert into tab_enum values('a');
+							insert into tab_enum values('a','A');	
+							insert into tab_enum values('m');   插入失败
+						集合类型：set
+							create table tab_set(s1 set('a','b','c','d'));
+							insert into tab_set values('a');	
+							insert into tab_enum values('a','b');	
+							insert into tab_enum values('a','b','c');	
+						区别：
+							1.char代表固定长度的字符，m代表最大的字符数，可以省略，默认为1，比较占空间，效率较高
+							2.varchar代表可变长度的字符，m代表最大的字符数，m不可以省略，比较省空空间 ，效率较低				
+					较长的文本：text、blob(较长的二进制数)		
+				日期型：
+					类型：
+						1.date：保存年月日
+						2.datetime：
+						3.timestamp：时间戳
+						4.time:保存时分秒
+						5.year：保存年
+					datetime和timestamp区别：
+						1.timestamp，4个字节，支持的时间范围小（1970-2038），和实际时区有关，属性受版本影响
+						2datetime，8个字节，支持的时间范围大（1000-9999）
+			6.常见约束
+				含义：一种限制：用于限制表中的数据，为了保证表中的数据的准确和可靠性
+				类型
+					1.not nul：非空约束，该字段的值不能为空，比如，姓名、学号等字段
+					2.default：默认约束，用于保证该字段有默认值，比如，性别
+					3.primary key：主键约束，用于保证该字段的值具有唯一性，并且不能非空，比如学号
+					4.unique：唯一约束，用于保证该字段的值具有唯一性，并且可以非空，比如座位号
+					5.check：检查约束，mysql不支持，比如性别，只能写男或女，或者年龄必须在一定范围内
+					6.foreign key：外键约束，用于限制两个表的关系，用于保证该字段的值必须来自主表的关联列的值
+						在从表添加外键约束，用于引用主表的某列的值，比如专业编号，部门编号
+				主键和唯一的对比：
+					1.主键：保证与唯一性，不允许为空，一个表中至多有一个主键，允许两个列组合成一个主键（不推荐）
+							constraint pk primary key(id，stu_name)
+					2.唯一：保证与唯一性，允许为空，但只能有一个为空，一个 表中可以有多个唯一键，允许两个列组合成一个唯一键（不推荐）
+				外键的特点：
+					1用于限制两个表的关系，从表的字段值引用了主表的某字段值，要求在从表设置外键关系
+					2.从表的外键列的类型和主表的关联列的类型要求一致或兼容，名称无要求
+					3.主表的被引用列必须是一个key（一般为主键）
+					4.插入数据时，应先插入主表，再插入从表；删除时，先删除从表，再删除主表
+					补充：可以通过以下两种方式删除主表的记录
+						1.级联删除
+							案例1:在删除主表major的id为3的记录时，把从表中major_id为3的记录也一并删除
+								删除原来的外键：
+									alter table stuinfo drop foreign key  fk_stu_major；
+								添加外键方式：
+									alter table stuinfo add constraint fk_stu_major foreign key(major_id) refernece major(id) on delete cascade;
+								删除：
+									delete from major where id=3;   此时major表的id为3的行删除，stuinfo中major_id为3的行也全部删除
+						2.级联置空
+							案例1:在删除主表major的id为3的记录时，把从表中major_id为3的记录置空
+								删除原来的外键：
+									alter table stuinfo drop foreign key  fk_stu_major；
+								添加外键方式：
+									alter table stuinfo add constraint fk_stu_major foreign key(major_id) refernece major(id) on delete set null;
+								删除：
+									delete from major where id=3;     此时major表的id为3的行删除，stuinfo中major_id为3的这一行中的major_id项为空
+				添加约束的时机：		
+					1.创建表的时候：
+						1.添加列级约束
+							语法：
+								直接在字段名和类型后追加约束，只支持默认、非空、主键、唯一约束，不支持外键、check约束
+							create database students；
+							use students;
+							create table major(id int primary key, major_name varchar(20));
+							create table stuinfo(id int primary key, stuname varchar(20) not null, gender char(1) check(gender in('男'，'女')), seat int unique, age int default 18, major_id int  reference major(id));
+						2.添加表级约束：
+							语法：
+								在各个字段的最后面【constraint    约束名】 约束类型 (字段名)
+							案例：
+								create table stuinfo(id int, stuname varchar(20), gender char(1), seat in, age int, major_id int， constraint pk primary key(id), constraint uq unique(seat), constraint ck check(gender='男' or gender='女')， constraint fk_stuinfo_major foreign key(major_id) references major(id));
+						通用写法：一般外键放在表级约束，其他放在列级约束
+							create table if not exists stuinfo(id  int  primary key, stu_namae varchar(20) not null, gender char(1), age  int default 18, seat int unique, major_id，constraint fk_stuinfo_major froeign key(major_id) references major(id));
+					2.修改表的时候添加约束：
+						drop table if exists stuinfo；
+						create table stuinfo(int int, stu_name varchar(20), gender char(1), seat int, age int , major_id int);
+						语法：
+							1.表级约束：
+								alter table 表名 add 【constraint 约束名】约束类型(字段名)
+							2.列级约束
+								alter table 表名 modify column 字段名 字段类型 新约束；
+						1.添加非空约束
+							alter table stuinfo modify column stuname varchar(20) not null;
+						2.添加默认约束
+							alter table stuinfo modify column age int default 18;
+						3.添加主键约束
+							alter table stuinfo modify column id int primary key;  列级约束写法
+							alter table stuinfo add primary key(id);     表级约束写法
+						4.添加唯一约束
+							alter table stuinfo modify column seat int unique;
+							alter table stuinfo add unique(seat); 
+						5.外键约束(表级约束，没有效果)
+							alter table stuinfo add 【constraint fk_stuinfo_major】 foreign key(major_id) references major(id); 
+				修改表时删除约束：
+					1.删除非空约束
+						alter table stuinfo modify column stuname varchar(20) null;
+					2.删除默认
+						alter table stuinfo modify column age int;
+					3.删除主键
+						alter table stuinfo drop primary key;     表级约束写法
+					4.删除唯一
+						alter table stuinfo drop index seat(约束名); 
+					5.删除外键
+						alter table stuinfo drop forengn key fk_stuinfo_major;
+				约束的添加分类：
+					1.列级约束：六大约束语法上都支持，但外键约束没有效果，列级约束可以再一个字段添加多个，空格隔开
+						字段名 字段类型 列级约束
+					2.表级约束：除了非空和默认，其他都可以	
+					区别：
+						1.位置不同
+						2.支持的约束类型，列级支持所有，但外键没有效果，表级默认和非空都不支持
+						3.是否可以起名，列级不可以，表级可以、但主键起名没有效果	
+			7.标识列：自增长列
+				含义：可以不用手动的插入值，系统提供默认的序列值，默认从1开始，步长也为1
+				特点：
+					1.标识列不一定和主键搭配，但必须是一个key
+					2.一个表中只能有一个标示列
+					3.标识列的类型只能是数值型
+					4.标识列可以通过set auto_increamnet_increament=3;设置步长
+					   通过手动插入指定值，设置起始值
+				1.创建表时设置标识列
+					create table tab_iddentity(id int primary key auto_increament, name varchar(20));
+					insert into tab_identity values(NULL,'john');
+				2.修改表时设置标识列
+					alter table tab_iddentity modify  column id int primary key auto_increamnet;
+				3.修改表时删除标识列
+					alter table tab_iddentity modify  column id int primary key;
+				
+TCL事务控制语言
+	事务：一个或一组sql语句组成的一个执行单元，这个执行单元要么全部执行，要么全不执行。  案例：转账
+	*事务的特性：
+		1.原子性：指事务不可再分，事务中的操作要么全部执行，要么全不执行。
+		2.持久性：事务一旦被提交，它对数据库数据的改变是永久性的。
+		3.一致性：事务必须使数据库从一个一致性状态转换到另一个一致性状态。如转账前后总金额一致
+		4.隔离性：一个事务的执行不受其他事务的干扰
+	事务的创建：
+		1.隐式事务：事务没有明显的开启和结束的标记，比如insert、update、delete语句
+		2.显式事务：事务具有明显的开启和结束的标记，
+			前提：先设置自动提交功能为禁用，使用命令：set autocommit=0；只针对当前事务有效
+			步骤：		
+			1.开启事务：set autocommit=0；
+				   start transaction；   可选的
+			2.编写事务中的sql语句（一般为增、删、该、查，不可以为DDL语言）
+			3.结束事务：
+				commit：提交事务
+				rollback：回滚事务
+			示例：演示事务的使用步骤		
+				1.set autocommit=0；
+				   start transaction；
+				2.update account set balabce=500 where username='张无忌'；
+				   update account set balabce=1500 where username='赵敏'；
+				3.commit；
+	savepoint的使用（搭配rollback使用）
+			set autocommit=0；
+			start transaction；
+			delete from account where id=25；
+			savepoint a；   设置保存点
+			delete from account where id=28；
+			rollback to a；回滚到保存点  
+	delete和truncate在事务中的区别
+			1.delete：支持回滚
+				set autocommit=0；
+				start transaction；
+				delete from account;
+				roolback;
+			2.truncate：不支持回滚，会实际删除
+				set autocommit=0；
+				start transaction；
+				delete from account;
+				roolback;     
+	并发事务：
+		多个事务同时访问数据库的同一个数据资源时
+		1.引起的问题：
+			脏读：对于两个事务T1、T2，T1读取了已经被T2更新但还没有被提交的字段之后，若T2回滚，T1读取的内容就是临时且无效的，即读到的数据时其他事物“更新”的数据
+			不可重复读：对于两个事务T1、T2，T1读取了一个字段，然后T2更新（提交）了该字段之后，T1再读取同一个字段，值就不同了。（同一个事务多次查询结果不同）
+			幻读：对于两个事务T1、T2，T1开启事务后从表中读取了一个字段，然后T2在该表中插入了并提交了一些新的行之后，如果T1再次读取同一个表，就会多几行。
+				即一个事务读取了其他事务还没有提交的数据，只是读到的数据时其他事物“插入”的数据
+		2.数据库事务的隔离级别
+			隔离级别：
+				1.read uncommited：读未提交的数据，会出现脏读、不可重复度、幻读
+				2.read commited：读已提交的数据，只允许事务读取已经被其他事务提交了的变更。避免了脏读，会出现不可重复度
+				3.repeatable read：可重复读，确保事务可以多次从一个字段读到相同的值，在这个事务持续期间，禁止其他事务对这个事务进行更新，避免了脏读和不可重复读，只有再次新开一个事务T3，读取数据时，才会读到更新后的数据
+				4.serializable：串行化，确保事务可以从一个表中读取相同的行，在这个事务持续期间，禁止其他事务对该表进行插入、更新和删除操作，所有并发问题就都可以避免，但性能低下。
+			orecal支持两种隔离级别：read uncommited（默认）、serializable
+			mysql支持四种隔离级别：repeatable read（默认）
+		3.常用命令：
+			1.查看当前的隔离级别：select @@tx_isolation;
+			2.设置当前mysql连接的隔离级别：set transaction isolation level 隔离级别
+			3.设置数据库系统的全局隔离级别：set global transaction isolation level 隔离级别 		
+			
+试图：
+	含义：本身是一个虚拟表，5.1版本出现的，和普通表一样使用，它的数据来自于表，通过执行时动态生成，只保存sql逻辑，不保存查询结果
+	举例：舞蹈班、普通班级对比
+	应用场景：
+		1.多个地方用到同样的查询结果
+		2.待查询的结果使用相同的sql语句
+	好处：
+		1.重用sql语句
+		2.保护数据，提高安全性
+		3.简化复杂的sql操作，不必知道它的查询细节
+	案例：查询姓张的学生名和专业名
+		方式1：
+			selete stu_name，major_name from stuinfo as s inner join major as m on s.major_id=m.id where s.stu_name like  '张%';
+		使用试图：
+			ceate view v1 as selete stu_name，major_name from stuinfo as s inner join major as m on s.major_id=m.id；
+			select * from v1 where  stu_name like  '张%';
+	1.试图的创建
+		语法：
+			create view 试图名 as 查询语句；
+		案例1：查询姓名中包含a字符的员工名、部门名和工种信息
+			create view myv1 as select last_name，department_name，job_title from employees as e inner join departments as d on e.'department_id'=d.'department_id' inner join jobs as  j on e.jod_id=j.job_id;
+			select * from myv1 where last_name  like '%a%';
+		案例2：查询各部分的平均工资级别
+			创建试图，查看每个部门的 平均工资
+				create view myv2 as select avg(salary) as ag,department_id  from employees group by department_id;
+			使用试图：
+				selelct myv2.ag, grade_level from myv2 inner join job_grades as g on myv2.ag between g.lowest_sal and g.highest_sal;
+		案例3：查询平均工资最低的部门信息
+			创建试图，查看每个部门的平均工资
+				create view myv2 as select avg(salary) as ag,department_id  from employees group by department_id;
+			创建试图并使用试图，查询最低工资的对应部门id
+				create view myv3 as select * from myv2 order by limit 0,1；
+			查询部门名和工资
+				select  d.*，myv3.ag from myv3 m inner join departments as d on m.dpartemnt_id=d,dpartemnt_id;
+	2.试图的修改
+		语法：
+			方式1：create or replace view 视图名 as 查询语句；存在则替换，不存在则创建
+			方式2：alter view 视图名 as 查询语句；
+	3.删除视图
+		语法：
+			drop view 视图名，视图名，....;
+	4.查看视图的结构类型
+		语法：
+			desc 视图名；
+			show create view 视图名；   效果不好
+	5.视图中数据的更新
+		1.可以更新的视图：
+			特点：修改了原来表的内容
+			create or replace view myv1 select last_name，email as annual_salary from employees; 
+			1.插入
+				insert into myv1 values('张飞'，'zf@qq.com');				
+			2.修改：
+				update myv1 set last_name='张无忌' where last_name='张飞'；
+			3.删除
+				delete from myv1 where last_name='张无忌'；
+		2.具备以下特点的视图不允许更新
+			1.包含关键字distinct、分组函数、group by、having、union、union all
+			2.常量视图 ，比如create or replace view myv1 select 'john' as name;
+			3.select中包含子查询
+			4.slect中有连接join
+			5.from一个不能更新的视图 
+			6.where子句的子查询引用了子句中的表
+	6.视图和表对比
+		1.创建的语法不同
+		2.是否实际占用物理空间，表占用了物理空间，但视图只保存了视图的物理逻辑
+		3.表可以增删改查，而视图一般不做增删改，只做查询
+变量：
+	类型：
+		系统变量
+			全局变量：
+			会话变量：作用域，仅仅针对客户端的一次连接
+		自定义变量
+			用户变量
+			局部变量
+	1.系统变量：
+		说明：变量由系统提供，不是用户定义的，属于服务器层面
+		作用范围：
+			服务器每次启动将为所有的全局变量赋初值，针对所有的会话【连接】都有效，但是不能跨重启
+		使用语法：
+			1.查看所有的系统变量：show global variables；show 【session】 variables；
+			2.查看满足条件的部分变量：show global 【session】variables  模糊查询；
+			3.查看指定的某个系统变量的值：select @@global|【session】.系统变量名       
+			4.为某个系统变量赋值：set global|s【session】 系统变量名=值； set @@global|【session】.系统变量名=值
+	2.用户变量：
+		说明：变量是用户自定义的，不是由系统提供的
+		作用域：针对当前会话或连接有效，应用在任何地方
+		使用步骤
+			1.变量的声明并初始化：set @用户变量名=值；    set @用户变量名:=值;      select @用户变量名:=值
+			2.变量的赋值（更新用户变量的值）
+				方式一：set @用户变量名=值；    set @用户变量名:=值;      select @用户变量名:=值
+				方式二：select 字段 into 变量名 from 表
+					示例：
+						set @count:=1;
+						select count(*) into  @count from employees;
+			3.使用（查看、比较、运算）
+				查看：select @用户变量名
+	3.局部变量
+		作用域：仅仅在局部有效，仅仅在它的begin和end中有效，且必须为begin和end第一句话
+		使用步骤：
+			1.声明：declare 变量名 类型
+			2.初始化：declare 变量名 类型 default 值；
+			3.赋值：	 
+				方式一：set 局部变量名=值；    set 局部变量名:=值;      select @局部变量名:=值
+				方式二：select 字段 into 变量名 from 表
+					示例：
+						set @count:=1;
+						select count(*) into  @count from employees;  
+			4.使用：
+				查看：select 局部变量名；
+	4.局部变量和用户变量区别：
+		1.作用域不同
+		2.定义和使用的位置，用户变量可以再任何位置，局部变量必须为begin和end第一句话
+		3.语法不同：用户变量赋值需要加上@符号，声明时需要限定类型，局部变量赋值一般不加，需要用select声明时才加，声明时不用限定类型
+		案例：声明两个变量并赋初值，求和
+			用户变量：
+				set @m=1;
+				set @n=2;
+				set @sum=@m+@n;
+				select @sum;
+			局部变量：
+				delare m int default 1;
+				delare n int default 2;
+				delclare sum int;
+				set sum=m+n;
+				select sum;
+					
+存储过程和函数
+	存储过程：
+		定义：一组预先编译好的sql语句的集合，可以可以理解成批处理语句
+		好处：
+			1.提高了代码的通用性
+			2.简化操作
+			3.减少了编译次数和数据库服务器的连接次数，提高了效率
+		1.创建语法：
+			create procedure 存储过程名(参数列表)
+			begin
+				存储过程体（一组sql语句）
+			end
+		2.注意事项：
+			1.参数列表包含三部分
+				参数模式：
+					in：该参数可以作为输入，该参数需要调用方传入值
+					out：该参数可以作为输出，该参数可以作为返回值		
+					inout：该参数可以作为输出又可以作为输入
+				参数名：
+				参数类型：
+			2.begin和end
+				1.如果存储结构体中只有一句话，begin和end可以省略
+				2.存储过程体中每条sql语句的结尾要求必须加分号，存储过程的结尾可以使用delimiter 结束标记重新设置结束标记
+		3.调用语法
+			call 存储过程名(实参列表)；
+			1.空参列表
+				案例：插入到admin表中5条记录
+					创建存过程
+					delimiter $
+					create procedure myp1( )
+					begin
+						insert into admin(username,password) values('john1',0000),('lily',0000),('rose',0000),('jack',0000),('tom',0000);
+					end $
+					调用：
+					call myp1()$
+			2.创建带in模式参数的存储过程
+				案例1：创建存储过程实现根据女神名查询对应的男神信息
+					创建存储过程
+						delimiter $
+						create procedure myp2(in beautyname varchar(20))
+						begin
+							select bo.* from boys as bo right join beauty as b on bo.id=b.boyfriend_id where b.name=beautyname;
+						end $
+					调用：
+						call myp2('柳岩')$
+				案例2：创建存储过程实现，用户是否登录成功
+					创建存储过程
+						delimiter $
+						create procedure myp3(in username varchar(20),in password varchar(20))
+						begin
+							declare result int default 0;
+							select count(*) into result from admin where admin.username=username and admin.passsword=password;
+							select result;
+							select if(result>0,'成功','失败');
+						end $
+					调用：
+						call myp3('张飞'，‘0000’)$
+			3.创建带out模式参数的存储过程
+				案例1：根据女神名，返回对应的男神名
+					创建存储过程
+						delimiter $
+						create procedure myp4(in beautyname varchar(20),out boyname varchar(20))
+						begin
+							select bo.boyname into boyname from boys as bo inner join beauty as b on bo.id=b.boyfriend_id where b.name=beautyname;
+						end $
+					调用：
+						set @bname$
+						call myp4('柳岩', @bname)$
+						select @bname$
+				案例2：根据女神名，返回对应的男神名和男神魅力值
+					创建存储过程
+						delimiter $
+						create procedure myp5(in beautyname varchar(20),out boyname varchar(20),out usercp int)
+						begin
+							select bo.boyname, bo.usercp into boyname,usercp from boys as bo inner join beauty as b on bo.id=b.boyfriend_id where b.name=beautyname;
+						end $
+					调用：
+						set @bname$
+						set @usercp$
+						call myp4('柳岩', @bname,@usercp)$
+						select @bname,@usercp$
+			
+			4.创建带inout模式参数的存储过程
+				案例1：传入a和b，最终a和b都翻倍并返回		
+					创建存储过程
+						create procedure myp6(inout a int，inout b int)
+						begin
+							set a=a*2;
+							set b=b*2;
+						end $ 
+					调用：
+						set @m=10$
+						set @n=20$
+						call myp6(@m,@n)$
+						select @m,@n$
+		4.删除存储过程
+			语法：
+				drop procedure 存储过程名称
+		5.查看存储过程的信息
+			show create procedure 存储过程名
+	函数：
+		1.区别：
+			1.返回值：存储过程：可以由0个返回，或多个返回，函数：只能有一个返回
+			2.应用场景：存储过程一般做批量插入、删除、更新；函数适合处理数据后返回一个结果
+		2.创建语法
+			语法：
+				create functioon 函数名(参数列表) returns 返回类型
+				begin	
+					函数体
+				end
+			注意：
+				1.参数列表包含两部分：参数名，参数类型
+				2.函数体：肯定会有return语句，如果没有会报错，如果return语句没有放在函数体最后也不会报错，但不建议
+				3.当函数体只有一个语句，可以省略begin和end
+				4.使用delimeter语句设置结束标记
+		3.调用语法
+			select 函数名(参数列表)
+		4.查看函数
+			show create function 函数名
+		5.删除函数
+			drop function 函数名
+		6.案例：
+			1.无参有返回的类型
+				案例：返回公司的员工个数
+				创建一个函数
+					delimeter $
+					create functioon myf1() returns int
+					begin	
+						declare c int default 0;
+						select count(*) into c from employees;
+						return c;
+					end $	
+				调用：
+					select myf1()$
+			2.有参有返回的类型
+				案例：根据员工名，返回员工工资
+				创建一个函数
+					delimeter $
+					create functioon myf2(empname varchar(20)) returns double
+					begin	
+						set @sal=0;   定义一个用户变量
+						select salary into @sal from employees where last_name=empname;    用户变量赋值
+						return @sal;
+					end $	
+				调用：
+					select myf1('k_ing')$
+				案例：根据部门名返回该部门的平均工资
+				创建一个函数
+					delimeter $
+					create functioon myf3(deptbname varchar(20)) returns double
+					begin	
+						declare sal double default 0;   定义一个局部变量
+						select avg(salary) into sal from employees as  e inner  join departments as  d on d.department_id=e.department_id where d.department_name=depname;    局部变量赋值
+						return sal;
+					end $	
+				调用：
+					select myf3('IT')$
+						
+流程控制结构
+	1.顺序结构：程序从上往下顺序执行
+	2.分支结构：程序从两条或多条路径中选择一条执行
+		1.if函数
+			功能：实现简单的双分支
+			语法：if(表达式1，表达式2，表达式3) 
+				执行顺序：如果表达式1成立，则if函数返回表达式2的值，否则返回表达式3的值
+			应用：任何地方
+		2.case结构
+			情况1：类似于switch语句，一般用于实现等值判断
+				语法：
+					case 变量
+					when 要判断的值1 then 返回的值1或【语句1;】
+					when 要判断的值2 then 返回的值2或【语句2;】
+					else 要返回值n【语句n;】
+					end 【case】；
+			情况2：类似于多重if分支，一般用于区间判断	
+				语法：
+					case 
+					when 要判断的条件1 then 返回的值1【语句1;】
+					when 要判断的条件2 then 返回的值2【语句2;】
+					else 要返回值n【语句n;】
+					end 【case】；
+			特点：
+				1.可以作为表达式嵌套在其他语句中使用，放在任何地方，begin和end中，begin和end外
+				   可以作为独立语句使用，只能放在begin和end中	
+				2.如果when中的值或条件成立，则执行对应then后的语句，并且结束case
+				    如果都不满足，则执行else中的语句或值
+				3.如果else省略了，且所有的条件或值都不满足，则返回null	
+			作为独立语句的案例：
+				案例：创建存储过程，根据传入的成绩，显示等级
+					创建存储过程
+						create procedure test_pro(in score int)
+						begin
+							case 
+							when score>=90 and score<=100 then select 'A'；
+							when score>=80 then select 'B'；
+							when score>=60 then select 'C'；
+							else select 'D';
+							end case;
+						end $
+					调用
+						call test_pro(95)$
+		3.if结构
+			功能：实现多重分支
+			语法：
+				if 条件1 then 语句1
+				elseif 条件2 then 语句2
+				【else 语句n】
+				end if；
+			应用场合：
+				只能应用在begin和end中
+			案例：根据传入的成绩，返回级别
+				创建函数：
+					create function test(score int) return char(1)	
+					begin
+						
+						if score>=90 and score<=100 then return 'A';
+						elseif score>=80 then return 'B';
+						elseif score>=60 then return 'C';
+						else return 'D';
+						end if;
+					end
+				调用：
+					select test(98)$
+	3.循环结构：程序在满足一定条件的基础上，重复执行一段代码
+		分类：
+			while：先判断后执行
+			loop：没有条件的死循环
+				语法:
+					【标签：】loop
+						循环体；
+					end loop 【标签】；		
+			repeat：先执行后判断
+				语法：
+					【标签：】repeat
+						循环体；
+					until 结束循环的条件
+					end repeat 【标签】；
+		位置：
+			begin和end中
+		循环控制
+			iterate：类似于continue，结束本次循环，继续下一次
+			leave：类似于break
+		1.while
+			语法：
+				【标签：】while 循环条件 do
+					循环体；
+				end while【标签】；
+		案例：批量插入，根据设置的次数插入到admin表中多条记录
+			create procedure pro_while1(in insertcount int)
+			begin
+				declare i int default 1;
+				a:while i<=insertcount do
+					insert into admin(username,password) values(concat('lily',i),'666');
+					set i=i+1;
+				end while a;	
+			end $
+			call pro_while(100)$
+			select * from admin$
+		案例：添加leave语句，根据设置的次数插入到admin表中多条记录，如果次数大于20，则停止
+			create procedure pro_while2(in insertcount int)
+			begin
+				declare i int default 1;
+				a:while i<=insertcount do
+					insert into admin(username,password) values(concat('lily',i),'666');
+					if i>=20 then leave a;
+					end if;
+					set i=i+1;
+				end while a;	
+			end $
+			call pro_while(100)$     只插入20条
+			select * from admin$
+		案例3：添加iterate语句，只插入偶数次
+			create procedure pro_while2(in insertcount int)
+			begin
+				declare i int default -1;
+				a:while i<=insertcount do
+					set i=i+1;
+					if mod(i,2)!=0 then iterate a;
+					end if;
+					insert into admin(username,password) values(concat('lily',i),'666');
+				end while a;	
+			end $
+			call pro_while(100)$     只插入20条
+			select * from admin$
+		案例：已知表中有两个字段id（自增长），content ，向表中插入指定个数的随机字符串
+			建表：
+				create table stringcontent(id int primary key auto_increment, content varchar(20));
+			创建存储过程：
+				delimeter $
+				create procedure test(in count int)
+				begin
+					declare i int default 1;
+					declare startindex int default 1;   代表起始索引 
+					declare len int default 1；代表截取的字符串长度
+					declare str varchar(26) default 'abcdefghijklmnopqrstuvwxyz';
+					a:while i<=count do
+						set len= floor(rand() *(20-startindex+1)+1);
+						set startindex=floor(rand()*26+1);   产生一个随机数，代表起始索引1-26
+						insert into stringcontent(content) values(substr(str,startindex,len));
+						set i=i+1;   循环变量更新
+					end while a;
+				end $
+	
+	
+	
+ 		
+		
+								
+	
+
+
+

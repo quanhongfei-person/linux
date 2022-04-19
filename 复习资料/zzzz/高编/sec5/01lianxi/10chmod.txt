@@ -1,0 +1,23 @@
+
+
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+
+int main(int argc, const char *argv[])
+{
+
+	int ret = chmod("./pslog",0000);
+	if(-1 ==ret)
+	{
+		//printf("pslog1 no exists");
+		perror("chmod failure...\n");
+		exit(1);
+	}
+	else
+	{
+		printf("chmod ok\n");
+	}
+
+	return 0;
+}

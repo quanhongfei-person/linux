@@ -1,0 +1,98 @@
+
+域名解析
+int ipanel_dns_format_domain(const char* src,unsigned char* dst,int dlen)
+{
+	int first_num=0;
+	int sec_num =0;
+	int end_num=0;
+	char* arg[3]={NULL};
+	if(NULL ==src)
+	{
+		return -1;
+	}
+	arg[0]=strtok(src,".");
+	arg[1]=strtok(NULL,".");
+	arg[2]=strtok(NULL,"\0");
+	if(NULL ==arg[0]|| NULL==arg[1]||NULL == arg[2])
+		return -1;
+	if(strlen(arg[0])>DNS_MAXLABEL||strlen(arg[1])>DNS_MAXLABEL||strlen(arg[2])>DNS_MAXLABEL)
+		return -1;
+	sprintf(dst,"0x%02d%s0x%02d%s0x%02d%s",strlen(arg[0]),arg[0],strlen(arg[1]),arg[1],strlen(arg[2]),arg[2]);
+	if(strlen(dst)>DNS_MAXCDNAME)
+		return -1;
+	return strlen(dst);
+}
+
+
+xhl:
+
+typedef struct __DATA__
+{
+	int count;
+	char*data;
+}DATA;
+
+int handle_xml(const char* src)
+{
+	assert(src);       //断言
+	char* temp=src;
+	DATA data;
+	char buf[1024]={0};
+	int first_flag = 0;
+	int end_flag = 0 ;
+	int val_flag=0;
+	char val[1024]={0};
+	stack name;
+	int index=0;
+	while(*temp!='\0')
+	{
+		if(*temp=='<')
+		{
+			if(1==first_flag)
+			{
+				end_flag=1;
+				strncat(val,temp,'\0');
+				val_flag=0;
+			}
+			else
+			{
+				first_flag=1;
+				bzero(val,1024);
+			}
+			temp++;
+		}
+		if(*temp=='>')
+		{
+			if(1== end_flag)
+			{
+				if(0 ==strcmp(buf+1,get_top(name)))
+				{
+					pop(name);
+					if(0==strcmp(buf,"count")
+					{
+						data.count = atoi(val);
+						data.data = malloc(data.count* 10);
+					}
+					else
+					{
+						if(0== strncmp(buf,"srvtypedid",10))	
+						strcpy(&data.data[(index++)*10],name);
+					}
+				}
+			}
+			else
+			{
+				stack_push(name,buf);
+			}
+			if(1== first_flag)
+				val_flag=1;	
+			bzero(buf,1024);
+			temp++;
+		}
+		if((first_flag==1 &&val_flag ==0) || (end_flag==1&&val_flag ==0))
+			strncat(buf,temp,1);
+		if(val_flag==1)
+			strncat(val,temp,1);
+		temp++;
+	}
+}

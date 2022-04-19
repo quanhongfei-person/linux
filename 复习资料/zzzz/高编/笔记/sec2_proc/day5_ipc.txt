@@ -1,0 +1,428 @@
+ IPC   进程间通信  inter process communicate     进程资源不共享
+	三大类：
+1、古老的通信方式
+		无名管道  有名管道  信号
+
+2、IPC对象通信 system v    BSD     suse fedora   kernel.org
+		消息队列
+		共享内存
+		信号量集 
+		
+
+3、socket通信
+		网络通信
+
+		
+		线程信号，posix  sem_init
+
+特列：古老的通信方式中信号是唯一的异步通信
+	  所有的通信方式中共享内存是唯一的最高效
+
+管道==》无名管道、有名管道
+
+	无名管道 ===》pipe ==》只能给有亲缘关系进程通信
+	有名管道 ===》fifo ==》可以给任意单机进程通信
+
+	管道的特性：
+	1、管道是 半双工的工作模式
+	2、所有的管道都是特殊的文件不支持定位操作。lseek
+	3、管道是特殊文件，读写使用文件IO。fgets,fread,fgetc,
+	open,read,wirte,close;;
+	
+	1,读端存在，一直向管道中去写，超过64k，写会阻塞。
+	2，写端是存在的，读管道，如果管道为空的话，读会阻塞。
+	
+	3.读端关闭，写管道，管道破裂，，。
+	
+使用框架：
+	创建管道 ==》读写管道 ==》关闭管道
+
+1、无名管道 ===》管道的特例 ===>pipe函数
+	特性：
+	1.1  亲缘关系进程使用
+	1.2  有固定的读写端
+
+    流程：
+	创建并打开管道： pipe函数
+#include <unistd.h>
+int pipe(int pipefd[2]);
+功能：创建并打开一个无名管道
+参数：pipefd[0] ==>无名管道的固定读端
+	  pipefd[1] ==>无名管道的固定写端
+返回值：成功 0
+		失败 -1；
+
+注意事项：
+	1、无名管道的架设应该在fork之前进行。
+	
+无名管道的读写：===》文件IO的读写方式。
+	读： read()
+	写： write()
+
+关闭管道： close();
+
+
+练习：
+	设计一个多进程程序，用无名管道完成
+	父子进程间的任意信息：传送，包括数字
+	字符串 等。。。。
+
+
+验证如下问题：
+1、父子进程是否都有fd[0] fd[1],
+   如果在单一进程中写fd[1]能否直接从fd[0]中读到。
+
+   可以，写fd[1]可以从fd[0]读
+
+2、管道的数据存储方式是什么样的
+   数据是否一直保留？
+	栈， 先进后出
+   队列形式存储 读数据会剪切取走数据不会保留
+   先进先出
+
+3、管道的数据容量是多少，有没有上限值。
+	操作系统的建议值： 512* 8 = 4k
+	代码测试实际值：   65536byte= 64k
+
+4、管道的同步效果如何验证？读写同步验证。
+	读端关闭能不能写？ 不可以 ===>SIGPIPE 异常终止 
+	写端关闭能不能读？ 可以，取决于pipe有没有内容，===>read返回值为0 不阻塞
+
+	结论：读写端必须同时存在，才能进行
+		  管道的读写。
+
+
+5、固定的读写端是否就不能互换？
+	能否写fd[0] 能否读fd[1]?   不可以，是固定读写端。
+
+	
+练习：
+	如何用管道实现一个双向通信功能
+	将从父进程发送的消息在发回给父
+	进程。
+	
+	
+	pipe,
+	
+	fork()
+	
+	if(pid>0)
+	{
+		read(file,,)
+		wirte(fd[1]);
+	}
+	
+	if(0 == pid)
+	{
+			read(fd[0]);
+			write(newfile);
+	}
+	
+	
+	
+	person
+	{
+		char name[];
+		int age;
+		char phone;
+	}
+	
+	
+	pipe[];
+	fork();
+	
+	> 0
+	fgets 获得输入
+	填结构体，
+	写入管道，
+	==0
+	
+	read，
+	填结构体，，
+	
+	显示到。。。
+	
+	hello
+	pipe:hello 
+	wordld
+	pipe2 ::world;
+	
+	
+	
+	
+	
+	
+
+有名管道===》fifo ==》有文件名称的管道。
+					  文件系统中可见
+
+框架：
+	创建有名管道 ==》打开有名管道 ==》读写管道
+	==》关闭管道  ==》卸载有名管道
+
+1、创建：mkfifo
+#include <sys/types.h>
+#include <sys/stat.h>
+unlink();
+
+int mkfifo(const char *pathname, mode_t mode);
+功能：在指定的pathname路径+名称下创建一个权限为
+      mode的有名管道文件。
+参数：pathname要创建的有名管道路径+名称
+	  mode  8进制文件权限。
+返回值：成功 0
+		失败  -1；
+
+2、打开有名管道 open
+	注意：该函数使用的时候要注意打开方式，
+	因为管道是半双工模式，所有打开方式直接决定
+	当前进程的读写方式。
+	一般只有如下方式：
+	int fd-read = open("./fifo",O_RDONLY); ==>fd 是固定读端
+	int fd-write = open("./fifo",O_WRONLY); ==>fd 是固定写端
+	不能是 O_RDWR 方式打开文件。
+	不能有 O_CREAT 选项，因为创建管道有指定的mkfifo函数
+
+
+3、管道的读写： 文件IO
+
+	读： read(fd-read,buff,sizeof(buff));
+	写： write(fd-write,buff,sizeof(buff));
+
+4、关闭管道：
+		close(fd)；
+
+5、卸载管道：
+		int unlink(const char *pathname);
+		功能：将指定的pathname管道文件卸载，同时
+			  从文件系统中删除。
+		参数： ptahtname 要卸载的有名管道 
+		返回值：成功 0
+				失败  -1；
+
+练习：
+	编写一个非亲缘关系进程间通信程序，可以从
+	A程序向B程序连续发送不同的数据，并从B中
+	将发送的信息打印输出，当双方收到quit的时候
+	程序全部退出。
+
+思考题：
+	是否每次启动程序必须进行有名管道的创建工作
+	能否有一个独立的维护工具，可以任意创建并删除
+	有名管道？
+	比如：
+		./fifo_tool -A fifo  ==>创建一个有名管道fifo
+		./fifo_tool -D fifo  ==>删除一个有名管道fifo
+
+作业：
+
+	有名管道的操作函数封装：
+	int fifo_read(char *fifoname,void *s,int size);
+	int fifo_write(char *fifoname,void *s,int size);
+
+	编写测试程序验证以上两个函数效果。
+
+
+  有名管道 ===》
+
+	1、是否需要同步，以及同步的位置。
+		读端关闭 是否可以写，不能写什么原因。
+		写端关闭 是否可以读。
+
+		结论：有名管道执行过程过必须有读写端同时存在。
+			  如果有一端没有打开，则默认在open函数部分阻塞。
+
+	2、有名管道是否能在fork之后的亲缘关系进程中使用。
+		结论： 可以在有亲缘关系的进程间使用。
+		注意： 启动的次序可能会导致其中一个稍有阻塞。
+
+	3、能否手工操作有名管道实现数据的传送。
+		读： cat  fifoname
+		写： echo "asdfasdf" > fifoname
+		
+		
+		
+		
+	进程间通信 ===》信号通信
+	应用：异步通信。 中断，，
+	1~64；32应用编程。
+	如何响应：
+	 Term   Default action is to terminate the process.
+
+       Ign    Default action is to ignore the signal.
+	   wait
+	   
+
+       Core   Default action is to  terminate  the  process  and  dump  core  (see
+              core(5)).
+
+       Stop   Default action is to stop the process.
+
+       Cont   Default  action  is  to  continue  the  process  if  it is currently
+              stopped.
+
+	
+	kill      -xx     xxxx
+	发送进程  信号    接收进程
+	kill -9 1000
+	a.out  9 1000
+	1、发送端
+	#include <sys/types.h>
+	#include <signal.h>
+
+	int kill(pid_t pid, int sig);
+	功能：通过该函数可以给pid进程发送信号为sig的系统信号。
+	参数：pid 要接收信号的进程pid
+		  sig 当前程序要发送的信号编号 《=== kill  -l
+	返回值：成功 0
+			失败  -1；
+
+	练习：
+		编写一个自己的kill程序，尽量模拟kill命令的效果。
+
+	int raise(int sig)== kill(getpid(),int sig);
+	功能：给进程自己发送sig信号
+
+	unsigned int alarm(unsigned int seconds);SIGALAM
+	功能：定时由系统给当前进程发送信号
+		  也称为闹钟函数
+
+		  闹钟只有一个，定时只有一次有效，
+		  但是必须根据代码逻辑是否执行判断。
+
+
+	int pause(void);
+	功能：进程暂停，不再继续执行，除非
+		  收到其他信号。
+
+
+	2、信号  kill  -l  ==>前32个有具体含义的信号
+		
+		信号的含义详见图片
+
+
+	3、接收端
+		每个进程都会对信号作出默认响应，但不是唯一响应。
+		一般如下三种处理方式：
+		1、默认处理
+		2、忽略处理 9,19
+		3、自定义处理 9,19
+
+		以上三种方式的处理需要在如下函数上实现。
+
+	信号注册函数原型：
+	 
+	 void ( *signal(int signum, void (*handler)(int)) ) (int);
+
+
+	 typedef void (*sighandler_t)(int);
+	 ===》void (*xx)(int); == void fun(int);
+	 ===》xx是 void fun(int) 类型函数的函数指针
+	 ===》typedef void(*xx)(int)   sighandler_t; ///错误
+		  typedef int   myint;
+
+	 ===>sighandler_t signal(int signum, sighandler_t handler);
+	 ===> signal(int sig, sighandler_t fun);
+	 ===> signal(int sig, xxx fun);
+	 ===>fun 有三个宏表示：SIG_DFL 表示默认处理
+						   SIG_IGN 表示忽略处理
+						   fun     表示自定义处理
+
+
+
+	练习：
+		编写信号注册函数，并测试所有的32个系统信号
+		是否能全部被忽略？ 如果不能，则找出信号编号。
+
+	结论： 9  19 不能被忽略也不能被自定义
+
+
+	自定义信号处理：
+	1、必须事先定义自定义函数，必须是如下格式：
+		void fun(int sig)  ////sig 接收到的信息编号
+		{
+
+		}
+
+	2、在所有的信号中有如下两个特列：
+		10 SIGUSR1
+		12 SIGUSR2
+		
+		专门预留给程序员使用的未定义信号。
+
+	练习题：
+
+	1、编写信号处理函数，对于自定义的10 和 12 信号分别输出不同的语句。
+
+
+	2、验证信号的反复注册后信号处理流程。====>顺序依次注册则最后一个有效
+
+
+	大作业：
+	1、修改有名管道的通信程序，并添加信号处理流程，
+	   当发送quit的是，进程A 发送10 或者 12 信号
+	   进程B 收到信号后退出。
+
+	2、创建多进程程序，在父子进程间处理信号流程，
+	   父进程给子进程发送一个信号则子进程打印指定的文件
+	   如果发送另一个信号则打印另外一个文件内容。
+
+	   子进程：收到10 信号打印a.txt
+				   12 信号打印b.txt
+				   13 信号子进程退出。
+				  
+	   父进程提示用户输入信息，根据输入信息
+	   决定发送信号编号。
+	   
+	   
+	   
+	   
+	   w.c
+
+		main()
+		{
+			mkfifo(myfifo);
+			open(myfifo);
+			stat("1.png");
+			filesize;
+			write(&filesize);
+			while(1)
+			{
+			ret = read(buf);
+			write(buf,ret);
+			
+			}
+					
+		}
+	   
+	   r.c
+
+		main()
+		{
+			mkfifo(myfifo);
+			open(myfifo);
+			read(myfifo,4)===int;
+			
+			int total;
+			while(1)
+			{
+			ret = read(myfifo);
+			total+= ret ;
+			
+			total == filesize
+			break;
+			}
+			
+		}
+		
+		a,fifo 
+		fgets(buf) ===>fifo
+		quit    kill ()
+		
+		b;
+		read(fifo)
+	   
+	   
+	   
+	   
+	   

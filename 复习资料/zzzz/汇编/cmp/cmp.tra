@@ -1,0 +1,19 @@
+*** Creating Trace Output File 'cmp.tra' Ok.
+### Preparing for ADS-LD.
+### Creating ADS-LD Command Line
+### List of Objects: adding '"cmp.o"'
+### ADS-LD Command completed:
+--cpu ARM920T "cmp.o" --strict --scatter "cmp.sct" 
+--autoat --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\cmp.map" -o "cmp.axf"### Preparing Environment (PrepEnvAds)
+### ADS-LD Output File: 'cmp.axf'
+### ADS-LD Command File: 'cmp.lnp'
+### Checking for dirty Components...
+### Creating CmdFile 'cmp.lnp', Handle=0x00000CE8
+### Writing '.lnp' file
+### ADS-LD Command file 'cmp.lnp' is ready.
+### ADS-LD: About to start ADS-LD Thread.
+### ADS-LD: executed with 0 errors
+### Updating obj list
+### LDADS_file() completed.

@@ -1,0 +1,301 @@
+项目简介：
+	发送方使用存放在共享内存中已经协商好的秘钥，利用des加密算法实现数据的安全传输，接收方使用秘钥对接收到的数据解密，实现各网络节点间数据安全传输。	
+
+OpenSSL一共实现了 4 种非对称加密算法：DH 算法、RSA 算法、DSA 算法和椭圆曲线算法（EC）。
+
+1、DH 算法
+	DH 是 Diffie-Hellman 的首字母缩写，是 Whitefield 与 Martin Hellman 在1976年提出了一个的密钥交换协议，故其一般用于密钥交换。
+
+2、RSA 算法
+	既可以用于密钥交换、数字签名、数据加密（缓慢）。
+
+3、DSA 算法
+	Digital Signature Algorithm，数字签名算法，只用于数字签名。
+
+4、EC 算法
+	椭圆曲线算法
+
+Base64算法 
+MD5算法 
+SHA算法:SHA-1、SHA-224、SHA-256、SHA-384，和SHA-512
+AES算法
+RSA算法
+
+项目模块划分：
+	1. 基础组件 模块  （报文编解码、安全通信组件、共享内存、数据库操作组件）
+	2. 密钥相关 模块  （server、client、 shm、 DB）
+	3. 管理终端 模块  （MFC图形界面、win 数据库、配置文件）
+	4. 外联接口 模块  （数据加解密、封装）
+
+我负责了什么 
+	基础组件模块：报文编码解码组件、安全通信组件、数据库接口组件、共享内存组件
+
+		报文编码解码组件：
+			itcast_asn1_der.c  itcastderlog.c keymng_msg.c   keymnglog.c
+			采用asn.1标准，把各种各样的报文结果类型转换成TLV三元组格式，避免传输过程中将报文直接暴露
+
+			提供了一组API函数接口、
+				int MsgEncode(void *pStruct,int type,unsigned char **outdata,int *outlen);
+				int MsgDecode(unsigned char *inData,int   inLen,void  **pStruct ,int  *type);
+				int MsgMemFree(void **point,int type);
+
+			定义了两个结构体：(该组件是由动态库实现封装、便于后续使用)
+				秘钥请求结构体：服务器编号、客户端编号、认证码、客户端生成的随机数、报文命令码
+				秘钥应答结构体：秘钥生成状态、服务器编号、客户端编号、随机数
+
+		通信组件：(poolsocket.cpp 、poolsocket.h 、 socketlog.cpp 、 socketlog.h 、 socketutil.cpp 、 socketutil.h)
+			将底层的实现tcp/ip的函数进行进一步封装、分别为服务器和客户端提供一套函数接口，实现通信
+
+			sockuntil.c
+			客户端环境：			
+				int sckClient_init()//客户端环境初始化
+				int sckClient_connect(char *ip, int port, int connecttime, int *connfd) //客户端连接(socket、connect)
+				int sckClient_send(int connfd, int sendtime, unsigned char *data, int datalen)//客户端发送报文write
+				int sckClient_rev(int connfd, int revtime, unsigned char **out, int *outlen)//客户端端接受报文read
+				int sckClient_closeconn(int connfd)//客户端 关闭与服务端的连接
+				int sck_FreeMem(void **buf)//客户端 释放内存
+				int sckClient_destroy()// 客户端环境释放 
+			服务器端环境：
+				int sckServer_init(int port, int *listenfd)//服务器端初始化（socket、setsockopt、bind、listen）
+				int sckServer_accept(int listenfd,  int timeout, int *connfd)   //accept_timeout
+				int sckServer_send(int connfd, int timeout, unsigned char *data, int datalen)//服务器端发送报文write_time
+				int sckServer_rev(int connfd, int timeout, unsigned char **out, int *outlen)//服务器端端接受报文read_time
+				int sckServer_close(int connfd)//服务器端 关闭连接
+				int sckServer_destroy()//服务器端环境释放
+			socklog.c
+				void Socket_Log(const char *file, int line, int level, int status, const char *fmt, ...); //文件名、文件行号、错误级别、错误码、可变参数（错误描述）
+					判断是否要写日志---->要的话--->vs_start(args,fmt)---->error_core---->va_end
+				定义了5个错误级别 
+					0:没有日志；
+					1:debug；
+					2:info；
+					3:警告；
+					4:错误
+
+		共享内存组件：(myipc_shm.cpp 、myipc_shm.h  keymnglog.c--->keymng_shmop.c)
+			网点密钥信息结构体：NodeSHMInfo{ seckey，clientID， serverID， seckeyid,  status}
+			共享内存是进行间通信的一种，将服务器和客户端生成的秘钥放在共享内存中，提高效率。
+
+			my_ipc.c
+			//创建共享内存 若共享内存不存在，则创建 若存在使用原来的
+			int IPC_CreatShm(int key, int shmsize, int *shmhdl)-----shmget
+			//打开共享内存 若共享内存不存在，返回错误 
+			int IPC_OpenShm(int key, int shmsize, int *shmhdl)
+			//关联共享内存
+			int IPC_MapShm(int  shmhdl, void **mapaddr)----->shmat
+			//取消关联
+			int IPC_UnMapShm(void *unmapaddr)---->shmdt 
+			//删除共享内存
+			int IPC_DelShm(int shmhdl)------>shmctl(shmhdl,IPC_RMID,NULL)
+
+			keymng_shmop.c:
+				int KeyMng_ShmInit(int key, int maxnodenum, int *shmhdl) //查看共享内存是否存在，存在则使用，不存在则创建
+					IPC_OpenShm--->失败--->IPC_CreatShm--->IPC_MapShm--->清空---->IPC_UnMapShm(mapaddr)
+						      ---->成功
+				int KeyMng_ShmWrite(int shmhdl, int maxnodenum, NodeSHMInfo *pNodeInfo)   //写网点秘钥，存在则修改，不存在，则找一个空位置写入
+					IPC_MapShm--->根据num遍历整个共享内存，判断serverid和clientid是否和传入的相同--->相同则存在，直接覆盖
+				
+				int KeyMng_ShmRead(int shmhdl, char *clientId, char *serverId,  int maxnodenum, NodeSHMInfo *pNodeInfo)	//根据clientid和serverid 去读网点信息
+					 IPC_MapShm---->遍历网点信息	          							     --->不存在，则在空位置写入
+			同一数据库接口组件：keymng_dbop.c
+				//读keysn表 更新ikeysn列 +1 ---> seckeyid 
+				int KeyMngsvr_DBOp_GenKeyID(void *dbhdl, int *keyid)
+				//写密钥  插入共享内存结构体 到数据库   seckinof
+				int KeyMngsvr_DBOp_WriteSecKey(void *dbhdl, NodeSHMInfo *pNodeInfo) 
+					获取当前操作时间-->base64编码-->组织sql语句-->执行非查询的sql语句
+				为什么进行base64编码：不能保证都是可见字符，即不能使用oracle数据库中的varchar2类型来存储，需要进行base64编码
+
+	秘钥协商服务器后台程序和秘钥协商客户端程序开发：
+	
+		秘钥协商流程：
+			客户端：
+				显示菜单。
+				接收用户选择。  num。
+				客户端信息初始化。MngClient_Info(clientid、serverid、autocode、serberip、serverport、maxnode、shmkey、shmhdl)--->KeyMng_ShmInit
+				switch(num) {
+					case 1协商：
+						密钥协商。 建立连接、封装req结构体、编码、发送、接收、解码、生成密钥、写共享内存。
+						_Agree();
+					case 2校验：
+						密钥校验。 建立连接、封装req结构体、编码、发送、接收、解码、生成密钥、写共享内存。	
+						_Check();	
+						
+					case 查看：
+						密钥查看。 建立连接、封装req结构体、编码、发送、接收、解码、生成密钥、写共享内存。
+						_View();
+				}
+				将结果展示给用户。
+			模块划分：
+				业务逻辑：keymngclient.c 
+
+				业务功能：
+
+				keymngclientop.c    	
+
+				struct clientInfo { serverIp, serverPort, clientID, serverID, Autocode, shmkey, shmid, maxnode }
+
+				int keymng_Agree(struct clientInfo *pInfo)
+				{
+					//组织密钥请求结构体MsgKey_Req msgKey_req;
+					//编码密钥请求结构体MsgEncode
+					//初始化连接sckClient_init
+					//建立连接sckClient_connect
+					//发送请求报文sckClient_send
+					//接收应答报文sckClient_rev
+					//解析应答报文MsgDecode
+					//生成密钥r1+r2
+					// 组织密钥信息结构体NodeSHMInfo 
+					//写共享内存KeyMng_ShmWrite
+					统一释放内存
+				}
+
+		密钥协商服务器：
+			keymngserver.c:
+			//结束标记，通过用户信号来赋值，从而停止循环等待
+			int flg = 1;
+			//信号处理函数
+			void signel_catch(int signo)
+			{
+				flg = 0;
+			}
+			void *callback(void *arg)
+			{
+				while(1){
+					//查看结束标记，若为0，直接break出循环，释放资源
+					// 接收客户端 密钥请求报文 sckServer_rev
+					// 解码客户端 密钥请求报文  MsgDecode---> cmdType
+					switch(cmdType) {   //根据密钥请求结构体业务类型调用处理函数
+						case 密钥协商:
+							mngServer_Agree();
+							break;
+					}	
+					//发送应答报文sckServer_send
+				}
+				释放内存
+				关闭链接sckServer_close
+			}
+
+			main（） 
+			{
+				
+				//创建守护进程    fork---父进程退出----子进程创建新的会话，关闭0、1、2文件描述符
+				//创建信号捕捉函数signal（）
+				// 服务器信息初始化。MngServer_Info-->KeyMng_ShmInit--->//初始化数据库连接池IC_DBApi_PoolInit	
+				//初始化socketsckServer_init
+				while(1) {
+					查看结束标记，若为0，直接break出循环，释放资源
+					sckServer_accept//等待接收客户端连接请求
+					pthread_create();// 通过线程来处理链接请求
+				}
+				sckServer_destroy();//释放链接
+			}
+
+		keymngserverop.c 
+
+		struct serverInfo {serverIp, serverPort, clientID, serverID, Autocode, shmkey, shmid, maxnode, username, passwd, dbname} 
+		初始化完成后不会信息不变，可以定义在全局，保证子线程可以使用这些信息，这样传参时就不用传这个结构体l
+
+		int MngServer_Agree(MngServer_Info *svrInfo, MsgKey_Req *msgkeyReq, unsigned char **outData, int *datalen);   //秘钥协商服务器端
+		{	
+			//识别当前serverid是否正确	
+			// 组织 应答结构体 res ：生成随机数 r2 ,结合 r1 r2 生成密钥r2  seckeyid
+			//获取一条数据库连接池中的连接IC_DBApi_ConnGet(&handle, 0,0);
+			//开启事务IC_DBApi_BeginTran(handle);
+			//从数据库中获取seckeyid，msgkeyRes.seckeyid = keyid;
+			// 组织密钥节点信息结构体NodeSHMInfo
+			// 写数据库KeyMngsvr_DBOp_WriteSecKey
+			//关闭事务，写数据库失败rollback，成功commit
+			// 写共享内存KeyMng_ShmWrite
+			// 编码应答报文  传出MsgEncode
+		}
+=====================================================================
+		
+		秘钥注销流程：						keyserver.c
+								      服务器端：接收客户端连接
+									       创建线程，接收请求报文
+									       解码秘钥请求结构体
+									       switch（cmdType）{
+										case KeyMng_Revoke：
+											MngServer_Revoke();
+
+											break;
+										}			
+									        发送应答报文
+			客户端：  组织请求报文                                             keyserverop.c：取出请求报文的clientid和serverid
+			                编码请求报文（TLV）		         	          注销当前秘钥：根据serverid和clientid找到对应共享内存中的秘钥seckeyid
+				发送请求报文				          根据seckeyid修改数据库中的对应的status0--->1 (update)
+				。。。。					          	封装实现函数：写数据库   update---seckeyinfo---->status 0-->1
+				接收应答报文  				          根据结果修好
+				解码应答报文				          修改共享内存中的秘钥status0-->1
+				修改共享内存中的秘钥的status 0-->1		          组织应答报文结构体。传出
+				返回结果给用户
+================================================================================
+
+秘钥校验流程：
+	服务器：
+	int MngServer_check()
+	{	
+		//1.识别认证码
+		//读出 密钥请求结构体中 r1[] (10字节的密钥数据)
+		//依据 clientid、serverid 读共享内存 --> seckey 密钥 --> 提取前10字节 --> 比较
+		//根据比较结果填充 res.rv 
+		//组织密钥应答结构体 res 其他成员变量
+		//编码密钥应答结构体 --> 传出。
+	}
+	
+	客户端：
+
+		校验方法：
+			1. a1b2c3 --> 再加密（非对称加密）--> jqk678
+			2. 片段校验法： 0-10 密钥信息一致  --> 一致。
+
+		int MngServer_check()
+		{
+			//读共享内存 --> seckey 密钥 --> 提取前10字节 --> req.r1[];
+			//组织密钥请求结构体（校验的事）
+			//编码密钥请求结构体 req 
+			//初始化连接 --> listenfd
+			//建立连接 --> connfd
+			//发送请求报文 -->  TLV send
+			//接收应答报文 --> fwq TLV res
+			//解析应答报文 --> TLV --> Struct --> rv --> 0 一致 1 不一致。
+			//给用户返回校验结果。	
+		}
+
+遇到过什么困难、bug （2件）
+	1.如何管理服务器进程
+		让服务器进程运行在后台，如何关闭服务器进程
+			通过编写一个shell脚本，通过在脚本文件中获取服务器进程的进程id，通过发送信号给服务器进程
+			达到关闭服务器进程的目的，但是这个这时候又遇到一个问题，我们希望关闭进程的时候先将内存都释放掉，
+				#! /bin/bash
+				userN=`whoami`
+				mypid=`ps -u ${userN} | grep keymngserver | awk '{print $1}'`
+				if [ -z ${mypid} ]; then
+       					 echo "The process is not started."
+      					  exit 1;
+				fi
+				kill -9 ${mypid}
+				echo "kill keymngserver successful"
+
+造成了什么影响。
+
+通过什么途径解决的。  获取途径方法、思路 
+
+最大的收获。
+	1.在整个项目搭建的过程中，对项目各个模块如何进行划分，以及实现所使用的的技术进行整体的思考，了解整个项目开发的一个流程。
+	2.系统各个模块是如何通信的
+
+3.项目难点
+	我在项目中对两部分内容进行了优化
+		1.项目设计初期，是将所有的秘钥都放在了数据库当中，第三方进程在进行加密的时候，需要访问数据库，拿到秘钥进行加密，这个过程比较耗费资源，
+		  后期的话，添加了共享内存模块，将当前客户端和服务器使用的秘钥放在共享内存中，提高了速率
+		2.在设计服务器进程的时候，将他设计前台进程，后期经过优化，将服务器进程设计为一个守护进程，这就涉及到了如果关闭守护进程的问题，在linux中
+		   虽然可以通过命令关闭，但这样就非常影响用户的体验感，另外，我们还希望服务器进程关闭之前能够释放掉已经开辟的资源，所以，我最终是通过编写了
+		   一个简单的shell脚本，在shell脚本中，获取服务器进程的进程号，当通过kill函数向服务器该进程发送信号，服务器端注册信号捕捉函数，在信号处理函数中，
+		  修改一个标志位的值，当标志位置1时，是的服务器进程跳出监听循环，释放内存，结束进程。
+
+			
+
+		
+
+	

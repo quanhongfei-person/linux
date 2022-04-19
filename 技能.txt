@@ -1,0 +1,53 @@
+熟悉Linux下文件IO、多进程间通信、多线程间同步与互斥编程，了解线程池及内存池原理及使用方法。
+熟悉网络编程，熟悉网络OSI模型及网络状态转换图，熟悉常用网络协议如arp、tcp/ip、http等。
+熟悉select、poll、epoll服务器模型，了解epoll反应堆模型。
+熟悉常用如堆、栈、队列、链表等数据结构，了解常用算法原理。
+熟悉shell脚本及Makefile使用，熟悉常用linux命令。 
+  熟悉C++下抽象、封装、继承、多态等基础编程思想，掌握STL下各种容器操作及原理，对C++11有一定认识。
+  熟悉Git SVN Dbox等多人协调项目管理工具，熟悉VSCode, Eclipse等开发IDE使用。
+  熟悉Linux下各种调测工具，如：tcpdump、asan、mtrace、valgrind、wireshark，熟悉GDB命令及多种场景下调试方法。
+  熟悉静态库、链接库的制作方法，熟悉冷热补丁制作方法。
+  熟悉Linux中创建RPM包，SPEC文件源码编译及打包规则，熟悉OBS编包流程。
+  了解wget curl ftp、httpd grpc unbound nftables iptables firewalld用法及服务。
+  了解各种Linux发行版，如CentOS Debian Ubuntu Fedora OpenSuse OpenEuler Redhat。
+  了解字符设备驱动编程，了解Linux系统启动流程及uboot kernel rootfs裁剪和移植。
+  
+  熟悉ssh协商过程，了解各种加密算法。
+  熟悉命令：systemctl strace scp rpmbuild patch netstat ps kill file find whereis which grep wc awk ftp df mount diff ip telnet tcpdump nc pstree useradd alise export rpm unset tar dump 
+  
+  
+  熟悉C语言，了解Linux下文件、进程、线程通信编程。
+熟悉C++语言，了解C++11新特性及STL。
+了解Java、Python语言。
+熟悉链表、栈、队列等常用数据结构。
+了解网络OSI模型及网络编程，了解TCP/IP、UDP 、HTTP等协议。
+熟悉软件设计中常用的设计模式及设计流程。
+熟练掌握Linux常用命令及Git、SVN开发工具。
+熟悉Eclipse、VSCode、Keil等软件。
+
+  
+  
+  Euleros/OpenEuler 操作系统开发
+  openEuler 是一个开源、免费的 Linux发行版平台,将通过开放的社区形式与全球的开发者共同构建一个开放、多元和架构包容的软件生态体系。同Redhat、Centos、Fedora、Debian Ubuntu OpenSuse等
+  软件包需求开发：根据下游客户需求，对软件包功能进行拓展或裁减，拆包及依赖变更。
+  软件包Bug/漏洞修复：解决软件包使用过程存在的重大Bug或漏洞,使用冷不丁或热补丁修复。
+  同各软件包开源社区Maintainer互动，确保软件包功能稳定。
+  主负责软件包：httpd、wget/curl openssh libssh lftp grub2 iputils ipmitool samba dnsmasq kernel网络部分。
+  
+MVC：
+Model发送新数据给View
+View传指令给Controller
+Controller完成逻辑业务，要求Model改变状态
+
+MVVM：
+Model用纯JavaScript对象表示
+View负责显示
+ViewModel负责把Model的数据同步到View显示出来，还负责把View的修改同步回Model
+
+双向绑定：View改变，反映在ViewModel，Model数据变动，自动展示给页面显示。
+  
+  
+  
+  
+  
+  

@@ -1,0 +1,115 @@
+/*
+ ============================================================================
+ Name        : 05log.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+#include <stdio.h>
+#include <stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include<time.h>
+
+int isnum(char * name)
+{
+	while(*name != '\0')
+	{
+
+		if(*name >= '0' && *name <='9')
+			name++;
+		else
+			return 0;
+
+	}
+	return 1;
+}
+int main(void)
+{
+
+	FILE* fp = fopen("log_proc","w");
+	if(NULL == fp)
+	{
+
+		perror("fopen log");
+		exit(1);
+	}
+
+	pid_t pid = fork();
+	if(pid>0)
+	{
+		int times = 10;
+		while(times--)
+		{
+		int num =0 ;
+		 DIR *dir = opendir("/proc");
+		 if(NULL == dir)
+		 {
+
+			 perror("opendir");
+			 exit(1);
+		 }
+		 struct dirent * dir_info;
+		 while(dir_info=readdir(dir))
+		 {
+			 if(isnum(dir_info->d_name))
+			 {
+				 num++;
+
+			 }
+
+		 }
+		 time_t tm;
+		 time(&tm);
+		 fprintf(fp,"pid:%d,proc_num:%d,time:%s",getpid(),num,ctime(&tm));
+		 fflush(fp);
+		 closedir(dir);
+		 sleep(1);
+		}
+
+	}
+	if(0 ==  pid )
+	{
+
+		int times = 10;
+				while(times--)
+				{
+				int num =0 ;
+				 DIR *dir = opendir("/proc");
+				 if(NULL == dir)
+				 {
+
+					 perror("opendir");
+					 exit(1);
+				 }
+				 struct dirent * dir_info;
+				 while(dir_info=readdir(dir))
+				 {
+					 if(isnum(dir_info->d_name))
+					 {
+						 num++;
+
+					 }
+
+				 }
+				 time_t tm;
+				 time(&tm);
+				 fprintf(fp,"pid:%d,proc_num:%d,time:%s",getpid(),num,ctime(&tm));
+				 fflush(fp);
+				 closedir(dir);
+				 sleep(3);
+				}
+	}
+	if(pid<0)
+	{
+
+		perror("fork");
+		exit(1);
+	}
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

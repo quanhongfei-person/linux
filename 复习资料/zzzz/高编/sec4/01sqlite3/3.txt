@@ -1,0 +1,82 @@
+
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include<sqlite3.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+#include<fcntl.h>
+
+int main(int argc, const char *argv[])
+{
+	sqlite3* db;
+	int ret = sqlite3_open("dict.db",&db);
+	if(SQLITE_OK!=ret)
+	{
+		fprintf(stderr,"open aaa.db：%s\n",sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+	char* errmsg;
+	char sql_cmd[]="create table if not exists dict(id  integer primary key asc,word char, mean text);";
+
+	ret = sqlite3_exec(db,sql_cmd,NULL,NULL,&errmsg);
+	if(SQLITE_OK!=ret)
+	{
+		fprintf(stderr,"exec %s:%s\n",sql_cmd,errmsg);
+		sqlite3_free(errmsg);
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	FILE*fp = fopen("/home/linux/dict.txt","r");
+	if(NULL == fp)
+	{
+		perror("open dict.txt");
+		exit(1);
+	}
+	struct stat st;
+	ret = stat("/home/linux/dict.txt",&st);
+	if(-1==  ret)
+	{
+		perror("stat dict");
+		exit(1);
+	}
+	int len = 0;
+	while(1)
+	{
+		char buf[1024]={0};
+		if(fgets(buf,1024,fp))
+		{
+			len+= strlen(buf);
+			char *word = strtok(buf," ");
+			char * mean = strtok(NULL,"\n");
+
+			char insert_cmd[1024]={0};
+			sprintf(insert_cmd,"insert into dict values(NULL,\"%s\",\"%s\");",word,mean);
+			strcpy(insert_cmd,"insert into dict values(NULL,'word','mean')");
+			ret = sqlite3_exec(db,insert_cmd,NULL,NULL,&errmsg);
+			if(SQLITE_OK!=ret)
+			{
+				fprintf(stderr,"exec %s:%s\n",sql_cmd,errmsg);
+				sqlite3_free(errmsg);
+				sqlite3_close(db);
+				exit(1);
+			}
+
+			printf("\rprocess: %f%%",  (float)len/st.st_size *100);
+
+		}
+		else
+			break;
+
+
+
+	}
+	sqlite3_close(db);
+
+	return 0;
+}

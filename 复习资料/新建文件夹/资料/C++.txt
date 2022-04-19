@@ -1,0 +1,112 @@
+
+
+C++中有6个默认的成员函数，在类中未实现的成员函数编译器将默认生成该成员函数。
+
+class Good
+{
+public:
+	Good(char* name= NULL,float price = 0);   //默认构造函数
+	~Good();           //析构函数 
+	Good(const Good &);    //拷贝构造函数 
+	Good& operator =(const Good& g);    //赋值运算符 
+	Good* operator &();     //取址运算符 
+	const Good* operator &()const;    
+private:
+	char* name;
+    float price;
+};
+构造函数
+构造函数是一种特殊的成员函数，在实例化的过程中被调用，只执行一次并且没有this指针。
+
+默认构造函数通常是指无参的构造函数，函数体为空，不执行任何操作，在类内没有任何构造函数时编译器将会默认生成的无参构造函数。
+
+Good::Good()
+{
+	name = new char[1];
+}
+一旦定义了构造函数，则编译器不会在生成默认构造函数。如果需要对对象初始化是可以采用缺省的构造函数和使用初始化参数表两种初始化方式。
+
+Good::Good(char* mname = "",float mprice = 0)
+{
+       if(name != NULL)//strlen 函数不能接受参数 NULL
+       {
+             name = new char[strlen(mname)+1]();
+	     strcpy(name,mname);
+	     price = mprice;            
+        }
+        name = new char[1]();
+        price = 0;	
+}
+Good::Good(char* mname ): price(0);
+初始化列表可以对const修饰的变量或者引用等变量进行初始化。
+
+
+拷贝构造函数
+拷贝构造函数是构造函数的重载，用一个已经创建的对象去构造一个新对象，在该函数内调用g的成员变狼只能用常成员函数函数或者直接访问g的成员变量。
+Good::Good(const Good & g)//只能引用，否则循环调用拷贝构造函数，无穷递归
+{
+	name = new char[strlen(g.name)+1]();//防止浅拷贝，重复析构
+	strcpy(name,g.name);
+	price = g.price;
+}
+
+赋值运算符重载
+对已经存在的对象进行相互赋值的过程。
+Good& Good::operator =(const Good& g)//形参可以使用Good类型,但是使用引用可以提高效率，减少临时对象的生成
+{
+	if(g == this)//排除自赋值的情况
+	{
+		return;
+	}
+	delete[] name;//释放之前占用的资源
+	name = new char[strlen(g.name)+1]();//开辟新资源
+	strcpy(name,g.name);
+	price = g.price;
+}
+赋值运算符重载函数需要考虑：1.是否为自赋值；2.释放占有的旧资源；3.开辟新资源。
+运算符重载函数的参数+const
+1.防止修改形参内存，因为this指针的类型如下
+//this 指针为 Good *const
+2.接收隐式生成的临时量
+ Good G;
+G = "AK";//编译器检查类型不相同，生成临时对象
+临时对象的生存周期为一个语句结束，但explicit关键字禁止隐式转换。
+
+析构函数
+析构函数用来释放被占用的资源比如释放申请的内存、关闭打开的文件；一个类中只用一个析构函数，不能重载；对象声明周期结束时，系统自动调用析构函数。
+
+
+Good::~Good()
+{
+	delete []name;//使用数组的析构方式
+}
+因为函数压栈的关系，调用构造函数和析构函数的顺序，先构造的后析构，后构造的先析构。
+
+
+
+取地址运算符重载
+取地址运算符一般不需要重新定义。
+
+
+const Good* operator &()const
+{
+    return this;
+}
+前一个const表示返回类型为常对象的指针，后一个const表示常成员函数、只能常成员对象调用，
+
+//this :const Good *const
+只能访问变量不能修改变量，使用Mutable关键字的变量可以被修改。
+
+函数后边的const表明在函数体中不能改变对象的成员，当然可以改变mutable变量。函
+
+数的返回值是指向常对象的指针。
+
+
+static函数
+static void  Good::ShowCname()
+{
+   cout << "Good"<<endl;
+}
+static函数属于类不属于对象，没有this指针，不依赖对象调用。
+Good::ShowCname();
+static变量在类外初始化。

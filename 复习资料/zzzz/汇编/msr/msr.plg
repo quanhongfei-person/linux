@@ -1,0 +1,93 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+D:\keil\test1\msr\msr.uvproj
+Project File Date:  08/21/2018
+
+<h2>Output:</h2>
+Build target 'Target 1'
+assembling msr.S...
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=4 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+assembling msr.S...
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=8 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+assembling msr.S...
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=20 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=20 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=20 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=20 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+assembling msr.S...
+msr.S(10): error: A1163E: Unknown opcode m , expecting opcode or Macro
+msr.S:    10 00000014  m mrs r0, cpsr
+msr.S:                 ^
+msr.S: 1 Error, 0 Warnings
+Target not created
+Build target 'Target 1'
+assembling msr.S...
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=36 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=36 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+assembling msr.S...
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=36 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=36 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=36 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+msr.sct(8): warning: L6314W: No section matches pattern *(InRoot$$Sections).
+Program Size: Code=36 RO-data=0 RW-data=0 ZI-data=0  
+msr.sct: Finished: 0 information, 1 warning and 0 error messages.
+"msr.axf" - 0 Error(s), 1 Warning(s).

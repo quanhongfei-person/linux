@@ -1,0 +1,68 @@
+1、 下载源码
+	http://www.sqlite.org/download.html
+	sqlite-autoconf-3220000.tar.gz
+
+2、将源码包复制到主机工作目录下
+mkdir /home/sqlite3             #在主机（如Ubuntu）创建工作目录
+cd /home/sqlite3                #进入工作目录中
+cp sqlite-autoconf-3080500.tar.gz ./        #复制SQLite源码到主机
+tar zxvf sqlite-autoconf-3080500.tar.gz      #解压
+cd sqlite-autoconf-3080500                   #进入解压后的目录
+
+
+3、配置编译选项
+mkdir /home/sqlite3/install       #创建安装目录
+./configure空格--host=arm-none-linux-gnueabi空格--prefix=/home/sqlite3/install
+
+其中，--host：指定交叉编译工具，一般为arm-linux、arm-linux-gnueabihf、
+		arm-none-linux-gnueabi等，具体要和板子用的交叉编译工具对应。
+--prefix： 指定安装目录，编译后的文件会全部放在安装目录中。必须是绝对路径
+
+4、编译安装
+make
+make install
+
+5、安装sqlite3到开发板     
+       pc端安装好的sqlite3            arm开发板的目录
+cp /home/sqlite3/install/bin/sqlite3     /bin
+
+	pc端安装好的sqlite3                          arm开发板的目录
+cp /home/sqlite3/install/lib/libsqlite3.so.0.8.6   /lib
+cd /lib
+ln -s libsqlite3.so.0.8.6 libsqlite3.so.0
+ln -s libsqlite3.so.0.8.6 libsqlite3.so
+
+6、运行sqlite
+在开发板上执行sqlite3命令，看到如下信息说明sqlite3移植成功！
+sqlite3
+SQLite version 3.8.5 2014-06-04 14:06:34
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+sqlite> 
+
+7、根据我自己的sqlite3安装路径, 编译自己的程序，使用sqlite3 数据库，编译选项应该为：
+root@ubuntu:~#	arm-none-linux-gnueabi-gcc gaolu.c  -lsqlite3 -I /nfs_root/13day/install/include -L/nfs_root/13day/install/lib/  -o gaolu
+其中： -I 用来指定头文件的路径 ， -L 用来指定链接库的路径， -l 指定链接库的名字
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

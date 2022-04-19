@@ -1,0 +1,59 @@
+
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include<sqlite3.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+#include<fcntl.h>
+int handle(void* arg,int col,char** result, char** title)
+{
+	*(int*)arg = 1;
+	printf("%s:%s\n",result[0],result[1]);
+	
+}
+int main(int argc, const char *argv[])
+{
+	sqlite3* db;
+	int ret = sqlite3_open("dict.db",&db);
+	if(SQLITE_OK!=ret)
+	{
+		fprintf(stderr,"open aaa.db：%s\n",sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+	
+	// #quit
+	char want_word[1024]={0};
+	printf("input the word...");fflush(stdout);
+	fgets(want_word,1024,stdin);//  \n
+	want_word[strlen(want_word)-1]='\0';
+	
+	
+	
+	char* errmsg;
+	char sql_cmd[1024]={0};//o'clock
+	sprintf(sql_cmd,"select word,mean from dict where word =\"%s\";",want_word);
+	int flag = 0 ;
+	ret = sqlite3_exec(db,sql_cmd,handle,&flag,&errmsg);
+	if(SQLITE_OK!=ret)
+	{
+		fprintf(stderr,"exec %s:%s\n",sql_cmd,errmsg);
+		sqlite3_free(errmsg);
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	if(0 == flag)
+	{
+		printf("cant find word %s\n",want_word);
+		
+	}
+	
+	sqlite3_close(db);
+
+	return 0;
+}

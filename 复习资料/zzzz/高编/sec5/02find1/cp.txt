@@ -1,0 +1,110 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<errno.h> 
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<dirent.h>
+#include<string.h>
+ 
+void cp_file(char *src_file, char *dst_file)
+{
+    FILE *src, *dst;
+    char buf[255];
+    printf("src file: %s\n", src_file);
+    printf("dst file: %s\n", dst_file);
+    src = fopen(src_file, "r");
+    dst = fopen(dst_file, "w");
+    if(NULL == src)
+	{ 
+        printf("src error\n");
+        exit(EXIT_FAILURE);
+    }
+    if(NULL == dst）
+	{
+        printf("dst error\n");
+        exit(EXIT_FAILURE);
+    }
+    while(1）
+	{
+        if(fgets(buf, 255, src))
+		{
+            fputs(buf, dst);
+        }
+		else
+        break;
+	}
+    fclose(src);
+    fclose(dst);
+}
+ 
+void cp_dir(char *src_path, char *dst_path)
+{
+	DIR *srcdir = opendir(src_path);
+	if(NULL == srcdir)
+	{
+		printf("open dir %s error, pls check it.\n", src_path);
+		exit(EXIT_FAILURE);
+	} 
+	struct dirent *tmp = NULL; 
+	char sub_dir_path[255];
+	size_t length = strlen(src_path);
+	memset(sub_dir_path, '\0', 255);
+	strcpy(sub_dir_path, src_path);
+	sub_dir_path[length] = '/';
+	sub_dir_path[length + 1] = '\0';
+ 
+	char dst_dir_path[255];
+	size_t dstlen = strlen(dst_path);
+	memset(dst_dir_path, '\0', 255);
+	strcpy(dst_dir_path, dst_path);
+	dst_dir_path[dstlen] = '/';
+	dst_dir_path[dstlen + 1] = '\0';
+ 
+	char *dirname = strrchr(src_path, '/');
+	printf("dirname %s\n", dirname);
+	strcat(dst_dir_path, dirname);
+	int dst_pre_path_length = strlen(dst_dir_path);
+	mkdir(dst_dir_path, S_IRUSR|S_IWUSR|S_IXUSR);
+ 
+	while(1)
+	{
+		tmp = readdir(srcdir);
+		if(NULL == tmp) break;
+		if(strcmp(".", tmp->d_name) == 0 ||
+			strcmp("..", tmp->d_name) == 0)
+			continue;
+		//1:get source path (file or director)
+		strcat(sub_dir_path, tmp->d_name);
+		if(tmp->d_type ==  DT_DIR)
+		{
+			printf("sub dir name is: %s\n", tmp->d_name);
+			cp_dir(sub_dir_path, dst_dir_path); 
+		}
+		else
+		{
+			//TODO: copy file
+			//set dst file path
+			strcat(dst_dir_path, "/");
+			strcat(dst_dir_path, tmp->d_name);
+			printf("src: %s \ndst: %s\n", sub_dir_path, dst_dir_path);
+			cp_file(sub_dir_path, dst_dir_path);
+			dst_dir_path[dst_pre_path_length] = '\0';
+		}
+		// Reset prefix of source path (file or director)
+		sub_dir_path[length + 1] = '\0';
+	}
+	closedir(srcdir);
+}
+ 
+int main(int argc, char **argv)
+{
+	if(3!= argc)
+	{
+		printf("USAGE: %s src_dir, dst_disr\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+	cp_dir(argv[1], argv[2]);
+	//cp_file(argv[1], argv[2]);
+	return 0;
+}

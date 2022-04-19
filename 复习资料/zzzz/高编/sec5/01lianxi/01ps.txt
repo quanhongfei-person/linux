@@ -1,0 +1,117 @@
+/*
+ * 01ps.c
+ *
+ *  Created on: Mar 17, 2018
+ *      Author: linux
+ */
+
+#include<stdio.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include<unistd.h>
+#include<errno.h>
+#include<stdlib.h>
+#include<string.h>
+int isnum(char * filename)
+{
+	//  asound
+	while(*filename!='\0')
+	{
+
+		if(*filename >='0' && *filename<='9')
+			filename++;
+		else
+			return 0;
+
+	}
+	return 1;
+}
+int main()
+{
+
+	DIR * dir = opendir("/proc");
+	if (NULL == dir)
+	{
+		perror("opendir proc");
+		exit(1);
+
+	}
+	FILE* newfp = fopen("pslog","w");
+	if(NULL==newfp)
+	{
+		fprintf(stderr, "fopen %s:%s\n", "pslog", strerror(errno));
+							exit(1);
+
+	}
+	struct dirent* dirinfo;
+	while (dirinfo = readdir(dir))
+	{
+		if (dirinfo->d_type == DT_DIR)
+		{
+			if(dirinfo->d_name[0]=='.') continue;
+			if (isnum(dirinfo->d_name))
+			{
+				char filename[256] = { 0 };
+				sprintf(filename, "/proc/%s/status", dirinfo->d_name);
+				FILE* fp = fopen(filename, "r");
+				if (NULL == fp)
+				{
+					fprintf(stderr, "fopen %s:%s\n", filename, strerror(errno));
+					exit(1);
+
+				}
+
+				char buf1[50] = { 0 };
+				char buf2[50] = { 0 };
+				char buf3[50] = { 0 };
+				char buf4[50] = { 0 };
+				char buf5[50] = { 0 };
+				char buf6[50] = { 0 };
+				char buf7[50] = { 0 };
+				char buf8[50] = { 0 };
+				fgets(buf1, 50, fp);
+				fgets(buf2, 50, fp);
+				fgets(buf3, 50, fp);
+				fgets(buf4, 50, fp);
+				fgets(buf5, 50, fp);
+				fgets(buf6, 50, fp);
+				fgets(buf7, 50, fp);
+				fgets(buf8, 50, fp);
+
+				char * name = strstr(buf1, "\t");
+				name += 1;
+				name[strlen(name) - 1] = '\0';
+
+				strtok(buf2, "\t");
+				char* state = strtok(NULL, "\n");
+				// Pid:\t1\n
+				char* pid = index(buf4, '\t');
+				pid += 1;
+				pid[strlen(pid)-1]='\0';
+
+				char* ppid = index(buf5, '\t');
+				ppid += 1;
+				ppid[strlen(ppid)-1]='\0';
+				char* uid = index(buf7, '\t');
+				uid += 1;
+				uid= strtok(uid,"\t");
+
+				char* gid = index(buf8, '\t');
+				gid += 1;
+				gid= strtok(gid,"\t");
+				fclose(fp);
+				fprintf(newfp,"%s:%s:%s:%s:%s:%s\n",name,state,
+						pid,ppid,uid,gid);
+				fflush(newfp);
+
+			}
+
+		}
+
+	}
+	fclose(newfp);
+	closedir(dir);
+	printf("done!!!\n");
+	return 0;
+}
+

@@ -1,0 +1,25 @@
+#include<stdio.h>
+#include<pthread.h>
+#include<stdlib.h>
+#include<string.h>
+void* th1(void* arg)
+{
+
+	int i=3;
+	static int a =20;
+	while(i--)
+	{
+		printf("++++++\n");
+	}
+	pthread_exit(&a);
+}
+int main(int argc, const char *argv[])
+{
+	//void a;
+	pthread_t tid;
+	void* ret=NULL;
+	pthread_create(&tid,NULL,th1,NULL);
+	pthread_join(tid,&ret);
+	printf("ret is %d\n",*(int*)ret);
+	return 0;
+}

@@ -1,0 +1,2 @@
+Dependencies for Project 'bic', Target 'Target 1': (DO NOT MODIFY !)
+F (.\bic.S)(0x5B7A5BC3)(--cpu ARM920T -g --apcs=interwork -I "C:\Keil\ARM\INC" -I "C:\Keil\ARM\INC\Samsung" --list "bic.lst" --xref -o "bic.o" --depend "bic.d")

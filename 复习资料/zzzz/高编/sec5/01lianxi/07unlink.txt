@@ -1,0 +1,22 @@
+
+
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+
+int main(int argc, const char *argv[])
+{
+
+	int ret = unlink("./hardlink");
+	if(-1 ==ret)
+	{
+		perror("unlink");
+		exit(1);
+	}
+	else
+	{
+		printf("unlink 成功。。。\n");
+	}
+
+	return 0;
+}

@@ -1,0 +1,4 @@
+--cpu ARM920T "msr.o" --strict --scatter "msr.sct" 
+--autoat --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\msr.map" -o "msr.axf"

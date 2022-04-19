@@ -1,0 +1,27 @@
+#include<stdio.h>
+#include<unistd.h>
+
+
+int main(int argc, const char *argv[])
+{
+	
+	pid_t pid = fork();
+	if(pid>0)
+	{
+		printf("this is father pid:%d,ppid:%d\n",getpid(),getppid());
+		sleep(1);
+	}
+	if(0 == pid)
+	{
+		printf("this is child pid:%d,ppid:%d\n",getpid(),getppid());
+	
+	}
+	if(pid<0)
+	{
+		perror("fork");
+		return 0;
+	}
+
+	printf("end... pid %d,ppid :%d\n",getpid(),getppid());
+	return 0;
+}

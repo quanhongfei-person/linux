@@ -1,0 +1,109 @@
+#include<stdio.h>
+#include<unistd.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include<stdlib.h>
+#include <sys/sem.h>
+//这个联合是给semctl使用的
+union semun {
+	int              val;    /* Value for SETVAL 用于设置初值（1个信号量）*/
+	struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
+	unsigned short  *array;  /* Array for GETALL, SETALL */
+	struct seminfo  *__buf;  /* Buffer for IPC_INFO
+								(Linux-specific) */
+};
+
+//给信号量集合设置初值
+int init_sem(int semid)
+{
+	union semun un;
+	//对应信号量的初值
+	un.val = 1;
+	//setval 设置初值
+	//第二个参数，因为信号量的集合可以当做数组，0 代表第一个元素
+	int ret = semctl(semid,0,SETVAL,un);
+	if(-1 == ret)
+	{
+		perror("sem init");
+		exit(1);
+	}
+
+}
+int sem_P(int semid)
+{
+	//是用于给信号量申请资源或释放资源的结构体
+	struct sembuf buf;
+	//信号量集合中的下标，0代表操作第一个元素
+	buf.sem_num = 0 ;
+	// -1 代表需要在信号量中申请一个资源
+	buf.sem_op = -1;
+	//undo的意思，代表在进程结束的时候，如果之前申请的信号量没有释放的话
+	//会自动。
+	buf.sem_flg = SEM_UNDO;
+	//最后一个参数，表示需要对信号量操作的次数，这个参数会和sem_op相乘，之积表示要申请的资源的个数
+	int ret = semop(semid,&buf,1);
+	if(-1 == ret)
+	{
+		perror("semop");
+		exit(1);
+	}
+}
+int sem_V(int semid)
+{
+	 struct sembuf buf;
+	buf.sem_num = 0 ;
+	buf.sem_op = +1;
+	buf.sem_flg = SEM_UNDO;
+	int ret = semop(semid,&buf,1);
+	if(-1 == ret)
+	{
+		perror("semop");
+		exit(1);
+	}
+}
+int main(int argc, const char *argv[])
+{
+	key_t key = ftok("./",'!');
+	if(-1 == key)
+	{
+		perror("ftok");
+		exit(1);
+	}
+
+	int shmid = shmget(key,4096, IPC_CREAT|0666);
+	if(-1 == shmid)
+	{
+		perror("shmget");
+		exit(1);
+	}
+	
+	int semid = semget(key,1,IPC_CREAT|0666);
+	if(-1 == semid)
+	{
+		perror("semget");
+		exit(1);
+	}
+	void* ptr = shmat(shmid,NULL,0);
+	if(((void *) -1) == ptr )
+	{
+	
+		perror("shmat");
+		exit(1);
+	}
+
+	int i =10;
+	init_sem(semid);
+	sem_P(semid);
+	while(i--)
+	{
+	
+		*(int*)ptr  =  i;
+		printf("%d\n",i);
+		sleep(1);
+	
+	}
+	sem_V(semid);
+	
+
+	return 0;
+}

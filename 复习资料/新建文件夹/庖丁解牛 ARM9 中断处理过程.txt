@@ -1,0 +1,172 @@
+庖丁解牛 ARM9 中断处理过程
+
+
+这个 2440test里面的中断写的向量有些隐蔽，兜了很多个圈，也难怪这么难理解，下面
+就对这个东西抽丝剥茧，看清楚这究竟是一个怎么样的过程。
+中断向量
+b HandlerIRQ ;handler for IRQ interrupt
+很自然，因为所有的单片机都是那样，中断向量一般放在开头，用过单片机的人都会很熟悉
+那就不多说了。
+异常服务程序
+这里不用中断（interrupt）而用异常（exception），毕竟中断只是异常的一种情况，呵呵
+下面主要分析的是“中断异常”说白了，就是我们平时单片机里面用的中断！！！所有有器件
+引起的中断，例如TIMER中断，UART中断，外部中断等等，都有一个统一的入口，那就是中断
+异常 IRQ ! 然后从IRQ的服务函数里面分辨出，当前究竟是什么中断，再跳转到相应的中断
+服务程序。这样看来，ARM比单片机要复杂一些了，不过原理是不变的。
+上面说的就是思路，跟着这个思路来接着分析。
+HandlerIRQ 很明显是一个标号，我们找到了
+HandlerIRQ HANDLER HandleIRQ
+这里是一个宏定义，我们再找到这个宏，看他是怎么定义的：
+MACRO
+$HandlerLabel HANDLER $HandleLabel
+$HandlerLabel
+sub sp,sp,#4 ;decrement sp(to store jump address)
+stmfd sp!,{r0} ;PUSH the work register to stack(lr does not push because it return to original
+address)
+ldr r0,=$HandleLabel ;load the address of HandleXXX to r0
+ldr r0,[r0] ;load the contents(service routine start address) of HandleXXX
+str r0,[sp,#4] ;store the contents(ISR) of HandleXXX to stack
+ldmfd sp!,{r0,pc} ;POP the work register and pc(jump to ISR)
+MEND
+用 HandlerIRQ 将这个宏展开之后得到的结果实际是这样的
+HandlerIRQ
+sub sp,sp,#4 ;decrement sp(to store jump address)
+stmfd sp!,{r0} ;PUSH the work register to stack(lr does not push because it return to original
+address)
+ldr r0,=HandleIRQ ;load the address of HandleXXX to r0
+ldr r0,[r0] ;load the contents(service routine start address) of HandleXXX
+str r0,[sp,#4] ;store the contents(ISR) of HandleXXX to stack
+ldmfd sp!,{r0,pc} ;POP the work register and pc(jump to ISR)
+至于具体的跳转原理下面再说好了，这样的话就容易看的多了，很明显， HandlerIRQ 还是一个标号，IRQ异常向量就是跳
+转到这里执行的，这里粗略看一下，应该是保存现场，然后跳转到真正的处理函数，那么很容易
+发现了这么一句 ldr r0,=HandleIRQ ，没错，我们又找到了一个标号 HandleIRQ ，看来真正的处理函数应该是这个 HandleIRQ ，继续寻找
+AREA RamData, DATA, READWRITE
+^ _ISR_STARTADDRESS ; _ISR_STARTADDRESS=0x33FF_FF00
+HandleReset # 4
+HandleUndef # 4
+HandleSWI # 4
+HandlePabort # 4
+HandleDabort # 4
+HandleReserved # 4
+HandleIRQ # 4
+最后我们发现在这里找到了 HandleIRQ ，^ 其实就是 MAP ，这段程序的意思是，从 _ISR_STARTADDRESS
+开始，预留一个变量，每个变量一个标号，预留的空间为 4个字节，也就是 32BIT，其实这里放的是真正
+的C写的处理函数的地址，说白了，就是函数指针 - -
+这样做的话就很灵活了
+
+接着，我们需要安装IRQ处理句柄，说白了，就是设置处理函数的地址，让PC指针可以正确的跳转。
+于是我们在接着的找到安装句柄的语句
+
+; Setup IRQ handler
+ldr r0,=HandleIRQ ;This routine is needed
+ldr r1,=IsrIRQ ;if there is not 'subs pc,lr,#4' at 0x18, 0x1c
+str r1,[r0]
+说白了就是将 IsrIRQ 的地址填到 HandleIRQ对应的地址里面，前面说了 HandleIRQ 放的是中断处理的函数的入口地址，我们继续找 IsrIRQ
+IsrIRQ
+sub sp,sp,#4 ;reserved for PC
+stmfd sp!,{r8-r9}
+ldr r9,=INTOFFSET
+ldr r9,[r9]
+ldr r8,=HandleEINT0
+add r8,r8,r9,lsl #2
+ldr r8,[r8]
+str r8,[sp,#8]
+ldmfd sp!,{r8-r9,pc}
+
+要理解这个代码，得先学学2440的中断系统了，INTOFFSET存放的是当前中断的偏移号，根据偏移就知道当前是哪个中断源发生的中断。
+注意了，我们说的是中断，而不是异常，看看原来的表是啥样子的
+^ _ISR_STARTADDRESS ; _ISR_STARTADDRESS=0x33FF_FF00
+HandleReset # 4
+HandleUndef # 4
+HandleSWI # 4
+HandlePabort # 4
+HandleDabort # 4
+HandleReserved # 4
+HandleIRQ # 4
+HandleFIQ # 4
+HandleEINT0 # 4
+HandleEINT1 # 4
+HandleEINT2 # 4
+HandleEINT3 # 4
+.......
+可以看到，前面几个是异常，从 HandleEINT0 就是 IRQ异常的向量存放的地方了，这样就可以理解为什么上面 IsrIRQ 里面里面要执行那条指令
+ldr r8,=HandleEINT0
+add r8,r8,r9,lsl #2
+道理很简单， HandleEINT0 就是所有IRQ中断向量表的入口，在这个地址上面，加上一个适当的偏移量，
+INTOFFSET ，那么我们知道现在，到底是哪个IRQ在申请中断了。
+至于具体怎么跳转的？
+首先，我们说了，HandleEINT0 开始的一段内存里面，存放的就是中断服务函数的函数指针，ARM的体系的话，每个指针变量就是占4个字节，这里就解释了，为什么这里为每个标号分配了4个字节的空间，里面放的就是函数指针！！！下面再看看怎么跳转，继续看 IsrIRQ 里面就实现了跳转了
+str r8,[sp,#8]
+ldmfd sp!,{r8-r9,pc}
+其实最核心就是这两句了，先查找到当前中断服务程序的地址，将他放到 R8 里面，然后出栈，弹出给PC
+那么PC很自然就跳到中断服务程序了。至于这里的堆栈问题又是一个非常棘手的，需要好好的参透ARM的中断架构，需要了解的可以自己仔细的阅读 《ARM体系结构与编程》里面说的很详细。我们这里的重点是研究怎么跳转。
+最后，我们看看在C代码中是怎么安装终端向量的，例如看 按键的外部中断，是怎么具体设置的，参看/src/keyscan.c 里面的代码很简单，里面只有3个函数
+KeyScan_Test 是按键测试的主函数
+Key_ISR 是按键中断服务函数
+在 KeyScan_Test里面，我们发现了有这么一句
+pISR_EINT0 = pISR_EINT2 = pISR_EINT8_23 = (U32)Key_ISR;
+可以理解否？ Key_ISR就是上面提到的按键中断服务函数，函数的名字，代表的就是函数的地址！！！！
+将中断服务函数的地址，注意了，是地址，这是一个 U32型的变量。送到几个变量，我们以pISR_EINT0
+作为例子，查看头文件定义，在 2440addr.h 里面找到
+// Interrupt vector
+#define pISR_EINT0 (*(unsigned *)(_ISR_STARTADDRESS+0x20))
+_ISR_STARTADDRESS有没有似曾相识的感觉？没错，刚才分析的汇编代码里面就提到了
+^ _ISR_STARTADDRESS ; _ISR_STARTADDRESS=0x33FF_FF00
+HandleReset # 4
+HandleUndef # 4
+......
+对，地址就是这里，然后 _ISR_STARTADDRESS+0x20 就是跳过前面的异常向量，进入IRQ中断向量的入口
+所以说到尾
+pISR_EINT0 = (U32)Key_ISR;
+完成的操作就是，将 Key_ISR 的地址存放到
+HandleEINT0 # 4
+这个IRQ向量表里面！！！！
+当按键中断发生的时候，发生IRQ异常中断
+当前PC值-4 保存到LR_IRQ里面，然后执行
+b HandlerIRQ
+然后是执行
+HandlerIRQ
+sub sp,sp,#4 ; 预留一个用来存放PC地址
+stmfd sp!,{r0} ; 保存R0，因为下面使用了
+ldr r0,=HandleIRQ ; 将HandleIRQ（服务程序）的地址装载到R0
+ldr r0,[r0]
+str r0,[sp,#4] ; 保存到刚才预留的地方
+ldmfd sp!,{r0,pc} ; 弹出堆栈，恢复R0，并且将刚才计算好的 HandleIRQ 地址弹出到 PC
+堆栈是向下生长的，所以 SUB SP,SP,#4 就相当于 PUSH XX，但是这个XX这个时候并没有用，因为这里用的是强制移动 SP 指针实现的。然后得到服务程序的地址，再将这个值放回刚才预留的栈的空位上面，最后
+就是POP出R0恢复，并且将刚才得到的服务程序的地址送到 PC，那么实现的效果就是跳转到 HandleIRQ 里面了。
+接着看刚才是怎么安装的HandleIRQ 的
+; Setup IRQ handler
+ldr r0,=HandleIRQ ;This routine is needed
+ldr r1,=IsrIRQ ;if there is not 'subs pc,lr,#4' at 0x18, 0x1c
+str r1,[r0]
+可以看出，这里将 IsrIRQ 的地址的值保存到 HandleIRQ 中，也就是说，上面的 IRQ 服务程序，这个时候实际上就是指 IsrIRQ ！
+所以接着的事情就是转移到 IsrIRQ 中执行：
+IsrIRQ
+sub sp,sp,#4 ; 预留一个值来保存PC
+stmfd sp!,{r8-r9}
+ldr r9,=INTOFFSET ; 计算偏移量，下面解释
+ldr r9,[r9]
+ldr r8,=HandleEINT0
+add r8,r8,r9,lsl #2
+ldr r8,[r8]
+str r8,[sp,#8] ; 因为保存了2个寄存器R8 R9 ，所以SP下移了8位
+ldmfd sp!,{r8-r9,pc} ; 恢复寄存器，弹出到PC，同上面的一样
+怎么保存，操作SP，跟最后弹出到PC的部分和上面的例子一样，下面说说中间的计算部分
+计算偏移量，其实原理很简单，首先 INTOFFSET 保存着当前是哪个IRQ中断，例如 0代表着 HandleEINT0，1代表HandleEINT1 ..... 等等，这不是乱来，有一个表的，这个是由 S3C2440 的datasheet说的，自己可以去查看。
+然后得到 中断处理函数的向量表，这个表的首地址就是 HandleEINT0，那么很自然的想到，怎么查表？那还不简
+单？HandleEINT0 + INTOFFSET 不就完了？基地址加偏移量就得到表中某项了，当然，因为这里是中断处理向量每一项占用4个字节，所以用lsl #2处理一下，左移2位相当于乘以4，偏移量乘以4，这应该很好理解的。
+我们这个例子找到的就是 HandleEINT0 ，将里面的值读出来，里面放的是 HandleEINT0 服务函数的地址，这个
+地址怎么来的？是在C程序里面设置的。我们看 keyscan.c 程序，找到一个 void KeyScan_Test(void) 函数，里面有这么一句：
+pISR_EINT0 = pISR_EINT2 = pISR_EINT8_23 = (U32)Key_ISR;
+这里是安装了3个按键中断服务程序，我们只关注 0号中断，也就是
+pISR_EINT0 = (U32)Key_ISR;
+这句话什么意思？先看看pISR_EINT0的定义，在 2440addr.h 中定义
+#define pISR_EINT0 (*(unsigned *)(_ISR_STARTADDRESS+0x20))
+看到没有？_ISR_STARTADDRESS 不就是刚才说的那个异常向量的入口地址？加上一个 0x20
+之后实际上指向的，就是 HandleEINT0 ！！！这么说来，上面的意思就是，将 Key_ISR 处理函数的入口地址，送到 HandleEINT0 中。嵌入式学习QQ754634522
+再来看 Key_ISR ，这是一个典型的服务程序，加了_irq 作为编译关键字，告诉编译器，这个函数是中断服务程序得保存需要的寄存器，免得被破坏。具体可以参考 《ARM体系结构与编程》P283 页的描述。
+static void __irq Key_ISR(void)
+{
+.......
+}
+加上 _irq 关键字之后，编译器就会处理好所有的保存动作了，并不需要多关心。但是这个是 ARM-CC 编译器的关键字，GCC中并没有这个东西，所以GCC处理中断的时候最好还是自己保存一下。深圳专业嵌入式ARM、Linux、单片机专业技术实训，学习顾问郭老师：QQ754634522

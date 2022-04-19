@@ -1,0 +1,74 @@
+/*
+ ============================================================================
+ Name        : 12jsq.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include<string.h>
+#include<unistd.h>
+#include<pthread.h>
+typedef struct __JSQ__
+{
+	float a;
+	float b;
+	char c;
+	float d;
+}JSQ;
+
+void* th(void* arg)
+{
+	JSQ* temp =  (JSQ*)arg;
+	switch(temp->c)
+	{
+	case '+':
+		temp->d = temp->a + temp->b;
+		break;
+	case '-':
+		temp->d = temp->a - temp->b;
+		break;
+	case '*':
+		temp->d = temp->a * temp->b;
+			break;
+		case '/':
+			temp->d = temp->a / temp->b;
+			break;
+		default:
+			fprintf(stderr,"表达式有误");
+			exit(1);
+
+
+	}
+	pthread_exit(temp);
+}
+int main(void)
+{
+
+	JSQ jsq;
+	printf("请输入个表达式：");fflush(stdout);
+	char buf[256]={0};
+	fgets(buf,256,stdin);//3.14 * 5.2\n
+	char *arg1=NULL;
+	char * arg2 =NULL;
+	char *arg3=NULL;
+	arg1 = strtok(buf," ");
+	arg2 = strtok(NULL," ");//*\0
+	arg3=	strtok(NULL,"\n");
+	jsq.a = strtof(arg1,NULL);
+	jsq.b = strtof(arg3,NULL);
+	jsq.c = arg2[0];
+	pthread_t tid;
+	pthread_create(&tid,NULL,th,&jsq);
+	void* ret;
+	pthread_join(tid,&ret);
+	printf("result %f\n", ((JSQ*)ret)->d);
+
+
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

@@ -1,0 +1,20 @@
+#include<stdio.h>
+#include<pthread.h>
+#include<stdlib.h>
+int a = 20;
+
+void* th1(void* arg)
+{
+
+	printf("sub thread++++\n");
+	a+=10;
+	
+}
+int main(int argc, const char *argv[])
+{
+	pthread_t tid;
+	pthread_create(&tid,NULL,th1,NULL);
+	sleep(5);
+	printf("main thread a is %d\n",a);
+	return 0;
+}

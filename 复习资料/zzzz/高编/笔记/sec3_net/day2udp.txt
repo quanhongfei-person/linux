@@ -1,0 +1,143 @@
+网络编程之 UDP
+
+1、特性： 无链接  不可靠  大数据
+
+2、框架： C/S模式 
+
+   server：socket() ===>bind()===>recvfrom()===>close()
+   client：socket() ===>bind()===>sendto() ===>close()
+
+
+注意：socket(）的参数需要调整。
+
+      socket(PF_INET,SOCK_DGRAM,0);
+
+	  bind() 客户端是可选的，服务器端是必选的。
+
+发送接收函数：
+ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+	         const struct sockaddr *dest_addr, socklen_t addrlen);
+
+功能：用于UDP协议中向对方发送数据。
+参数：sockfd  本地的套接字id
+	  buff    本地的数据存储，一般是要发送的数据。
+	  len     要发送的数据长度
+	  flags   要发送数据方式，0 表示阻塞发送。
+
+	  dest_addr: 必选，表示要发送到的目标主机信息结构体。
+	  addrlen ：目标地址长度。
+
+返回值：成功  发送的数据长度
+	    失败   -1；
+
+
+ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+                  struct sockaddr *src_addr, socklen_t *addrlen);
+
+功能：用于UDP协议中获取对方发送的数据。
+参数：sockfd 本地的套接字id
+	  buff   要存储数据的内存区，一般是数组或者动态内存。
+	  len    要获取的数据长度，一般是buff的大小。
+	  flags  获取方式，0 阻塞
+
+	  src_addr 可选，表示对方的地址信息结构体，
+	  			如果为NULL，表示不关心对方地址。
+	  addrlen  对方地址信息结构体大小。
+	  			如果对方地址是NULL，则该值也为NULL。
+返回值：成功 接收到的数据长度
+		失败  -1；
+
+练习：
+1、根据以上知识点编写UDP测试程序，验证UDP协议的无链接性质。
+
+2、根据UDP协议特征编写基于UDP的点对点聊天程序。
+
+3、将以上知识点融合，考虑如何实现一个基于UDP的聊天室程序。
+	要求如下：
+	1、要有注册过程，每个客户端必须在服务器端有注册信息。
+	2、任意客户端发送的消息必须由服务器转发给所有在线客户端。
+	3、任意客户端下线必须通知其他在线用户主机。
+	
+	
+	
+	
+	ser.c
+	struct package
+	{
+		name;
+		type;
+		buf;
+	}
+	
+	struct IPPACK;
+	{
+		sockaddr_in ip;
+		int num;//0 ,useable
+				//1,occupt
+	}
+	IPPACK pack[100];
+	do_login()
+	{
+	
+		for(i=0;i<100;i++)
+		{
+			if(pack[i],num == 0)
+			{
+				pack[i].ip =ip;
+				num = 1;
+			}
+		}
+	}
+	
+	do_chat()
+	{
+		for(i = 0 ;i<100;i++)
+		if( ip  != pack[i].ip )
+		
+		sendto(,pack[i].ip);
+		
+	}
+	
+	main
+	{
+		while(1)
+		{
+			ret =recvfrom(&package,&cli,)
+			if(ret > 0)
+			{
+				switch(package.type)
+				{
+					case 1:
+					do_login();
+					case 2:
+					do_chat();
+					csse 3:
+					do_quit();
+					default:
+					continue;
+				
+				}
+				
+			}
+			
+			
+		}
+	}
+	
+	
+	
+	cli.c
+	main()
+	{
+		fget name;
+		type =1;
+		sendto();
+		
+		fork();
+		>0
+			
+		
+		==0
+	
+	
+	}

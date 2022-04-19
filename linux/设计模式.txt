@@ -1,0 +1,1187 @@
+数据结构、算法、设计模式、重构、软件工程
+
+设计模式：设计模式是在特定环境下人们解决重复出现问题的一套成功或有效的解决方案。即在一定环境下，用固定套路解决问题。
+
+软件设计模式的种类：GoF提出的设计模式有23个，
+
+  包括：
+	创建型（Creational）模式：如何创建对象；
+
+    结构型（Structural）模式：如何实现类或对象的组合；
+
+    行为型（Behavioral）模式：类或对象怎样交互以及怎样分配职责。
+
+有一个“简单工厂模式”不属于GoF23种设计模式，
+
+学习设计模式将有助于更加深入地理解面向对象思想。让你知道：
+
+    1. 如何将代码分散在几个不同的类中？
+
+    2. 为什么要有“接口“？
+
+    3. 何谓针对抽象编程？
+
+    4. 何时不应该使用继承？
+
+    5. 如果不修改源代码增加新功能？
+
+    6. 更好的阅读和理解现有类库与其他系统中的源代码。
+
+学习设计模式会让你早点脱离面向对象编程的“菜鸟期”。
+
+设计 模式的基础是：多态。
+
+初学者：积累案例，不要盲目背类图。
+
+初级开发人员：多思考，多梳理，归纳总结，尊重事物的认知规律，注意临界点的突破，不浮躁。
+
+中级开发人员：合适的开发环境，寻找合适的设计模式来解决问题。多应用，对经典组合设计模式的大量、自由的运用。不断追求。
+
+
+
+2. 面向对象设计原则
+
+对于面向对象软件系统的设计而言，在支持可维护性的同时，提高系统的可复用性是一个至关重要的问题，如何同时提高一个软件系统的可维护性和可复用性是面向对象设计需要解决的核心问题之一。在面向对象设计中，可维护性的复用是以设计原则为基础的。每一个原则都蕴含一些面向对象设计的思想，可以从不同的角度提升一个软件结构的设计水平。
+面向对象设计原则为支持可维护性复用而诞生，这些原则蕴含在很多设计模式中，它们是从许多设计方案中总结出的指导性原则。面向对象设计原则也是我们用于评价一个设计模式的使用效果的重要指标之一。
+原则的目的：高内聚，低耦合
+2.1 面向对象设计
+
+
+
+1.  开闭原则：
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+//计算器
+class Caculator{
+public:
+  Caculator(){
+    this->a = 0;
+    this->b = 0;
+    this->MyOperator = "";
+  }
+  //获得结果
+  int GetResult(int a, int b, string MyOperator){
+    if (MyOperator.compare("+") == 0){
+      return a + b;
+    }
+    else if (MyOperator.compare("-") == 0){
+      return a - b;
+    }
+    else if (MyOperator.compare("/") == 0){
+      return a / b;
+    }
+    else if (MyOperator.compare("*") == 0){
+      return a * b;
+    }
+    else{
+      return -1;
+    }
+  }
+public:
+  int a;
+  int b;
+  string MyOperator;
+};
+
+void test01(){
+  Caculator caculator;
+  int ret = caculator.GetResult(10,20,"+");
+  cout << ret << endl;
+}
+//最好扩展功能的时候，不要去修改源代码，应该通过增加代码完成扩展
+//简单问题复杂化....
+//计算器的抽象类
+class AbstractCaculator{
+public:
+  AbstractCaculator(int a,int b):a(a),b(b){}
+  virtual int GetResult() = 0; //纯虚函数
+public:
+  int a;
+  int b;
+};
+//加法计算器
+class Plus : public AbstractCaculator{
+public:
+  Plus(int a, int b) :AbstractCaculator(a, b){}
+  virtual int GetResult(){
+    return a + b;
+  }
+};
+//减法计算器
+class Minute : public AbstractCaculator{
+public:
+  Minute(int a, int b) :AbstractCaculator(a, b){}
+  virtual int GetResult(){
+    return a - b;
+  }
+};
+//除法计算器
+class Divide : public AbstractCaculator{
+public:
+  Divide(int a, int b) :AbstractCaculator(a, b){}
+  virtual int GetResult(){
+    return a / b;
+  }
+};
+//乘法
+class Multiplies : public AbstractCaculator{
+public:
+  Multiplies(int a, int b) : AbstractCaculator(a, b){}
+  virtual int GetResult(){
+    return a * b;
+  }
+};
+//新增加功能 取模运算  通过增加代码完成
+class Module : public AbstractCaculator{
+public:
+  Module(int a, int b) : AbstractCaculator(a, b){}
+  virtual int GetResult(){
+    return a % b;
+  }
+};
+//计算操作
+void doBussiness(AbstractCaculator* caculator){
+  caculator->GetResult();
+}
+void test02(){
+  AbstractCaculator* caculator = NULL;
+  //创建加法计算器
+  caculator = new Plus(10,20);
+  cout << "结果：" << caculator->GetResult() << endl;
+  delete caculator;
+  caculator = new Minute(100,20);
+  cout << "结果：" << caculator->GetResult() << endl;
+  delete caculator;
+}
+
+int main(){
+  test01();
+  test02();
+  system("pause");
+  return EXIT_SUCCESS;
+}
+
+
+2. 迪米特法则
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+#include<list>
+using namespace std;
+//抽象楼盘
+class AbstractBuilding{
+public:
+  virtual void sale() = 0;
+public:
+  string quality;
+};
+//具体楼盘A 低档楼盘
+class BuidingA : public AbstractBuilding{
+public:
+  BuidingA(){
+    quality = "低品质";
+  }
+  virtual void sale(){
+    cout << "低档楼盘被售卖!" << endl;
+  }
+};
+//具体楼盘B 中档楼盘
+class BuidingB : public AbstractBuilding{
+public:
+  BuidingB(){
+    quality = "中品质";
+  }
+  virtual void sale(){
+    cout << "中档楼盘被售卖!" << endl;
+  }
+};
+//具体楼盘C 高档楼盘
+class BuidingC : public AbstractBuilding{
+public:
+  BuidingC(){
+    quality = "高品质";
+  }
+  virtual void sale(){
+    cout << "高档楼盘被售卖!" << endl;
+  }
+};
+//中介
+class Mediator{
+public:
+  Mediator(){
+    //初始化 将所有楼盘信息保存起来
+    AbstractBuilding* buiding = NULL;
+    buiding = new BuidingA;
+    mList.push_back(buiding);
+
+    buiding = new BuidingB;
+    mList.push_back(buiding);
+
+    buiding = new BuidingC;
+    mList.push_back(buiding);
+  }
+  //提供对外接口
+  AbstractBuilding* findBuiding(string quality){
+    for (list<AbstractBuilding*>::iterator it = mList.begin(); it != mList.end(); it ++){
+      if ((*it)->quality.compare(quality) == 0){
+        return *it;
+      }
+    }
+    return NULL;
+  }
+
+  ~Mediator(){
+    for (list<AbstractBuilding*>::iterator it = mList.begin(); it != mList.end(); it ++){
+      if (*it != NULL){
+        delete *it;
+      }
+    }
+  }
+public:
+  //需要容器保存楼盘信息
+  list<AbstractBuilding*> mList;
+};
+//业务类 就是找到我想要的高品质楼盘
+void doBussiness(){
+  //创建中介
+  Mediator* mediator = new Mediator;
+  AbstractBuilding* buiding =  mediator->findBuiding("不高不低");
+  if (buiding == NULL){
+    cout << "没有满足条件的楼盘!" << endl;
+    return;
+  }
+  buiding->sale();
+}
+
+int main(){
+  doBussiness();
+
+  system("pause");
+  return EXIT_SUCCESS;
+}
+3. 合成复用原则
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+
+//组合和继承，优先使用组合
+class AbstractCar{
+public:
+  virtual void run() = 0;
+};
+
+//宝马
+class BMWCar : public AbstractCar{
+public:
+  virtual void run(){
+    cout << "宝马车启动..." << endl;
+  }
+};
+
+//大众
+class DassCar : public AbstractCar{
+public:
+  virtual void run(){
+    cout << "大众车启动..." << endl;
+  }
+};
+
+//人开着宝马车去上班
+class Person : public BMWCar{
+public:
+  void GoWork(){
+    run();
+  }
+};
+
+//合成复用 继承和组合优先使用组合
+class PersonTall{
+public:
+  void setCar(AbstractCar* car){
+    this->pCar = car;
+  }
+  void GoWork(){
+    pCar->run();
+  }
+public:
+  AbstractCar* pCar;
+};
+
+void test01(){
+
+  AbstractCar* car = NULL;
+  car = new BMWCar;
+  PersonTall* person = new PersonTall;
+  //开宝马
+  person->setCar(car);
+  person->GoWork();
+
+  delete car;
+  //开大众
+  car = new DassCar;
+  person->setCar(car);
+  person->GoWork();  
+}
+
+int main(){
+  test01();
+
+  system("pause");
+  return EXIT_SUCCESS;
+}
+4. 依赖倒转原则
+
+
+
+传统的过程式设计倾向于使高层次的模块依赖于低层次的模块，抽象层依赖于具体的层次。
+
+
+传统的设计模式通常是自定向下逐级依赖，这一，底层模块，中层模块和高层模块的耦合度极高，若任意修改其中的一个，很容易导致全面的修改，非常麻烦，那么依赖倒转原则利用多态的先天特性，对中间抽象层进行依赖，这样，底层和高层之间进行了解耦合。
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+
+//银行工作人员
+class BankWorker{
+public:
+  void Pay(){
+    cout << "支付业务" << endl;
+  }
+
+  void Transform(){
+    cout << "转账业务" << endl;
+  }
+
+  void Save(){
+    cout << "存款业务" << endl;
+  }
+};
+
+void doBussiness01(){
+  //违反单一职责原则
+  BankWorker* worker = new BankWorker;
+  worker->Pay();
+  worker->Save();
+  worker->Transform();
+}
+
+//抽象银行工作人员
+class AbstractBankWorker{
+public:
+  virtual void doBussiness() = 0;
+};
+
+//专门负责支付业务
+class PayBankWorker : public AbstractBankWorker{
+public:
+  virtual void doBussiness(){
+    cout << "办理支付业务!" << endl;
+  }
+};
+
+//专门负责转账业务
+class TransformBankWorker : public AbstractBankWorker{
+public:
+  virtual void doBussiness(){
+    cout << "办理转账业务!" << endl;
+  }
+};
+
+//专门办理存款业务
+class SaveBankWorker : public AbstractBankWorker{
+public:
+  virtual void doBussiness(){
+    cout << "办理存款业务!" << endl;
+  }
+};
+
+//高层业务
+void doLogic(AbstractBankWorker* worker){
+  worker->doBussiness();
+}
+
+void test01(){
+  AbstractBankWorker* worker = NULL;
+  worker = new SaveBankWorker;
+  //高层业务
+  doLogic(worker);
+}
+int main(){
+
+  test01();
+
+  system("pause");
+  return EXIT_SUCCESS;
+}
+3. 创建型模型
+
+3.1 简单工厂模式
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+
+//抽象水果
+class AbstractFruit{
+public:
+  virtual void ShowName() = 0;
+};
+//苹果
+class Apple : public AbstractFruit{
+public:
+  virtual void ShowName(){
+    cout << "我是苹果!" << endl;
+  }
+};
+
+//香蕉
+class Banana : public AbstractFruit{
+public:
+  virtual void ShowName(){
+    cout << "我是香蕉!" << endl;
+  }
+};
+
+//鸭梨
+class Pear : public AbstractFruit{
+public:
+  virtual void ShowName(){
+    cout << "我是鸭梨!" << endl;
+  }
+};
+//新增：西瓜
+class Watermellon : public AbstractFruit{
+public:
+  virtual void ShowName(){
+    cout << "我是西瓜!" << endl;
+  }
+};
+//水果工厂
+class FruitFactory{
+public:
+  static AbstractFruit* CreateFruit(string tag){
+    if (tag.compare("apple") == 0){
+      return new Apple;
+    }
+    else if (tag.compare("banana") == 0){
+      return new Banana;
+    }
+    else if (tag.compare("pear") == 0){
+      return new Pear;
+    }
+    else if (tag.compare("watermellon") == 0){  //新增水果，修改源代码，违背了开闭原则
+      return new Watermellon;
+    }
+    else{
+      return NULL;
+    }
+  }
+};
+
+//给工厂传入参数，工厂根据参数动态创建对象
+void test01(){
+  //创建苹果
+  AbstractFruit* furit =  FruitFactory::CreateFruit("apple");
+  furit->ShowName();
+  //创建梨
+  delete furit;
+  furit = FruitFactory::CreateFruit("pear");
+  furit->ShowName();
+  //创建香蕉
+  delete furit;
+  furit = FruitFactory::CreateFruit("banana");
+  furit->ShowName();
+}
+
+int main(){
+  test01();
+
+  system("pause");
+  return EXIT_SUCCESS;
+}
+优点：
+
+实现了对象创建和使用的分离
+
+不需要记住具体类名，记住参数即可，减少使用者记忆量。
+
+缺点：
+
+1. 对工厂类职责过重，一旦不能工作，系统受到影响。
+
+2. 增减系统中类的个数，复杂度和理解度增加。
+
+3. 违反“开闭原则”，添加新产品需要修改工厂逻辑，工厂越来越复杂。
+
+3.2 工厂方法模式
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+
+//抽象水果
+class AbstractFruit{
+public:
+  virtual void ShowName() = 0;
+};
+
+//苹果
+class Apple : public AbstractFruit{
+public:
+  virtual void ShowName(){
+    cout << "我是苹果!" << endl;;
+  }
+};
+
+//香蕉
+class Banana : public AbstractFruit{
+public:
+  virtual void ShowName(){
+    cout << "我是香蕉!" << endl;;
+  }
+};
+
+//鸭梨
+class Pear : public AbstractFruit{
+public:
+  virtual void ShowName(){
+    cout << "我是鸭梨!" << endl;;
+  }
+};
+
+//抽象工厂
+class AbstractFactory{
+public:
+  virtual AbstractFruit* CreateFruit() = 0;
+};
+
+//苹果工厂
+class AppleFactory : public AbstractFactory{
+public:
+  virtual AbstractFruit* CreateFruit() {
+    return new Apple;
+  }
+};
+
+//香蕉工厂
+class BananaFactory : public AbstractFactory{
+public:
+  virtual AbstractFruit* CreateFruit() {
+    return new Banana;
+  }
+};
+
+//鸭梨工厂
+class PearFactory : public AbstractFactory{
+public:
+  virtual AbstractFruit* CreateFruit() {
+    return new Pear;
+  }
+};
+
+void test01(){
+  
+  AbstractFruit* fruit = NULL;
+  AbstractFactory* factory = NULL;
+
+  //我想吃苹果
+  factory = new AppleFactory;
+  fruit = factory->CreateFruit();
+  fruit->ShowName();
+
+  delete fruit;
+  delete factory;
+
+  //我想吃香蕉
+  factory = new BananaFactory;
+  fruit = factory->CreateFruit();
+  fruit->ShowName();
+  
+  delete fruit;
+  delete factory;
+
+  //我想吃鸭梨
+  factory = new PearFactory;
+  fruit = factory->CreateFruit();
+  fruit->ShowName();
+  delete fruit;
+  delete factory;
+}
+
+int main(){
+
+  test01();
+  system("pause");
+  return EXIT_SUCCESS;
+}
+3.3 抽象工厂模式
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+
+//抽象苹果
+class AbstractApple{
+public:
+  virtual void ShowName() = 0;
+};
+
+//中国苹果
+class ChinaApple : public AbstractApple{
+public:
+  virtual void ShowName(){
+    cout << "我是中国苹果！" << endl;
+  }
+};
+
+//美国苹果
+class USAApple : public AbstractApple{
+public:
+  virtual void ShowName(){
+    cout << "我是美国苹果！" << endl;
+  }
+};
+
+//日本苹果
+class JapanApple : public AbstractApple{
+public:
+  virtual void ShowName(){
+    cout << "我是日本小苹果！" << endl;
+  }
+};
+
+//新增:非洲苹果
+class AfricanApple : public AbstractApple{
+public:
+  virtual void ShowName(){
+    cout << "我是非洲黑苹果！" << endl;
+  }
+};
+
+//抽象香蕉
+class AbstractBanana{
+public:
+  virtual void ShowName() = 0;
+};
+
+//中国香蕉
+class ChinaBanana :public AbstractBanana{
+public:
+  virtual void ShowName(){
+    cout << "我是中国大香蕉！" << endl;
+  }
+};
+
+//美国香蕉
+class USABanana : public AbstractBanana{
+public:
+  virtual void ShowName(){
+    cout << "我是美国香蕉！" << endl;
+  }
+};
+
+//日本香蕉
+class JapanBanana : public AbstractBanana{
+public:
+  virtual void ShowName(){
+    cout << "我是日本小香蕉！" << endl;
+  }
+};
+
+//新增:非洲香蕉
+class AfricanBanana : public AbstractBanana{
+public:
+  virtual void ShowName(){
+    cout << "我是非洲黑香蕉！" << endl;
+  }
+};
+
+//抽象鸭梨
+class AbstractPear{
+public:
+  virtual void ShowName() = 0;
+};
+
+//中国鸭梨
+class ChinaPear :public AbstractPear{
+public:
+  virtual void ShowName(){
+    cout << "我是中国大鸭梨！" << endl;
+  }
+};
+
+//美国鸭梨
+class USAPear :public AbstractPear{
+public:
+  virtual void ShowName(){
+    cout << "我是美国鸭梨！" << endl;
+  }
+};
+
+//日本鸭梨
+class JapanPear :public AbstractPear{
+public:
+  virtual void ShowName(){
+    cout << "我是日本小鸭梨！" << endl;
+  }
+};
+
+//非洲鸭梨
+class AfricanPear : public AbstractPear{
+public:
+  virtual void ShowName(){
+    cout << "我是非洲黑鸭梨！" << endl;
+  }
+};
+
+//抽象工厂
+class AbstractFactory{
+public:
+  virtual AbstractApple* CreateApple() = 0;
+  virtual AbstractBanana* CreateBanana() = 0;
+  virtual AbstractPear* CreatePear() = 0;
+
+  //新增葡萄  
+};
+
+//中国工厂
+class ChinaFactory : public AbstractFactory{
+public:
+  virtual AbstractApple* CreateApple(){
+    return new ChinaApple;
+  }
+  virtual AbstractBanana* CreateBanana(){
+    return new ChinaBanana;
+  }
+  virtual AbstractPear* CreatePear(){
+    return new ChinaPear;
+  }
+};
+
+//美国工厂
+class USAFactory : public AbstractFactory{
+public:
+  virtual AbstractApple* CreateApple(){
+    return new USAApple;
+  }
+  virtual AbstractBanana* CreateBanana(){
+    return new USABanana;
+  }
+  virtual AbstractPear* CreatePear(){
+    return new USAPear;
+  }
+};
+
+//日本小工厂
+class JapanFactory : public AbstractFactory{
+public:
+  virtual AbstractApple* CreateApple(){
+    return new JapanApple;
+  }
+  virtual AbstractBanana* CreateBanana(){
+    return new JapanBanana;
+  }
+  virtual AbstractPear* CreatePear(){
+    return new JapanPear;
+  }
+};
+
+//非洲黑工厂
+class AfricanFactory : public AbstractFactory{
+public:
+  virtual AbstractApple* CreateApple(){
+    return new AfricanApple;
+  }
+  virtual AbstractBanana* CreateBanana(){
+    return new AfricanBanana;
+  }
+  virtual AbstractPear* CreatePear(){
+    return new AfricanPear;
+  }
+};
+
+//如果你增加一个产品族，符合开闭原则
+//如果增加一个产品等级结构，不符合开闭原则
+void test01(){
+  
+  AbstractApple* apple = NULL;
+  AbstractBanana* banana = NULL;
+  AbstractPear* pear = NULL;
+  AbstractFactory* factory = NULL;
+
+  //想吃中国苹果 香蕉 梨
+  factory = new ChinaFactory; 
+  apple = factory->CreateApple();
+  banana = factory->CreateBanana();
+  pear = factory->CreatePear();
+
+  apple->ShowName();
+  banana->ShowName();
+  pear->ShowName();
+
+  delete pear;
+  delete banana;
+  delete apple;
+  delete factory;
+
+  //想吃美国的苹果 香蕉 梨
+  factory = new USAFactory;
+  apple = factory->CreateApple();
+  banana = factory->CreateBanana();
+  pear = factory->CreatePear();
+
+  apple->ShowName();
+  banana->ShowName();
+  pear->ShowName();
+
+  delete pear;
+  delete banana;
+  delete apple;
+  delete factory;
+
+  //想吃日本
+  factory = new JapanFactory;
+  apple = factory->CreateApple();
+  banana = factory->CreateBanana();
+  pear = factory->CreatePear();
+
+  apple->ShowName();
+  banana->ShowName();
+  pear->ShowName();
+
+  delete pear;
+  delete banana;
+  delete apple;
+  delete factory;
+
+}
+
+int main(){
+
+  test01();
+
+  system("pause");
+  return EXIT_SUCCESS;
+}
+3.4 单例模式
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+
+class A{
+public:
+  static A* getInstance(){
+    return intance;
+  }
+private:
+  A(){
+    cout << "hello 1" << endl;
+  }
+  static A* intance;
+  
+};
+
+A* A::intance = new A; //编译阶段 创建这个对象
+
+int main01(){
+
+  cout << "hello 2" << endl;
+
+  //A* a = new A; // A a;
+  //A* aa = new A; // A aa;
+
+  A* a = A::getInstance();
+  A* b = A::getInstance();
+
+  if (a == b){
+    cout << "同一个对象！" << endl;
+  }
+  else{
+    cout << "不是同一个对象!" << endl;
+  }
+
+  system("pause");
+  return EXIT_SUCCESS;
+}
+3.5 代理模式
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+#include<string>
+using namespace std;
+
+//商品类
+class Goods{
+public:
+  Goods(string name,bool isreal){
+    this->name = name;
+    this->IsReal = isreal;
+  }
+public:
+  string name;
+  bool IsReal;
+};
+
+//抽象购物
+class AbstractShopping{
+public:
+  virtual void BuyGoods(Goods* goods) = 0;
+};
+
+//美国购物
+class USAShopping : public AbstractShopping{
+public:
+  virtual void BuyGoods(Goods* goods){
+    if (goods->IsReal){
+      cout << "在美国购买" << goods->name << endl;
+      cout << "通过海关安检，将商品带回祖国！" << endl;
+    }
+    else{
+      cout << "在美国购买的" << goods->name << "是假货,放弃购买!" << endl;
+    }
+  }
+};
+
+//日本购物
+class JapanShopping : public AbstractShopping{
+public:
+  virtual void BuyGoods(Goods* goods){
+    if (goods->IsReal){
+      cout << "在日本购买" << goods->name << endl;
+      cout << "通过海关安检，将商品带回祖国！" << endl;
+    }
+    else{
+      cout << "在日本购买的" << goods->name << "是假货,放弃购买!" << endl;
+    }
+  }
+};
+
+void test01(){
+  
+  //我自己去购买
+  Goods* goods = new Goods("汽车",true);
+  AbstractShopping* usa = new USAShopping;
+  usa->BuyGoods(goods);
+}
+
+//代理类 提供安检  辨别真伪
+class OverseasProxy : public AbstractShopping{
+public:
+  OverseasProxy(AbstractShopping* where){
+    whereShopping = where;
+  }
+  virtual void BuyGoods(Goods* goods){
+    if (goods->IsReal){
+      whereShopping->BuyGoods(goods);
+      cout << "通过海关按键，带商品回国！" << endl;
+    }
+    else{
+      cout << "假货，放弃购买！" << endl;
+    }
+  }
+public:
+  AbstractShopping* whereShopping;
+};
+void test02(){
+
+  Goods* goods = new Goods("马桶盖",false);
+  OverseasProxy* proxy = new OverseasProxy(new JapanShopping);
+  proxy->BuyGoods(goods);
+}
+
+int main01(){
+
+  //test01();
+  test02();
+
+  system("pause");
+  return EXIT_SUCCESS;
+}
+3.6 装饰模式
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+
+//抽象手机类
+class AbstractPhone{
+public:
+  virtual void ShowPhone() = 0;
+};
+
+//小米手机
+class XiaomiPhone : public AbstractPhone{
+public:
+  virtual void ShowPhone(){
+    cout << "掏出小米手机，嘚瑟一下..." << endl;
+  }
+};
+
+//苹果手机
+class ApplePhone : public AbstractPhone{
+public:
+  virtual void ShowPhone(){
+    cout << "掏出苹果手机，嘚瑟一下..." << endl;
+  }
+};
+
+//锤子手机
+class SmartisianPhone : public AbstractPhone{
+public:
+  virtual void ShowPhone(){
+    cout << "掏出锤子手机，砸核桃..." << endl;
+  }
+};
+
+//装饰器抽象类
+class Decorator : public AbstractPhone{
+public:
+  Decorator(AbstractPhone* phone){
+    this->phone = phone;
+  }
+  virtual void ShowPhone(){}
+public:
+  AbstractPhone* phone;
+};
+
+//贴膜装饰器
+class AddFilmDecorator : public Decorator{
+public:
+  AddFilmDecorator(AbstractPhone* phone) :Decorator(phone){}
+  void addFilm(){
+    cout << "给手机贴膜!" << endl;
+  }
+  virtual void ShowPhone(){
+    phone->ShowPhone();
+    addFilm(); //贴膜
+  }
+};
+
+//皮套装饰器
+class AddShellDecorator : public Decorator{
+public:
+  AddShellDecorator(AbstractPhone* phone) : Decorator(phone){}
+  void addShell(){
+    cout << "给手机带皮套！" << endl;
+  }
+  virtual void ShowPhone(){
+    phone->ShowPhone();
+    addShell();
+  }
+};
+
+void test01(){
+  
+  AbstractPhone* phone = new SmartisianPhone; //创建锤子手机
+  phone->ShowPhone();
+
+  cout << "----------------" << endl;
+
+  AbstractPhone* filmPhone = new AddFilmDecorator(phone); //带贴膜
+  filmPhone->ShowPhone();
+
+  delete filmPhone;
+  delete phone;
+}
+
+void test02(){
+  
+  AbstractPhone* phone = new XiaomiPhone;
+  phone->ShowPhone();
+
+  cout << "------------------" << endl;
+
+  //给手机贴膜
+  AbstractPhone* filmPhone = new AddFilmDecorator(phone);
+  filmPhone->ShowPhone();
+
+  cout << "---------------------" << endl;
+
+  //给贴过膜的手机带皮套
+  AbstractPhone* shellFilmPhone = new AddShellDecorator(filmPhone);
+  shellFilmPhone->ShowPhone();
+}
+
+int main01(){
+
+  //test01();
+  test02();
+
+  system("pause");
+  return EXIT_SUCCESS;
+}
+
+
+3.7 策略模式
+
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+
+//抽象武器
+class AbstractWeapon{
+public:
+  virtual void UseWeapon() = 0;
+};
+
+//菜刀
+class Caidao : public AbstractWeapon{
+public:
+  virtual void UseWeapon(){
+    cout << "使用杀器-菜刀!" << endl;
+  }
+};
+
+//指甲刀
+class Zhijiadao : public AbstractWeapon{
+public:
+  virtual void UseWeapon(){
+    cout << "使用杀器-指甲刀!" << endl;
+  }
+};
+
+//角色
+class People{
+public:
+  People(){
+    weapon = NULL;
+  }
+  //设置兵器
+  void setWeapon(AbstractWeapon* weapon){
+    this->weapon = weapon;
+  }
+
+  void UseMyWeapon(){
+    this->weapon->UseWeapon();
+  }
+public:
+  AbstractWeapon* weapon;
+};
+
+void test01(){
+  AbstractWeapon* weapon = new Caidao;
+  //菜刀
+  People* people = new People;
+  people->setWeapon(weapon);
+  people->UseMyWeapon();
+  delete weapon;
+  //指甲刀
+  weapon = new Zhijiadao;
+  people->setWeapon(weapon);
+  people->UseMyWeapon();
+
+  delete weapon;
+  delete people;
+}
+
+int main(){
+
+  test01();
+
+  system("pause");
+  return EXIT_SUCCESS;
+}

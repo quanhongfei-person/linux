@@ -1,0 +1,21 @@
+
+
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+
+int main(int argc, const char *argv[])
+{
+
+	int ret = access("./pslog1",F_OK);
+	if(-1 ==ret)
+	{
+		printf("pslog1 no exists");
+	}
+	else
+	{
+		printf("pslog1 exists ok\n");
+	}
+
+	return 0;
+}

@@ -1,0 +1,51 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             RESET,CODE
+    2 00000000                 ENTRY
+    3 00000000         start
+    4 00000000 EB000001        bl               fun
+    5 00000004 E3A00003        mov              r0, #3
+    6 00000008 E3A01004        mov              r1, #4
+    7 0000000C         fun
+    8 0000000C E3A02004        mov              r2, #4
+    9 00000010 E3A03005        mov              r3, #5
+   10 00000014 E1A0F00E        mov              pc, lr
+   11 00000018                 END
+Command Line: --debug --xref --cpu=ARM920T --apcs=interwork --depend=b.d -ob.o 
+-IC:\Keil\ARM\INC -IC:\Keil\ARM\INC\Samsung --list=b.lst b.S
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 1 in file b.S
+   Uses
+      None
+Comment: RESET unused
+fun 0000000C
+
+Symbol: fun
+   Definitions
+      At line 7 in file b.S
+   Uses
+      At line 4 in file b.S
+Comment: fun used once
+start 00000000
+
+Symbol: start
+   Definitions
+      At line 3 in file b.S
+   Uses
+      None
+Comment: start unused
+3 symbols
+327 symbols in table

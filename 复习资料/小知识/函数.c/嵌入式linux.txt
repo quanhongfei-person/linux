@@ -1,0 +1,61 @@
+完成的嵌入式linux系统组成：
+1.bootloader   加载引导内核                        存储在flash，运行在内存
+2.kernel       操作系统最核心功能;挂载根文件系统   存储在flash，运行在内存
+3.rootfs       用户空间  / init进程                存储在flash，
+
+
+bootloader代码不属于操作系统内核，但是是操作系统的必须！
+bootloader是平台相关代码，
+		bootloader作用：为操作系统内核运行做环境准备，软件和硬件（初始化cpu
+		存储/内存/串口），加载内核，引导内核，向内核传参（根文件系统的位置和方式）。
+		
+		uboot是个工程，制作bootloader的工程
+		
+		编译uboot：
+				CROSS_COMPILE=arm-linux-  交叉工具链配置
+				ARCH=arm  架构
+		
+		编译流程：
+			1.make NAME_config  确定平台	  make tiny4412_config 
+			2.make  编译uboot
+			
+		将uboot烧录到sd卡流程:
+				1. cd sd_fuse
+				2. make
+				3. cd tiny4412
+				4. sudo ./sd_fusing.sh /dev/sdb  将文件烧录到sd
+				
+				
+				将sd卡插入开发板，重启开发板，在minicom中断
+				
+		
+		
+		在pc安装dnw：
+					cd  dnw-linux
+					make
+					sudo make install
+	
+							
+	uboot：
+	加载内核：
+		在minicom终端
+		dnw  0x40008000     通过usb接收数据到内存0x40008000
+		在电脑：
+			sudo  dnw  zImage
+		
+		引导内核
+			指定根文件系统位置：
+					bootargs  
+					setenv bootargs root=/dev/nfs nfsroot=192.168.0.254:/home/linux/nfs ip=192.168.0.253 console=ttySAC0
+					
+					,115200
+					指定nfs方式
+					saveenv  保存修改到SD卡
+					printenv  查看设置是否正常
+			bootm 0x40008000  引导内核
+			
+			
+			
+			uboot加载引导内核，
+			内核运行根据uboot设置的参数挂载根文件系统，进入用户空间
+		

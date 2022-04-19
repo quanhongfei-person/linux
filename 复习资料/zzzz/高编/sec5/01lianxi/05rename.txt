@@ -1,0 +1,22 @@
+
+
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+
+int main(int argc, const char *argv[])
+{
+
+	int ret = remove("./soft2");
+	if(-1 ==ret)
+	{
+		perror("remove");
+		exit(1);
+	}
+	else
+	{
+		printf("remove 成功。。。\n");
+	}
+
+	return 0;
+}

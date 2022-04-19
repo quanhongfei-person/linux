@@ -1,0 +1,31 @@
+<!-- 表单中重要的字元素 input button -->
+<!-- 属性 action，指定表单发送的地址 -->
+<!-- 属性 method 发送的方式 get，post -->
+<!--get方法 数据会附加到url的后面传递给服务器 默认-->
+<!--post，将数据包大包发给服务器，等候服务器来读取 -->
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta charset="utf-8">
+		<title>表单</title>
+	</head>
+	<body>
+		这里是测试body测试内容。。。
+		<form action="http:\\hao.360.cn" method="get">
+		<input type="hidden" name="hidden_name" value="hidden_value">
+		用户名：<input type="text" name="user" placeholder="请输入姓名" required="">
+		密码：<input type="password" name="ps"  placeholder="密码" required="">
+		<input type="submit">
+		<!-- 清空输入框，但两个输入框有默认值-->
+		<input type="reset">
+		
+		</form>
+		<br>
+		<!-- input也可以设置在表单外部-->
+		<div>
+		<input type="text" maxlength="5">
+		<input type="image" src="abc.jpg">
+		<input type="hidden">
+		</div>
+	</body>
+</html>

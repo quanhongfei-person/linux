@@ -1,0 +1,61 @@
+/*
+ ============================================================================
+ Name        : 02cli.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+ #include <sys/types.h>          /* See NOTES */
+       #include <sys/socket.h>
+#include <sys/socket.h>
+       #include <netinet/in.h>
+       #include <netinet/ip.h> //#ifndef
+#include<string.h>
+ #include <arpa/inet.h>
+typedef struct sockaddr * SA;
+#define err_msg(msg) do{perror(msg);exit(1);}while(0)
+int main(void)
+{
+	int conn = socket(AF_INET,SOCK_STREAM,0);    //TCP//
+	if(-1 == conn) err_msg("socket");
+	struct sockaddr_in ser;
+	bzero(&ser,sizeof(ser));
+	ser.sin_addr.s_addr=	inet_addr("61.133.63.5");
+	ser.sin_family=AF_INET;
+	ser.sin_port = htons(8405);
+
+	int ret = connect(conn,(SA)&ser,sizeof(ser));
+	if(-1 == ret) err_msg("connect");
+	char send_cmd[1024]={0};
+	sprintf(send_cmd,"GET /showdatab.aspx?subid=14623 HTTP/1.1\r\n");
+	sprintf(send_cmd,"%sHost: 61.133.63.5:8405\r\n",send_cmd);
+	sprintf(send_cmd,"%sUser-Agent: Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:49.0) Gecko/20100101 Firefox/49.0\r\n",send_cmd);
+	sprintf(send_cmd,"%sAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n",send_cmd);
+	sprintf(send_cmd,"%sAccept-Language: en-US,en;q=0.5\r\n",send_cmd);
+	sprintf(send_cmd,"%sAccept-Encoding: gzip, deflate\r\n",send_cmd);
+	sprintf(send_cmd,"%sConnection: keep-alive\r\n\r\n",send_cmd);
+
+	send(conn,send_cmd,strlen(send_cmd),0);
+	char recv_buf[1500]={0};
+	recv(conn,recv_buf,1500,0);
+	int lenth = 0;
+	char * temp =NULL;
+	temp = strstr(recv_buf,"Content-Length:");
+	if(NULL == temp)err_msg("strstr lenth");
+	lenth = atoi(temp+16);  //Content-Length: 5da\r\n\r\n7890 /-234
+	temp = strstr(recv_buf,"\r\n\r\n");
+	FILE* fp = fopen("1.gz","w");
+	if(NULL == fp)err_msg("open 1.gz");
+	fwrite(temp+4,lenth,1,fp);    //-----------------------------------------------------------------------------//
+	fclose(fp);
+
+
+
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

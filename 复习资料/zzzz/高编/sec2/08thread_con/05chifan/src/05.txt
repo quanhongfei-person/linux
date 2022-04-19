@@ -1,0 +1,85 @@
+/*
+ ============================================================================
+ Name        : 05.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include<pthread.h>
+#include<semaphore.h>
+#include<unistd.h>
+#include<string.h>
+	typedef struct
+	{
+		char name[100][256];
+		int total_num;
+		int call_num;
+	}LIST;
+	pthread_mutex_t mutex;
+	sem_t sem_desk;
+	LIST list;
+
+	void* cust(void* arg)
+	{
+		char name[256]={0};
+		strcpy(name,(char*)arg);
+		printf("%s eating...\n",name);
+		sleep(rand()%5);
+		printf("%s leave...\n",name);
+		sem_post(&sem_desk);
+		return NULL;
+	}
+void* waiter(void* arg)
+{
+	while(1)
+	{
+		pthread_mutex_lock(&mutex);
+
+	if(list.total_num  > list.call_num)
+	{
+		pthread_mutex_unlock(&mutex);
+		sem_wait(&sem_desk);
+		pthread_t tid;
+		pthread_create(&tid,NULL,cust,list.name[list.call_num]);
+		list.call_num++;
+	}
+	else
+	{
+		pthread_mutex_unlock(&mutex);
+
+	}
+	}
+	return NULL;
+}
+int main(void) {
+	pthread_t tid;
+	pthread_create(&tid,NULL,waiter,NULL);
+
+	bzero(&list,sizeof(list));
+	sem_init(&sem_desk,0,3);
+	pthread_mutex_init(&mutex,NULL);
+
+	while(1)
+	{ //zhangsan
+		//lisi
+		//wangmazi
+		char temp[256]={0};
+		fgets(temp,256,stdin);
+		temp[strlen(temp)-1]='\0';
+		strcpy(list.name[list.total_num],temp);
+		pthread_mutex_lock(&mutex);
+		list.total_num++;
+		pthread_mutex_unlock(&mutex);
+
+
+	}
+	sem_destroy(&sem_desk);
+	pthread_mutex_destroy(&mutex);
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

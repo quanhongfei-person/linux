@@ -1,0 +1,43 @@
+/*
+ ============================================================================
+ Name        : 03bank.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include<pthread.h>
+#include<unistd.h>
+#include<semaphore.h>
+
+sem_t sem;
+void* th(void* arg)
+{
+
+		sem_wait(&sem);
+		printf("申请到一个窗口，开始办业务！\n");
+		sleep(rand()%5);
+		printf("业务办完了，释放资源！\n");
+		sem_post(&sem);
+
+
+	return NULL;
+}
+
+int main(void) {
+
+	int  i = 0;
+	pthread_t tid[10]={0};
+	sem_init(&sem,0,3);
+	for(i =0 ;i<10;i++)
+		pthread_create(&tid[i],NULL,th,NULL);
+	for(i=0;i<10;i++)
+		pthread_join(tid[i],NULL);
+	sem_destroy(&sem);
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

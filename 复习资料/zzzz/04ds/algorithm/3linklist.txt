@@ -1,0 +1,77 @@
+线性表的链式存储
+	解决顺序存储的缺点，插入和删除，动态存储问题。
+特点：
+	，线性表链式存储结构的特点是一组任意的存储单位存储线性表的数据元素，存储单元可以是连续的，也可以不连续。可以被存储在任意内存未被占用的位置上。
+	
+	所以前面的顺序表只需要存储数据元素信息就可以了。在链式结构中还需要一个元素存储下一个元素的地址。
+	
+	为了表示每个数据元素，ai与其直接后继数据元素ai+1之间的逻辑关系，对ai来说，除了存储其本身的信息外，还需要存一个指示器直接后续的信息。
+	把存储元素信息的域叫数据域，把存储直接后继位置的域叫指针域。这两部分信息组成数据元素ai的存储映像，叫结点(Node);
+	
+	
+	
+	单链表中，c语言的描述
+typedef struct person {
+	char name[32];
+	char sex;
+	int age;
+	int score;
+}DATATYPE;
+
+typedef struct node {
+	DATATYPE data;
+	struct node *next;
+}LinkNode;
+
+typedef struct list {
+	LinkNode *head;
+	int tlen;
+	int clen;
+}LinkList;
+
+LinkList *CreateLinkList(int len);
+int InsertHeadLinkList(LinkList *list, DATATYPE data);
+int ShowLinkList(LinkList *list);
+LinkNode *FindLinkList(LinkList *list, char *name);
+int DeleteLinkList(LinkList *list, char *name);
+int ReviseLinkList(LinkList *list, char *name, DATATYPE data);
+int DestroyLinkList(LinkList *list);
+int InsertTailLinkList(LinkList *list, DATATYPE data);
+
+	
+	
+	顺序表和链表 优缺点
+	存储方式：
+		顺序表是一段连续的存储单元
+		链表是逻辑结构连续物理结构（在内存中的表现形式）不连续
+	时间性能，
+		查找 顺序表O(1)
+			 链表  O(n)
+		插入和删除
+			顺序表 O(n)
+			链表   O(1)
+			
+	空间性能
+			顺序表 需要预先分配空间，大小固定
+			链表， 不需要预先分配，大小可变，动态分配
+			
+			
+	循环链表
+		简单的来说，就是将原来单链表中最有一个元素的next指针指向第一个元素或头结点，链表就成了一个环，头尾相连，就成了循环链表。circultlar linker list.
+		
+		注意非空表，和空表。多数会加入头结点。
+		原来结束的条件是
+		p->next != NULL ------->>>>> p-next != Head 
+		
+	双向链表
+	double link list。
+	
+	typedef struct DulNode
+	{
+	
+		ElemType data;
+		struct DulNode *pri;
+		struct DulNode *next;
+	}DulNode,*DuLinkList;
+	
+	

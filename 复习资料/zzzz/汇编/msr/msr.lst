@@ -1,0 +1,47 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             RESET,CODE
+    2 00000000                 ENTRY
+    3 00000000         start
+    4 00000000 E3A0D101        mov              sp, #0x40000000
+    5 00000004 E10F0000        mrs              r0, cpsr
+    6 00000008         ;10010
+    7 00000008 E3C0001F        bic              r0, r0, #0x1f
+    8 0000000C E3800012        orr              r0, r0, #0x12
+    9 00000010 E121F000        msr              cpsr_c, r0
+   10 00000014 E10F0000        mrs              r0, cpsr
+   11 00000018         ;10011
+   12 00000018 E3C0001F        bic              r0, r0, #0x1f
+   13 0000001C E3800013        orr              r0, r0, #0x13
+   14 00000020 E121F000        msr              cpsr_c, r0
+   15 00000024                 END
+Command Line: --debug --xref --cpu=ARM920T --apcs=interwork --depend=msr.d -oms
+r.o -IC:\Keil\ARM\INC -IC:\Keil\ARM\INC\Samsung --list=msr.lst msr.S
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 1 in file msr.S
+   Uses
+      None
+Comment: RESET unused
+start 00000000
+
+Symbol: start
+   Definitions
+      At line 3 in file msr.S
+   Uses
+      None
+Comment: start unused
+2 symbols
+326 symbols in table

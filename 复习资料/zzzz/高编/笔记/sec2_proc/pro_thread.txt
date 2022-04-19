@@ -1,0 +1,35 @@
+
+
+进程											线程
+动态运行一次过程			        			操作系统中最小的执行
+
+系统资源开销 大								小，线程栈栈，，，8 M		
+资源没有共享									共享
+
+
+	稳定性好些								差些
+	
+	
+	fork								pthread_create
+	
+	
+	wait,waidpid 						pthread_join
+	
+	exit,_exit,							pthread_exit
+												cancel
+	
+	
+	atexit								pthread_cleanup_push
+										pthread_cleanup_pop
+										
+	getpid,getppid pthread_self	
+
+
+		system,exec 
+	
+	
+	
+	
+
+	
+	

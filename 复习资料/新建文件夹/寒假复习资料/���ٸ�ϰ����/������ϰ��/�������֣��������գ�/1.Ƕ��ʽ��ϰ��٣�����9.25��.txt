@@ -1,0 +1,1136 @@
+笔试:
+	C语言
+	数据结构
+	进程线程概念
+	C++
+	
+面试:
+	项目
+	具体细节
+	
+C语言:
+1.基本数据类型、运算符、表达式
+	1.数据的扩展:
+			当小字节数据放入大字节空间时,
+			有符号数,高位补符号位,正数补0,负数补1
+			无符号数,高位补0
+			
+			char ch = -1;
+			short a = ch;
+			
+			printf("a = %d\n", a);
+		
+	2.数据的截断:
+			当大字节数据放入小字节空间时,
+			直接截取低数据位
+		
+		练习:
+			1.请写出程序输出的结果
+				char ch = 200;
+				printf("ch = %d\n", ch);
+			
+			2.请写出程序输出结果
+				char ch = -200;
+				printf("ch = %d\n", ch);
+			
+			3.请写出程序输出结果
+				unsigned char ch = -127;
+				printf("ch = %u\n", ch);
+			
+				111 1111
+				000 0000
+				1000 0001
+			
+			signed char: -128 - 0 - 127 
+			unsigned char: 0 - 255
+	
+	3.数据类型转换
+		1.显示类型转化(强制类型转化)
+		放在变量之前,将变量的这次操作进行强制类型转化
+		(float)a
+		
+		2.隐式类型转化
+			char、short -> int 
+			signed int unsigned int -> unsigned int 
+			int long -> long
+			整形、float -> double
+			float、double -> double
+
+	4.数据的运算符操作
+		1.算数运算符
+		算数运算符左右两端数据类型必须保持一致,
+		如果不一致,则将低精度数据类型转化为
+		高精度数据类型
+		
+		+	
+		-	
+		*	
+		/:左右两端类型必须保持一致(除数不能为0)
+		%:无法对浮点数类型操作
+		++:自增运算符
+		--:自减运算符
+		
+		i++:先用再加
+		++i:先加再用
+
+		int i = 0;
+		int a = 0;
+		
+		a = i++;   
+		printf("a = %d, i = %d\n", a, i);
+					0		1
+		a = ++i;
+		printf("a = %d, i = %d\n", a, i);
+					2		2
+		
+		int i = 0;
+		int a = 0;
+		
+		a = i+++i;		a == 0   i == 1
+		a = ++i+i++;	a == 2	 i == 2
+		a = (i++)+(++i);
+		
+		初始化 != 赋值
+		初始化:定义变量的时候,为变量赋值称为初始化
+		赋值:变量已经存在,想变量空间赋值
+		
+		2.关系运算符
+			> 		
+			<
+			>=
+			<=
+			==			
+			!=
+		
+		3.逻辑运算符
+		截断特性:
+			逻辑与左边表达式为假值,右边不进行计算
+			逻辑或左边表达式为真值,右边不进行计算 
+	
+		&&	逻辑与
+			既...又...
+			一假为假,全真为真
+			
+			num在0-100之间
+			num >= 0 && num <= 100
+			
+		||	逻辑或
+			要么...要么...
+			一真为真,全假为假
+			
+			num在0-100之外
+			num < 0 || num > 100
+		
+		!	逻辑非
+			真取非得假
+			假取非得真
+		
+		1.描述一个变量num在0 - 100之间
+			num >= 0 && num <= 100
+		2.描述一个字符ch为大写字母
+			ch >= 'A' && ch <= 'Z'
+		3.描述一个字符ch为小写字母
+			ch >= 'a' && ch <= 'z'
+		4.描述一个字符ch为字母
+			(ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')
+		5.描述a b c三个变量中有两个变量为负数
+			(a < 0 && b < 0 && c >= 0) ||
+			(a < 0 && b >= 0 && c < 0) ||
+			(a >= 0 && b < 0 && c < 0) 
+			
+		int a = 0;
+		int b = 0;
+		int c = 0;
+	
+		c = a++ && ++b; 
+		printf("a = %d, b = %d, c = %d\n", a, b, c);
+					1		0		0
+		
+		c = ++a || ++b;
+		printf("a = %d, b = %d, c = %d\n", a, b, c);
+					1		0		1
+		4.赋值运算符
+		=
+		+=
+		-=
+		*=
+		/=
+		%=
+			
+		5.位运算符
+		与0得0
+		或1置1
+		异或取反
+		其余不变
+		
+		&:按位与
+		|:按位或
+		~:按位取反
+		^:按位异或(相异为1 相同为0)
+			a ^ 0 == a
+			a ^ a == 0
+		>>:右移n位(缩小 除以2^n)
+		<<:左移n位(放大 乘以2^n)
+		
+		对某个变量第n位置1:
+		num = num | (1 << n-1);
+		
+		对某个变量第n位置0:
+		num = num & ~(1 << n-1);
+	
+		6.特殊运算符
+		结合方式:从右至左
+		三目运算符
+		表达式?表达式1:表达式2;
+		
+		判断表达式是否为逻辑真值,
+		如果为逻辑真值,执行表达式1,并将其结果作为整个表达式的结果
+		如果为逻辑假值,执行表达式2,并将其结果作为整个表达式的结果
+		
+		7.逗号运算符
+		逗号表达式,从左到右依次执行,并且将最后一个
+		表达式的结果作为整个逗号表达式的结果
+	
+		8.sizeof运算符
+		sizeof不是函数
+		sizeof是关键字、运算符
+		sizeof(数据类型/变量名)
+		获得数据类型/变量名在内存中所占字节数
+
+	运算符优先级:
+		高 -> 低:
+		括号 > 单目运算符 > 双目运算符 > 三目运算符 > 赋值运算符 > 逗号运算符
+	
+		双目运算符优先级: 高 -> 低
+			算术运算符 > 移位运算符 > 关系运算符 > 位运算符 > 逻辑运算符
+		
+		a = a | 1 << 4
+		
+	5.所有关键字
+		volatitle关键字作用:
+		volatile的本意是“易变的” 因为访问寄存器要比访问内存单元快的多,所以编译器一般都会作减少存取内存的优化，
+		但有可能会读脏数据。当要求使用volatile声明变量值的时候，系统总是重新从它所在的内存读取数据，即使它
+		前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的变量，编译器对访问该变量的代码就
+		不再进行优化，从而可以提供对特殊地址的稳定访问；如果不使用valatile，则编译器将对所声明的语句进行优化。
+	   （简洁的说就是：volatile关键词影响编译器编译的结果，用volatile声明的变量表示该变量随时可能发生变化，
+	    与该变量有关的运算，不要进行编译优化，以免出错）
+		
+		static关键字作用:
+		第一、在修饰变量的时候，static修饰的静态局部变量只执行一次，而且延长了局部变量的生命周期，直到程序运行结束以后才释放。 
+		第二、static修饰全局变量的时候，这个全局变量只能在本文件中访问，不能在其它文件中访问，即便是extern外部声明也不可以。 
+		第三、static修饰一个函数，则这个函数的只能在本文件中调用，不能被其他文件调用。Static修饰的局部变量存放在全局数据区的静态变量区。初始化的时候自动初始化为0； 
+		（1）不想被释放的时候，可以使用static修饰。比如修饰函数中存放在栈空间的数组。如果不想让这个数组在函数调用结束释放可以使用static修饰 
+		（2）考虑到数据安全性（当程想要使用全局变量的时候应该先考虑使用static）
+		
+		const关键字作用:
+		const:只读
+	
+		1.const int *p;
+		2.int const *p;
+	
+		3.int *const p;
+	
+		4.const int *const p;
+		5.int const *const p;
+	
+		1和2等价:
+			指针变量p的值允许改变,但不能利用指针变量修改其对应
+			内存空间的值
+	
+		3:
+			指针变量p不能改变,但可以利用指针变量p修改其对应内存
+			空间中的值,一定要对指针初始化
+		
+		4和5等价:
+			指针变量p不能改变,也无法通过指针变量p修改其对应空间
+			的值,一定要对指针初始化
+		
+	6.运算符 
+		运算符的优先级、结合方向
+		>> << 
+		&& ||
+		i++
+		++i
+	
+4.数组
+	1.数组的初始化
+		1.二位数组的初始化:
+		1.全部初始化:
+			int a[2][3] = {{1, 2, 3}, {4, 5, 6}};
+			int a[2][3] = {1, 2, 3, 4, 5, 6};
+		2.局部初始化:
+			int a[2][3] = {{1, 2}, {3}};
+			int a[2][3] = {1, 2, 3};
+			int a[2][3] = {0};
+			int a[2][3] = {{0}};
+		3.默认初始化:
+			行可以省略,但列不能省略
+			int a[][3] = {{1, 2, 3}, {4, 5, 6}};
+			int a[][3] = {{1, 2}, {3}};
+			int a[][3] = {1, 2, 3, 4};
+		
+		
+	2.数组的排序
+		常用排序算法:
+			1.冒泡排序:
+				void maopao_order(int *array, int len)
+				{
+					int i = 0, j = 0, t = 0;
+
+					for (j = 0;j < len - 1;j++) {
+						for (i = 0;i < len - 1 -j;i++) {
+							if (array[i] > array[i+1]) {
+								t = array[i];
+								array[i] = array[i+1];
+								array[i+1] = t;
+							}
+						}
+					}
+					return;
+				}
+			
+			2.选择排序:
+				void select_order(int *array, int len)
+				{
+					int i = 0, j = 0, t = 0, k = 0;
+
+					for (j = 0;j < len - 1;j++) {
+						k = j;
+						for (i = k+1;i < len;i++) {
+							if (array[k] > array[i])
+								k = i;
+						}
+						if (k != j) {
+							t = array[k];
+							array[k] = array[j];
+							array[j] = t;
+						}
+					}
+
+					return;
+				}
+				
+			3.插入排序:
+				void insert_order(int *array, int len)
+				{
+					int temp = 0, i = 0, j = 0;
+
+					for (i = 1;i < len;i++) {
+						temp = array[i];
+						for (j = i;temp < array[j-1] && j > 0;j--) {
+							array[j] = array[j-1];
+						}
+						array[j] = temp;
+					}
+
+					return;
+				}
+			
+			4.快速排序:
+				void quick_order(int *array, int low, int high)
+				{
+					int i = 0, j = 0, key = 0;
+					
+					i = low;
+					j = high;
+					key = array[low];
+
+					while (i < j) {
+						while (array[j] >= key && i < j)
+							j--;
+						if (i < j)
+							array[i] = array[j];
+						while (array[i] <= key && i < j)
+							i++;
+						if (i < j)
+							array[j] = array[i];
+					}
+					if (j-1 > low)
+						quick_order(array, low, j-1);
+					if (j+1 < high)
+						quick_order(array, j+1, high);
+
+					return;
+				}
+				
+		时间复杂度:
+			时间复杂度概念:https://blog.csdn.net/itachi85/article/details/54882603
+		
+		算法稳定性:
+			算法稳定性的概念:https://blog.csdn.net/serena_0916/article/details/53893070
+			
+		常用排序算法时间复杂度及算法稳定性:
+			常用算法时间复杂度及稳定性:https://blog.csdn.net/shihuboke/article/details/79387523
+			
+	3.常用字符串的操作:
+		strcpy:字符串拷贝
+		strncpy:拷贝n个字符串
+		strlen:获得字符串长度
+		strcmp:字符串比较
+		strncmp:比较前n个字符串
+		strcat:字符串拼接函数
+		strncat:n个字符串拼接
+5.指针
+	1.指针的概念
+		地址:内存用来区分不同空间的一个标号
+		指针:指针就是地址，地址就是指针
+		指针变量:用来存放指针的变量称为指针变量
+  
+	2.指针操作运算符
+		&:取地址操作
+		&a:获得变量a在内存空间存储的首地址
+		*:取值操作
+
+	3.指针的定义:
+		所有类型的指针都占四个字节
+	
+		数据类型 *变量名;
+		int *p;
+		char *p;
+		float *p;
+		double *p;
+	
+	4.指针的初始化:
+		int *p = NULL;	//将p初始化为空指针
+		空指针不能完成*p操作
+		int *p;			//野指针(不允许出现)
+	
+		int a = 100;
+		int *p = &a;
+	
+	5.指针算数运算符的操作:
+		+
+		-
+		++:向内存高地址偏移指向数据类型大小个字节
+		--:向内存低地址偏移指向数据类型大小个字节
+
+		int a = 100;
+		int *p = &a;
+		int b = 0;
+	
+		b = *p++;			//指针++
+		printf("b = %d\n", b);
+	
+	6.指针操作:
+		int a = 100;
+		int b = 200;
+		int *p = &a;
+		int *q = &b;
+	
+		1.q = &a;
+		2.*q = a;
+		3.p = q;
+		4.*p = *q;
+	
+		练习:从终端接收两个数,完成这两个数的四则运算
+			并将结果打印(使用指针完成)
+	
+	7.指针和一维数组的关系:
+		一维数组数组名是指向数组第一个元素的指针
+		数组的数组名是常量
+	
+		元素访问:
+			int a[5] = {1, 2, 3, 4, 5};
+			int *p = a;
+	
+			a[i] == *(a+i) == *(p+i) == p[i]
+			
+		1.指针数组:
+		int *a[5];
+		定义一个数组,数组中每个元素都是一个指向int类型的指针
+		数组占20个字节
+	
+		字符串数组:
+			char str[32] = "zhangsan";
+		
+	    数组指针:
+		int (*p)[5];
+		定义一个指针,指针指向了一个数组,指针占4个字节
+		
+		int a[5] = {1, 2, 3, 4, 5};
+		int *p = NULL;
+		
+		p = a;
+		printf("*(p + 1) = %d\n", *(p+1)); //2
+
+		p = (int *)(&a+1)-1;
+		printf("*p = %d\n", *p);
+		
+		
+		int a[5];
+		&a   数组指针类型: int [5] *
+		
+		int *p;
+		&p	 二级指针类型: int **
+		
+		指针和二维数组的关系
+		数组的数组名是指向数组第一行元素的一个数组指针
+	
+		int a[2][3] = {1, 2, 3, 4, 5, 6};
+		int (*p)[3] = a;
+		int *q = a[0];
+		int *q = &a[0][0];
+		
+		a[m][n]
+		*(a[m] + n)
+		*(*(a+m) + n)
+		*(*(p+m) + n)
+		*(p[m] + n)
+		p[m][n]
+		*(q + m*N + n)
+		
+		a[1][1] == *(a[1] + 1) == *(*(a+1) + 1)
+		*(q+1*3+1)
+		
+		
+		定义int a[3][5] = {{1, 2, 3, 4, 5},
+						   {6, 7, 8, 9, 10},
+						   {11, 12, 13, 14, 15}};
+		int (*p)[5] = a;
+		则 *(p[2]+3)值为:
+
+		
+	8.指针操作字符串
+		char* strcpy(char* pDest, const char* pSrc)
+		{
+			//要判断空
+			if (pDest==NULL || pSrc==NULL)
+				return NULL;
+			//注意记录
+			char* pDestCpy = pDest;
+			while((*pDestCpy++ = *pSrc++)!='\0');
+			return pDest;
+		}
+
+		char* strncpy(char* pDest, const char* pSrc, int size)
+		{
+			if (pDest!=NULL && pSrc!=NULL)
+				return NULL;
+			if (size >= 0) 
+				return NULL;
+			char* pDestCpy = pDest;
+			while(size-- && (*pDestCpy++ = *pSrc++)!='\0');
+			if(size > 0)
+				while(size--)
+					*pDestCpy++ = '\0';
+			return pDest;
+		}
+		
+		int strcmp(char* pDest, const char* pSrc)	
+		{
+			if(NULL == pDest || NULL == pSrc)
+				return NULL;
+			char* pDestCpy = pDest;
+			if (strlen(pDest) != strlen(pSrc))
+				return 1;
+			while (*pDest != 0 && *pSrc != 0)
+			{
+				if(*pDest > *pSrc)
+					return 1;
+				else if (*pDest < *pSrc)
+					return -1;
+		
+				pDest++;
+				pSrc++;
+			}
+    
+			return 0;	
+		}
+		
+	9. 字符串逆序函数编写（用递归实现）
+		char *reverse(char *str)
+		{
+			char *left = str;
+			char *right = str + strlen(str) - 1;
+			char tmp;
+			
+			if(*left != '\0')
+			{
+				tmp = *left;
+				*left = *right;
+				*right = '\0';
+				reverse(str + 1);
+				*right = tmp;
+				return str;
+			}
+			else
+			{
+				return NULL;
+			}
+		}
+		
+   10.编写 atoi 函数手写  
+	int atoi_my(const char *str)  
+	{  
+		int s = 0;  
+		bool falg = false;  
+		  
+		 while(*str == ' ')  
+		 {  
+			 str++;  
+		 }  
+	   
+		 if(*str == '-'|| *str == '+')  
+		 {  
+			 if(*str == '-')  
+				falg = true;  
+			 str++;  
+		 }  
+	   
+		 while (*str >= '0' && *str <= '9')  
+		 {  
+			 s = s * 10 + *str - '0';  
+			 str++;  
+			 if (s < 0)  
+			 {  
+				 s = 2147483647;  
+				 break;  
+			 }  
+		 }  
+		 return s * (falg ? -1 : 1);  
+	 }
+	 
+6.函数
+	函数的传参:
+		1.赋值传参:
+			实参将值拷贝给形参,形参变化,不会影响实参
+		2.地址传递:
+			实参地址传递给形参,形参可以使用*运算符,操作实参
+		
+		3.整形数组的传参:
+			int a[5] = {1, 2, 3, 4, 5};
+			
+			int fun(int *a, int len);
+			
+		4.字符数组,字符串的传参:
+			char str[32] = "hello world";
+			
+			int fun(char *str);
+			
+		5.结构体变量的传参:
+			struct student s;
+			
+			int fun(struct student s);
+		
+		6.结构体指针的传参:
+			struct student s;
+			struct student *p = &s;
+			
+			int fun(struct student *p);
+
+
+		7.结构体数组的传参:
+			struct student s[3];
+			
+			int fun(struct student *s, int len);
+			int fun(struct student *s, int len);
+
+		8.二维整形数组的传参:
+			int a[2][3] = {0};
+
+			int fun(int (*p)[3], int len);
+
+		9.二维字符型数组的传参:
+			char str[5][32] = {{0}};
+
+			int fun(char (*p)[32], int len);
+			
+		10.指针数组的传参:
+			char *str[5] = {"zhangsan", "lisi", "wanger", "zhaowu", "sunliu"};
+			
+			int fun(char **str, int len);
+	
+	递归函数:
+		1.不使用循环完成循环
+		
+	
+7.构造数据类型
+	1.测试结构体大小
+		内存对齐:
+			字对齐	半字对齐 字节对齐
+			4个字节 2个字节 1字节对齐
+		
+			1.结构体成员变量只能存放在内存地址为自身基本
+			  类型长度整数倍的内存单元中
+			2.结构体的长度必须为最大基本类型长度的整数倍
+			 
+			struct s
+			{
+				char a;
+				short b;
+				int c;
+				char d;
+				int f;
+			};
+			
+			struct s
+			{
+				char a;
+				int c;
+				short d;
+				char e;
+				char f;
+				int g;
+			};
+			
+			struct s
+			{
+				char a;
+				short b;
+				int c;
+				short e;
+				char f[23];
+				int g;
+			};
+			
+			struct s
+			{
+				char a;
+				short b;
+				int c;
+				short d;
+				double f;
+				int g;
+			};
+			
+			struct s
+			{
+				char a;
+				short b;
+				int c;
+				short d;
+				char f;
+			};
+		
+	2.位域操作
+			struct s
+			{
+				char a : 5;
+				char b : 5;
+				short c ：10;
+				int d : 6;
+			};
+			
+			printf("sizeof(struct s) = %d\n", sizeof(struct s));
+			
+			struct s 
+			{
+				char a : 3
+				char b : 2
+				char h: 
+				char c : 6
+				char d : 2
+				char e : 5
+				char :
+			};
+			printf("sizeof(struct s) = %d\n", sizeof(struct s));
+			
+	3.共用体测试内存大小端
+		#include <stdio.h>
+
+		union s
+		{
+			int a;
+			char b;
+		};
+
+		int main(int argc, const char *argv[])
+		{
+			union s s1;
+
+			s1.a = 1;
+			if (s1.b)
+			{
+				printf("小端!\n");
+			}
+			else
+			{
+				printf("大端!\n");
+			}
+
+			return 0;
+		}
+	
+		
+8.内存管理
+	堆和栈的区别 
+	进程内存分布中
+		1、栈区（stack）—   由编译器自动分配释放,存放函数的参数值,局部变量的值等。其操作方式类似于数据结构中的栈。  
+		2、堆区（heap） —   一般由程序员分配释放,若程序员不释放，程序结束时可能由OS回收。
+		3、申请方式不同,栈上的自动分配,自动回收,堆上的手动分配,手动回收。
+		申请后系统的响应：
+			栈：只要栈的剩余空间大于所申请空间，系统将为程序提供内存，否则将报异常提示栈溢出。 
+			堆：操作系统有一个记录空闲内存地址的链表，当系统收到程序的申请时，会遍历该链表，寻找第一个空间大于所申请空间的堆结点，然后将该结点从空闲结点链表中删除，并将该结点的空间分配给程序，另外，对于大多数系统，会在这块内存空间中的首地址处记录本次分配的大小，这样，代码中的delete语句才能正确的释放本内存空间。另外，由于找到的堆结点的大小不一定正好等于申请的大小，系统会自动的将多余的那部分重新放入空闲链表中。
+		申请的大小差异：
+			栈：linux下默认8M
+			堆：堆是向高地址扩展的数据结构，是不连续的内存区域。这是由于系统是用链表来存储的空闲内存地址的，自然是不连续的，而链表的遍历方向是由低地址向高地址。
+		效率：
+			栈由系统自动分配，速度较快。但程序员是无法控制的。 
+			堆是由malloc分配的内存，一般速度比较慢，而且容易产生内存碎片,不过用起来最方便.
+		存储的内容的差异：
+			栈:在函数调用时，第一个进栈的是主函数中后的下一条指令（函数调用语句的下一条可执行语句）的地址，然后是函数的各个参数，在大多数的C编译器中，参数是由右往左入栈的，然后是函数中的局部变量。注意静态变量是不入栈的。 
+			当本次函数调用结束后，局部变量先出栈，然后是参数，最后栈顶指针指向最开始存的地址，也就是主函数中的下一条指令，程序由该点继续运行。 
+			堆：一般是在堆的头部用一个字节存放堆的大小。堆中的具体内容有程序员安排。
+	
+数据结构:
+1.单向链表:
+	链表的常用操作:
+		LinkList *CreateLinkList(int len)
+		{
+			LinkList *list = NULL;
+
+			//1.申请链表表头空间
+			if (NULL == (list = malloc(sizeof(LinkList))))
+				error_exit("fail to malloc");
+			
+			//2.对表头成员初始化
+			list->head = malloc(sizeof(LinkNode));
+			list->head->next = NULL;
+			list->tlen = len;
+			list->clen = 0;
+			
+			//3.返回表头地址
+			return list;
+		}
+
+		int IsEmptyLinkList(LinkList *list)
+		{
+			return list->clen == 0;
+		}
+
+		int IsFullLinkList(LinkList *list)
+		{
+			return list->clen == list->tlen;
+		}
+
+		int InsertHeadLinkList(LinkList *list, DATATYPE data)
+		{
+			LinkNode *temp = NULL;
+
+			//1.判断链表是否为满
+			if (IsFullLinkList(list)) {
+				printf("链表已满\n");
+				return -1;
+			}
+			//2.申请节点空间
+			if (NULL == (temp = malloc(sizeof(LinkNode))))
+				error_exit("fail to malloc");
+			temp->data = data;
+
+			//3.让后面连起来
+			temp->next = list->head->next;
+
+			//4.让前面连起来
+			list->head->next = temp;
+
+			list->clen++;
+
+			return 0;
+		}
+
+		int ShowLinkList(LinkList *list)
+		{
+			LinkNode *p = NULL;
+
+			p = list->head->next;
+
+			while (p != NULL) {
+				printf("------------\n");
+				printf("姓名:%s\n", p->data.name);
+				printf("性别:%c\n", p->data.sex);
+				printf("年龄:%d\n", p->data.age);
+				printf("能力:%d\n", p->data.score);
+				p = p->next;
+			}
+			printf("\n\n\n");
+
+			return 0;
+		}
+
+		//功能:查找某个人是否在链表中存放
+		//参数:
+		//	list:链表的地址
+		//	name:要查找的名字
+		//返回值:
+		//	成功返回对应节点的地址
+		//	失败返回NULL(不存在)
+		LinkNode *FindLinkList(LinkList *list, char *name)
+		{
+			LinkNode *p = NULL;
+
+			p = list->head->next;
+			while (p != NULL) {
+				if (!strcmp(name, p->data.name))
+					return p;
+				p = p->next;
+			}
+			return NULL;
+		}
+
+		int DeleteLinkList(LinkList *list, char *name)
+		{
+			LinkNode *p = NULL, *q = NULL;
+
+			//1.判断链表是否为空
+			if (IsEmptyLinkList(list)) {
+				printf("链表为空!\n");
+				return -1;
+			}
+			
+			//2.判断链表中是否存在该元素
+			if (NULL == FindLinkList(list, name)) {
+				printf("%s 不存在!\n", name);
+				return -1;
+			}
+
+			//3.定义两个指针p、q分别指向第一个元素和空白节点
+			p = list->head->next;
+			q = list->head;
+
+			//4.遍历判断p指向的元素是否要删除
+			while (p != NULL) {
+				if (!strcmp(p->data.name,name)) {
+					q->next = p->next;
+					free(p);
+					list->clen--;
+					p = q->next;
+				} else {
+					p = p->next;
+					q = q->next;
+				}
+			}
+			//5.如果是要删除的元素让q 和p 后面的元素链接在一起
+			//6.释放p指向的空间
+			//7.list->clen--
+			//8.p、q向后移动
+			//9.如果不是要删的元素p、q均向后移动
+			//10.成功返回0
+			return 0;
+		}
+
+		int DestroyLinkList(LinkList *list)
+		{
+			LinkNode *p = NULL, *q = NULL;
+			p = list->head;
+			q = list->head;
+
+			while (p != NULL) {
+				p = p->next;
+				free(q);
+				q = p;
+			}
+			free(list);
+
+			return 0;
+		}
+
+		int ReviseLinkList(LinkList *list, char *name, DATATYPE data)
+		{
+			LinkNode *temp = NULL;
+
+			//1.找到对应元素
+			if (NULL == (temp = FindLinkList(list, name))) {
+				printf("%s 不存在\n", name);
+				return -1;
+			}
+
+			//2.修改对应位置的data
+			while (NULL != (temp = FindLinkList(list, name)))
+				temp->data = data;
+
+			//3.返回0
+			return 0;
+		}
+
+		int InsertTailLinkList(LinkList *list, DATATYPE data)
+		{
+			LinkNode *p = NULL;
+			LinkNode *temp = NULL;
+
+			//1.判断是否为满
+			if (IsFullLinkList(list)) {
+				printf("链表已满!\n");
+				return -1;
+			}
+
+			//2.找到最末尾的元素
+			p = list->head;
+			while (p->next != NULL) 
+				p = p->next;
+
+			//3.申请空间
+			if (NULL == (temp = malloc(sizeof(LinkNode))))
+				error_exit("fail to malloc");
+			
+			//4.对申请空间初始化
+			temp->data = data;
+			temp->next = NULL;
+
+			//5.将申请空间添加至末尾
+			p->next = temp;
+			//6.list->clen++
+			list->clen++;
+			//7.返回0
+
+			return 0;
+		}
+
+		int DaoZhiLinkList(LinkList *list)
+		{
+			LinkNode *p = NULL;
+			LinkNode *temp = NULL;
+
+			p = list->head->next;
+			list->head->next = NULL;
+
+			while (p != NULL) {
+				temp = p;
+				p = p->next;
+				
+				temp->next = list->head->next;
+				list->head->next = temp;
+			}
+
+			return 0;
+		}
+
+2.队列:
+		队列的概念:
+		队头:
+		队尾:
+		队列与栈的区别
+	
+3.树:
+	二叉树的特性:
+		二叉树的特性:https://www.cnblogs.com/willwu/p/6007555.html
+		
+		前序遍历:根左右
+		中序遍历:左根右
+		后序遍历:左右根
+
+操作系统:
+	IO:软连接和硬链接
+		1.如何创建硬链接文件
+			ln filename lnname
+		2.如何创建软连接文件
+			ln -s filename lnname
+		3.软连接和硬链接有什么不同?
+			软连接和硬链接的区别:https://blog.csdn.net/angle502/article/details/70244715
+	  
+	进程线程:
+		1.什么是进程?什么是线程?
+			线程是CPU独立运行和独立调度的基本单位；
+			（2）进程是资源分配的基本单位；
+			两者的联系：进程和线程都是操作系统所运行的程序运行的基本单元。
+			区别：
+			（1）进程具有独立的空间地址，一个进程崩溃后，在保护模式下不会对其它进程产生影响。
+			（2）线程只是一个进程的不同执行路径，线程有自己的堆栈和局部变量，但线程之间没有单独的地址空间，一个线程死掉就等于整个进程死掉。
+		2.多进程和多线程有什么区别?
+			多进程多线程优缺点:https://www.cnblogs.com/zhanht/p/5401685.html
+		3.僵尸进程如何产生?如何避免?
+			父进程创建子进程,子进程结束,父进程没有回收子进程空间,子进程成为僵尸进程
+			避免产生僵尸进程:
+				1.父进程先结束
+				2.父进程回收子进程空间
+		4.孤儿进程如何产生?
+			父进程先结束,子进程成为孤儿进程,父进程成为init进程,结束后由init进程回收空间
+			
+		5.进程的状态都有哪些?
+			进程的状态:https://blog.csdn.net/sdkdlwk/article/details/65938204
+			R	运行态、就绪态
+			S	可唤醒睡眠态
+			D 	不可唤醒睡眠态
+			T 	暂停态
+			Z	僵尸态
+			X	结束态
+		
+		6.什么是同步?什么是异步?什么是互斥?
+			同步:是指散步在不同任务之间的若干程序片断，它们的运行必须严格按照规定的某种先后次序来运行，这种先后次序依赖于要完成的特定的任务。
+				 发送一个请求,等待返回,然后再发送下一个请求 
+				 同步是一种更为复杂的互斥，而互斥是一种特殊的同步。
+				
+			互斥:是指散步在不同任务之间的若干程序片断，当某个任务运行其中一个程序片段时，其它任务就不能运行它们之中的任一程序片段，只能等到
+				 该任务运行完这个程序片段后才可以运行。最基本的场景就是：一个公共资源同一时刻只能被一个进程或线程使用，多个进程或线程不能同
+				 时使用公共资源。
+			
+			异步:发送一个请求,不等待返回,随时可以再发送下一个请求 
+				
+		
+		8.什么是死锁，如何避免死锁？
+			在多任务系统下，当一个或多个进程等待系统资源，而资源又被进程本身或其它进程占用时，就形成了死锁。由于资源占用是互斥的，当某个进程提出申请资源后，使得有关进程在无外力协助下，永远分配不到必需的资源而无法继续运行，这就产生了一种特殊现象。
+			1、撤消陷于死锁的全部进程；
+			2、逐个撤消陷于死锁的进程，直到死锁不存在；
+			3、从陷于死锁的进程中逐个强迫放弃所占用的资源，直至死锁消失。
+			4、从另外一些进程那里强行剥夺足够数量的资源分配给死锁进程，以解除死锁状态
+		
+		9.临界资源? 
+			临界资源是一次仅允许一个进程使用的共享资源。各进程采取互斥的方式，实现共享的资源称
+			作临界资源。属于临界资源的硬件有，打印机，磁带机等；软件有消息队列，变量，数组，
+			缓冲区等。诸进程间采取互斥方式，实现对这种资源的共享。
+			
+		10.内核常用的调度算法?
+			常用的调度算法:https://blog.csdn.net/sayhello_world/article/details/55802928
+		11.时间片?原子操作?
+			时间片即CPU分配给各个程序的时间，每个线程或进程被分配一个时间段，称作它的时间片
+			原子操作:CPU无法被进程调度打断的一次操作
+		12.什么是线程池?
+			线程池的目的是为了减少线程创建、销毁所带来的代价，当有非常多的任务需要独立的线程
+			去做时，可以使用线程池，从线程池中获取线程来处理一个个任务。
+		
+	网络编程
+		1.常用的网络通信模型?每层作用是什么?每层上面重要的协议都有哪些?
+			常用的网络通信模型:
+			OSI网络通信模型
+			TCP/IP网络通信模型
+			https://www.cnblogs.com/gdayq/p/5797645.html
+		
+		3.TCP和UDP的优缺点?
+			TCP和UDP的优缺点:
+			https://blog.csdn.net/u011957758/article/details/72353485
+		
+		4.TCP、UDP网络编程模型
+		  TCPclient		TCPServer
+			socket		socket
+						bind
+			connect		listen
+						accept
+			send		recv
+			recv		send
+			
+		  UDPclient		UDPServer
+			socket		socket
+						bind
+			sendto		recvfrom
+			recvfrom	sendto 
+		
+		5.计算机网络
+		
+		
+	数据库编程:
+		1.常用的SQL语句
+			create table
+			insert into
+			delete from
+			drop table
+			select
+			update
+			
+		2.多表联合查询
+			https://blog.csdn.net/u012999796/article/details/62232575
+		
+	
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+

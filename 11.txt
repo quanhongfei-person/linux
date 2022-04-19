@@ -1,0 +1,24 @@
+10.sqlite3是如何移植到电路板上的
+	1./home/linux  mkdir sqlite3
+	2./home/linux/sqlite3     mkdir install
+		ls:install sqlite-autoconf-3320300.tar.gz
+	3./home/linux/sqlite3     tar -zxf   sqlite-autoconf-3320300.tar.gz
+		ls:sqlite-autoconf-3320300  sqlite-autoconf-3320300.tar.gz
+	4./home/linux/sqlite3/sqlite-autoconf-3320300  ./configure --host   
+				 --prefix=/home/linux/sqlite3/install
+		--host：指定交叉编译工具
+		--prefix：指定安装路径，编译后的生成的文件存放在此目录
+	5./home/linux/sqlite3/sqlite-autoconf-3320300  make
+	6./home/linux/sqlite3/sqlite-autoconf-3320300 make install
+	7./home/linux/sqlite3/install  ls
+		lib bin include share
+	8./home/linux/sqlite3/install/lib   cp  libsqilte3* ~/nfs_rootfs/lib/
+		将lib目录下的库文件拷贝到开发板的/lib目录下
+	9./home/linux/sqlite3/install/bin   cp  libsqilte3 ~/nfs_rootfs/lib/
+		将bin目录下的sqilte3拷贝到开发板的/lib目录下
+
+16.数据库的增删改查
+	1.查：select 列名 from
+ 	2.增：insert  into
+	3.改：update set
+	4.删：delete from

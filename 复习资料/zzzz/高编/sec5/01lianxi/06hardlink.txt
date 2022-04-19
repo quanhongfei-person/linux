@@ -1,0 +1,22 @@
+
+
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+
+int main(int argc, const char *argv[])
+{
+
+	int ret = link("./pslog","hardlink");
+	if(-1 ==ret)
+	{
+		perror("hardlink");
+		exit(1);
+	}
+	else
+	{
+		printf("hardlink 成功。。。\n");
+	}
+
+	return 0;
+}

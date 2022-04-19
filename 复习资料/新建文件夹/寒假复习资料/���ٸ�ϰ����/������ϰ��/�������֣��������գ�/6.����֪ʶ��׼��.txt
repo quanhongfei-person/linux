@@ -1,0 +1,891 @@
+﻿
+****************************面试技巧**********************
+1、首先得态度端正，每一场面试都得认真对待。
+2、自己简历上写的东西一定要熟知。特别是项目，必须能说清楚。
+3、项目不能说自己独立完成，要说是跟老师做的项目。
+****************************************HR面**********************************
+1、优缺点
+	
+2、最喜欢看哪类书？说两本，最喜欢哪本？讲讲感受
+
+3、职业规划
+
+4、英语四六级
+*********************************数据库***************
+主要是sqlite3数据库
+其他相关的有：MS SQL数据库
+	      ACCESS数据库
+			  
+
+
+
+
+****************************linux************************
+1、linux常用的基本命令
+	ls、cp、cd、mv、rm、rmdir、touch、pwd、date、gzip、unzip、reboot
+	cp -a d1 d2 复制一个目录（把d1复制到d2）
+	arch/uname -m 显示机器的处理器架构
+	uname -r 显示正在使用的内核版本（我的是3.2.0）
+	shutdown -r now   马上重启正在运行的linux操作
+	halt -p 关闭系统后关闭电源
+	halt -d 关闭系统，但不留下纪录
+	tar Zxvf 解压文件
+2、GDB调试基本命令
+	start、n（执行下一条语句）、s（有函数时调用进入函数）、q（退出）
+	list/l           （列出源代码 每次从当前位置列10条）
+	list 行号/函数名 （列出从第几行开始的源代码/列出某个函数的源代码）
+3、GDB如何查看堆栈信息
+	backtrace/bt      打印当前的函数调用栈的所有信息
+	bt <n>   打印栈顶上n层的栈信息
+	bt <-n>  打印栈底下n层的栈信息
+	frame/f  查看栈的层编号  
+	f 0 	 表示栈顶 f 1 表示栈的第二层
+	up n 	 向栈的上面移动n层（默认1层）
+	down n   向栈的下面移动n层（默认1层）
+	查看当前栈层的信息：info frame/f
+	info args        打印出当前函数的参数名及其值
+	info locals      打印出当前函数的局部变量及其值
+	info catch       打印出当前函数的异常处理信息
+4、shell详解。
+	shell，俗称壳，用来区别内核，命令解析器，用来接收用户命令，调用相应的应用程序。
+	基本上shell分为两大类：图形界面shell（GUI shell）和命令行是式shell（CLI shell）
+	一般说shell基本都是说命令行式shell。
+	shell提供了用户操作系统之间的交互方式。还有两种模式：交互式shell和非交互式shell。
+******************************C部分**********************
+1、堆和栈
+	栈内存存储的是局部变量而堆内存存放的是实体/对象。
+	栈内存的更新速度比堆快，因为局部变量的生命周期比较短。
+	栈内存存放的变量一旦生命周期结束就会被释放，而堆内存存放的实体会被系统垃圾回收机制不定时的回收。
+	栈内存比堆内存小。
+2、压栈，出栈
+	压栈就是一种数据结构，先入后出（FILO），把一个新的值存入栈中，从栈顶放入，从栈顶取出，
+	先放入的存进高位内存中，后放入的存在低位内存中。
+3、数组和链表区别
+数组：	内存空间要求高，必须有足够连续的内存区域；大小固定，不可拓展；可能浪费内存；插入和删除效率比较低；
+		随机访问性强；查找速度快。
+链表：	在内存中可以存在任何位置，不要求连续；大小不固定，可灵活拓展；内存利用率高，不浪费内存；插入和删除速度快；
+		不能随机查找，必须从第一个数据开始遍历，查找效率低。
+4、队列和链表的区别
+	队列是一种数据结构，特点是先进先出，后进后出。队列的存储方式可以使用线性表存储，也可以使用链表存储。
+	链表是一种数据的存储方式，保存的数据是在内存中不连续，用指针进行数据的访问。
+4、排序
+冒泡是稳定的，时间复杂度O(n^2);
+选择是不稳定的，O(n^2);
+直接插入法是稳定的，O(n^2)；
+快速排序是不稳定的，最理想情况下复杂度是O(nlogn),最坏的是O（n^2）；
+什么情况下是最理想的？什么情况下是最坏的？
+最理想的就是 基准值恰好在中间；
+最坏的情况就是 基准值在最边上。
+快排：先找一个基准值，将比基准值小的放在基准值左边，比基准值大的放在基准值右边。
+	void Qsort(int* first,int* last)
+	{
+		if(first >= last)
+			return;
+		int* p = first;
+		int* q = last;
+		int tmp = *p;
+		while(p < q)
+		{
+			while(*q >= tmp && p < q)
+				--q;
+			*p = *q;
+			while(*p <= tmp && ｐ< q)
+				++p;
+			*q = *p;
+		}
+		*p = tmp;
+		
+		Qsort(first,p-1);
+		Qsort(p+1,last);
+	}
+5、链表增删改查、逆置、约瑟夫环。
+	
+6、sizeof和strlen的区别？
+	sizeof是运算符，在头文件中typedef为unsigned int，其值在编译编译的时候已经计算好了。
+		参数：数组、指针、类型、对象、函数等。
+		功能：获得保证能容纳实现所建立的最大对象的空间大小；{总大小}
+	strlen是函数，要在程序运行的时候才能计算。
+		参数：必须是字符型指针char*。
+		返回：字符串的长度。{实际大小}
+	eg: char a[10] = "123456";
+		sizeof(a) = 10;
+		strlen(a) = 6;
+6、无名管道和命名管道
+	管道是先进先出的（FIFO），单向的。
+	无名管道只能用于父进程与子进程之间的通信的；
+	有名管道可以实现同一系统的任意两个进程间的通信；
+7、结构体、内存分配方式
+	结构体大小 4的整数倍  内存对齐：以空间换取时间
+	内存分配方式有三种：
+		1、从全局存储区域分配：内存在程序编译阶段就已经分配好了，该内存在程序运行的整个周期都有效，如：全局变量，static修饰的变量
+		2、从栈上分配：执行函数时，函数内部的局部变量可以从栈中分配，函数结束之后局部变量存储单元被释放，执行效率高，但是分配内存有限。
+		3、从堆上分配：动态内存分配，用malloc和new申请，由程序员用free/delete手动释放。
+8、makefile
+	app:main.c
+		gcc main.o -o app
+9、如何避免因频繁申请空间释放空间而造成内存碎片？
+	内存池(Memory Pool)是一种内存分配方式。
+10、malloc/free和new/delete的区别
+	他们都是用来申请动态内存和释放内存的。malloc/free是库函数，new/delete是运算符。
+	对于内部数据类型的对象，两者申请/释放空间都可以。
+	对于非内部数据类型的对象，malloc/free无法满足动态对象的要求，不会执行构造和析构函数；
+	new是完成动态内存分配和初始化工作的运算符，delete是完成清理与释放内存工作的运算符。
+10、malloc（）开辟的空间是在物理内存上还是在虚拟内存上？
+11、内存区域划分
+	栈区===》局部变量
+	堆区===》实体/对象
+	全局变量区===》全局变量、static变量
+	字符常量区===》常量
+	代码区===》存放程序 二进制代码
+12、二分法函数
+	非递归：int binarySerch (int*a,int len,int goal)
+	{
+		int left =0;
+		int right = len - 1;
+		int mid ;
+		while(left < right)
+		{   
+			mid= (left + right)/2;
+			if(goal < a[mid])
+			{
+				right = mid-1;
+			}else if(goal > a[mid])
+			{
+				left = mid + 1;
+			}else	
+				return mid;
+		}
+		return -1;
+	}
+	递归：int binarySerch(int*a,int left,int right,int goal)
+	{
+		int mid = (left + right)/2;
+		if(a[mid] == goal)
+			return mid;
+		else if(a[mid] > goal)
+			binarySerch(a,left,mid-1,goal);
+		else if(a[mid] < goal)
+			binarySerch(a,mid+1,right,goal);
+		else return -1;
+	}
+	
+13、linux进程间的通信方式：无名管道/有名管道、信号量、信号、套接字、消息队列、共享内存。
+14、手写 strcmp strcat strcpy
+	int Strcmp(const char* str1,const char* str2)//只能比较字符串，不能比较数字等其他形式的参数。
+	{
+		while(*str1 == *str2)
+		{
+			if（*str1 == ‘\0’）
+					return 0；
+			str1++；
+			str2++；
+		}
+		return *str1 - *str2；
+	}
+	char* Strcat（ char* dst,const char* src）//dst要有足够的空间来拷贝src
+	{
+		char* p = dst;
+		while(*dst)
+			dst++;
+		while(*src)
+			*dst++ == *src++;
+		*dst = '\0';
+		return p;
+	}
+	char* Strcpy(char* dst,const char* src)
+	{
+		char* strDcpy = dst;
+		if(NULL == dst || NULL == src)
+		{
+			perror("dst/src");
+			exit(1);
+		}
+		while(*src)
+		{
+			*dst = *src;
+			dst++;
+			src++;
+		}
+		return strDcpy;
+	}
+	
+15. #include <file.h> 与  #include "file.h" 区别是什么
+		<> 代表系统目录，这个是可以配置的，配置多个目录，查找这些目录下是否有你要的文件，不会查找其他目录下的文件。
+“”这个是查找当前程序文件所在目录下是否有你要的头文件，然后查找系统目录下是否有你要的文件。。
+16. #error 是什么意思
+		#error命令是C/C++语言的预处理命令之一，当预处理器预处理到#error命令时将停止编译并输出用户自定义的错误消息
+
+17. 
+	struct A {char a; int b;);
+	struct B {int a; int b;};
+	能否使用 memcmp 比较两种类型的变量是否相等
+	不能用memcmp比较两种结构体大小，因为存在内存对齐问题，而memcmp是按照字节进行比较的。
+18. 什么是大小端，写出判断大小端的程序 
+		大端模式，是指数据的高字节保存在内存的低地址中，而数据的低字节保存在内存的高地址中
+		小端模式，是指数据的高字节保存在内存的高地址中，而数据的低字节保存在内存的低地址中
+19. struct A { unsigned int a:4; unsigned int b:4}; 是什么意思
+	定义了位域结构A 两个位域为 a和b 各占4位；
+	一个位域必须存储在同一个字节中，不能跨两个字节。
+20. 如何将一个变量的 bit3 位置1
+	int a = 8;
+	int b,c;
+	b = a | 8;//a的bit3置1
+	c = a & 0xfffffff7;//  清除a的 bit3
+21. 判断一个数中有多少个1
+思路：把一个整数先减去1，然后再与原来的数进行位与运算，相当于把整数的二进制最后一个1变成了0；
+int fun(int a)
+{
+	int count = 0;
+	int n = a;
+	while(n)
+	{
+		count++;
+		n = (n-1) & n;
+	}
+	return count;
+}
+22、const关键字和volatile关键字的作用？
+const修饰的数据类型是指常类型，常类型的变量或者对象的值不能被改变。
+	const int a;和int const a;都是指a是一个常整型，不能被更改；
+	const int* a；a是一个指向常整型的指针，即常量指针，指针的指向的数值不可以被改变，但是指针指向的地址可以被改变。
+	int const* a；a是一个指向整型的常指针，即指针常量，指针指向的数值可以改变，但是指针指向的内存地址不能被改变。
+volatile：防止编译器优化，确保本条指令不会被编译器优化而省略，每次直接读值。
+	volatile变量的几个例子：
+							1、并行设备的硬件寄存器（如：状态寄存器）；
+							2、一个中端服务子程序会访问到的非自动变量；
+							3、多线程中被几个任务共享的变量；
+	一个参数既可以是const又可以是volatile么？
+	可以是。 例如只读的状态寄存器，它是const是因为程序不应该试图去修改它，它是volatile是因为可能会被意想不到的改变。
+	一个指针可以是volatile吗？
+	可以是。例如当一个中断服务子程序修改一个指向buffer的指针。
+********************************高级编程与网络*********************************
+22、操作系统虚拟内存工作原理
+	虚拟内存是计算机内存管理的一种技术。虚拟存储器是由硬件和操作系统自动实现存储信息调度和管理的。
+	①中央处理器访问主存的逻辑地址分解成组号a和组内地址b，并对组号a进行地址变换，即将逻辑组号a作为索引，查地址变换表，以确定该组信息是否存放在主存内。
+
+	②如该组号已在主存内，则转而执行④;如果该组号不在主存内，则检查主存中是否有空闲区，如果没有，便将某个暂时不用的组调出送往辅存，以便将这组信息调入主存。
+
+	③从辅存读出所要的组，并送到主存空闲区，然后将那个空闲的物理组号a和逻辑组号a登录在地址变换表中。
+
+	④从地址变换表读出与逻辑组号a对应的物理组号a。
+
+	⑤从物理组号a和组内字节地址b得到物理地址。
+
+	⑥根据物理地址从主存中存取必要的信息。
+23、什么时候用多线程？单线程什么时候效率最高？
+	高并发、大任务时用线程。处理时间短的服务用单线程。
+23、多线程和多进程的优缺点？
+	多线程:											多进程：
+		优点：轻量											安全、资源独立，不会相互影响
+			  cpu资源开销小
+		缺点：不安全										cpu资源开销大
+			  资源共享，需要加入同步互斥机制
+24. c/s和b/s区别?
+	c/s是指客户端和服务端结构。而b/s架构是基于网页的系统，通常是浏览器和服务器
+24、什么是自旋锁？自旋锁和互斥锁的区别？
+	自旋锁是非阻塞锁，如果一个线程需要获取自旋锁，但是有其他线程正在占用该锁，该线程会一直忙等待，不断消耗cpu的时间，不断的试图获取该锁。
+	自旋锁适用于锁使用者保持锁时间比较短的情况下。
+	互斥锁是阻塞锁，如果一个线程无法获取互斥锁，那么该线程就会被挂起，不会消耗cpu时间，直到其他线程释放该锁，该线程才会运行。
+	单核处理器不宜用自旋锁，容易引起死锁。
+	如果是多核处理器，若预计线程等待锁的时间比较短，比线程两次上下文切换时间还短，那么使用自旋锁比较高效。
+	如果是多核处理器，若预计线程等待锁的时间比线程两次上下文切换时间长，那么使用互斥锁比较好。
+	另外，互斥锁比自旋锁的开销比较大。
+25、进程线程的区别？
+进程是一个程序执行的过程，创建、调度、消亡。
+		进程是系统进行资源分配和调度的一个独立单位。
+		线程是进程的一个实体,是CPU调度和分派的基本单位,它是比进程更小的能独立运行的基本单位。
+		进程之间不可共享变量，栈区内容也不可共享。
+		线程之间可以共享变量。除了栈区不共享，都可以
+		线程切换速度快，并发度比较高。
+		一个线程可以创建和撤销另一个线程;同一个进程中的多个线程之间可以并发执行.
+ ****   进程间是独立的，隔绝的。所以需要进行进程间通讯。
+ ****   共享内存和管道，管道会写阻塞。
+25、时间片：cpu在执行一个任务的短时间段。
+26、任务调度算法：
+	1.顺序调度算法
+	2.高优先级（短任务优先）调度算法
+	3.时间片轮转调度算法
+	4.多级队列反馈的调度算法
+	5.负载均衡调度算法
+26、你知道哪几种线程间通信方式？ 临界资源是什么，什么是临界区？ 
+		互斥锁和信号量。
+		一次仅允许一个进程使用的资源称为临界资源。
+		每个进程中访问临界资源的那段代码称为临界区。
+	线程间同步的方式：互斥锁、信号量、临界区、事件。
+	线程如何保证安全？
+		使用锁机制和信号量。
+27、什么是可重入函数？
+		可重入函数主要用于多任务环境中，一个可重入的函数简单来说就是可以被中断的函数，
+		也就是说，可以在这个函数执行的任何时刻中断它，
+		转入OS调度下去执行另外一段代码，而返回控制时不会出现什么错误
+28、什么是死锁，如何避免死锁？
+		集合中的每一个进程都在等待只能由本集合中的其他进程才能引发的事件，那么该组进程是死锁的。
+		即就是互相持有对方所需的资源，又互相等待对方主动释放资源。
+		死锁的四个必备条件：
+							1、互斥条件：一个资源只能被一个进程所占用，直到该进程释放该资源。
+							2、请求和保持条件：一个进程请求被占有的资源时阻塞等待，对已持有的资源不释放。
+							3、存在循环链：发生死锁时，所有等待的进程必定会形成一个环。
+							4、不可剥夺条件：任何一个未被进程释放的资源不可被其他进程剥夺使用。
+		避免死锁：
+					1.加锁顺序
+					2.加锁时限
+					3.死锁检测：设置优先级
+30、static和extern的作用以及在什么场合下用？
+	static 修饰局部变量延长局部变量生命周期；
+		   修饰全局变量和函数均是限定作用域，只能在本文件使用。
+	extern 用来外部声明变量，如果想调用别的文件的变量，可以在本文件用extern来声明使用。
+31、如何判断栈的伸展方向，向上还是向下？
+32、socket链接会出现什么状况？如何解决?轮询机制是什么？
+	
+33.TCP和UDP的区别以及创建服务器的流程是什么？
+	都属于传输层协议
+	区别：1.基于有连接和无连接。
+		  2.面向字节流和数据报。
+		  3.可靠与不可靠 tcp保证数据正确性和顺序，udp可能会丢包，不保证数据顺序。
+		  4.udp程序结构比较简单。
+		  6.tcp是点对点；udp支持一对一，一对多，多对多，多对一的交互通信。
+		  7.tcp速度没udp快。
+		  8.tcp首部开销20字节；udp首部开销小，只有8字节；
+TCP服务器创建流程:
+					1.创建套接字  socket(AF_INET,SOCK_STREAM,0)；
+					2.绑定ip端口号等信息到套接字 bind()；
+					3.监听 listen()；
+					4.等待连接 accept()；
+					5.收发数据，send()/recv()或者read()/write()
+					6.关闭网络连接；
+					7.关闭监听。
+UDP服务器创建流程:
+					1.创建套接字 socket(AF_INET，SOCK_DGRAM,0)；
+					2.绑定ip端口号等信息到套接字bind();
+					3.循环收数据  recvfrom();
+					4.关闭网络连接。
+34.TCP报头和UDP报头格式？
+	TCP:源端口号、目的端口号、序号、确认序号、数据偏移/首部长度、窗口、检验和、紧急指针、选项和填充、数据部分。
+	UDP：源端口号、目的端口号、数据报长度、校验值
+	TCP首部开销20字节，UDP首部开销8个字节。
+*****************************数据结构**************************
+1、二叉树的前、中、后序遍历
+typedef struct tree{                                 // 定义二叉树
+	char data;
+	struct tree* left;
+	struct tree* right;
+}Tnode;
+Tnode* create()   //   树的创建
+{
+	char data = getchar();
+	if(data == '#')
+		return NULL;
+	else{
+		Tnode* tmp = malloc(sizeof(Tnode));
+		tmp->data = data;
+		tmp->left = create();
+		tmp->right = create();
+		
+		return tmp;
+	}
+}
+void in_order(Tnode* root) //  中序遍历
+{
+	if(NULL == root)
+		return;
+	else
+	{
+		in_order(root->left);
+		printf("%c  ",root->data);
+		in_order(root->right);
+	}
+
+}
+void pre_order(Tnode* root)//  前序遍历
+{
+	if(NULL == root)
+		return;
+	else{
+		printf("%c ",root->data);
+		pre_order(root->left);
+		pre_order(root->right);
+	}
+}
+void post_order(Tnode* root)  // 后序遍历
+{
+	if(NULL == root)
+		return;
+	else{
+		post_order(root->left);
+		post_order(root->right);
+		printf("%c ",root->data);
+	}
+}
+2、frambuffer   帧缓冲
+	打开，操作，关闭。
+3、bmp：位图 bitmap 图像格式
+		显示方式：从左向右，从下向上 
+		前54个字节是位图图片的头信息
+		前14字节===位图文件头（1-2个字节位图类型，必须为BM
+								3-6个字节位图大小，低位在前
+								7-10字节位图保留字，必须为0
+								11-14字节 位图偏移量）
+		后40字节===位图信息头（宽度、高度、大小、像素、分辨率等）
+4.哈希表  
+	链表的数组  
+	根据键值对直接进行访问。 
+	就是找到数据内容与数据地址的一种映射关系。
+	除留取余法  
+	优点：哈希表查找效率非常高，几乎是o(1)的复杂度。
+	缺点：基于数组的，所以必须提前清楚表中要存储多少数据。
+5.哈弗曼树（最优二叉树） 权值较大的离根越近。
+*****************************C++部分***************************
+1、c++中的 class 和 struct 区别是什么？ 
+	默认的继承访问权限：class是private，struct是public。
+2、c++中类的六个默认的成员函数，列举其中四个
+	默认构造，默认析构，默认复制，默认取址运算符重载，默认赋值运算符重载，默认取常量的地址运算符重载。
+	
+3、c++中引用和指针的区别？
+引用不占字节，指针占4个字节。
+4、派生类继承基类三步走：1、吸收基类成员（******不可吸收构造和析构函数）
+						 2、改造基类成员（******派生类中有同名标示符，则执行派生类的******隐藏）
+						 3、添加新成员 私有成员派生类不可访问。
+5、重载、隐藏、覆盖（重写）的区别？
+	重载是在同一作用域内的同名不同参，返回类型可以不一样。
+	隐藏是在两个具有派生关系的类中同名,派生类中的就把基类的隐藏了。
+	覆盖是在两个具有派生关系的类中同名同参且返回类型也要一致，并且有virtual关键字。
+6、const的三个位置的含义：
+						const Complex Complex::Complex(const Complex& ref) const;
+	第一个const修饰函数返回类型，使其不能为左值；
+	第二个const修饰函数参数，在函数体中不能修改引用的内容，起到保护作用；
+	第三个const修饰函数体，函数不能修改数据成员的值。
+7、多态虚表实现原理，举一个多态的例子？
+	虚函数：两个或两个以上具有继承关系的类；
+			具有同名且同参的函数；
+			在基类函数前加virtual关键字声明；
+	存在虚函数的类都有一个一维的虚函数表（静态的本类虚函数函数的指针数组即就是本类虚函数的入口地址）
+	类的对象有一个指向虚表开始的指针。
+	#include <iostream>
+	using namespace std;
+	class Animal{
+	public:
+		virtual speak(){cout << "Animal::speak" << endl;}
+	};
+	class Dog:public Animal{
+		speak(){cout << "Dog::wangwangwang"<< endl;}
+	}
+	int main()
+	{
+		Dog a;
+		Animal* p = &a;
+		p->speak;
+		return 0;
+	}
+	程序执行结果： Dog::wangwangwang
+	c++多态实现概括一句话就是：在基类的函数前加上关键字virtual，在派生类中重写该函数，
+	运行时将会根据对象的实际类型来调用相应的函数。如果对象是基类，则调用基类相关函数；如果是派生类，
+	则调用派生类相关函数。这叫类的多态性。
+	函数的多态性是函数的重载。	
+	
+8、STL中vector连续push_back（）插入n个元素时，时间复杂度为？
+	O(n)
+9、构造函数执行流程：
+		1.传参
+		2.有直接或者间接虚基类，执行虚基类构造
+		3.执行基类构造
+		4.按照数据成员声明顺序为数据成员开辟内存空间
+		5.执行构造函数函数体
+10、构造函数初始化列表和构造函数复制的差异：
+	
+*****************************硬件部分**************************
+SRAM主要用于二级高速缓存（Level2 Cache)。它利用晶体管来存储数据。与DRAM相比，SRAM的速度快，但在相同面积中SRAM的容量要比其他类型的内存小。
+SRAM是静态存储方式，以双稳态电路作为存储单元，SRAM不像DRAM一样需要不断刷新，而且工作速度较快，但由于存储单元器件较多，集成度不太高，功耗也较大。 [1] 
+
+1、arm体系结构
+	arm公司设计的精简指令集cpu架构。低功耗、高效率。
+	exynos4412 4核心 主频1.4GHZ sumsung arm-cortex a9系列（armv7架构）32位处理器
+	arm的核心处理：指令集、alu、寄存器、流水线、协处理器、mmu。
+mmu：内存管理单元。通过页表查询虚拟地址对应的物理地址。
+	 需要提前建立映射列表，arm支持两级映射，一级表和二级表。
+						   一级映射是1M的映射关系。
+	1、arm的寄存器是32位，
+	2、所有指令也是32位，
+	3、大部分指令都是单周期的，
+	4、alu处理的数据只能来自寄存器，
+	5、支持load/store 完成内存数据交互
+	arm支持大小端，默认小端
+	arm-cortex a9 有9种工作模式
+		非特权模式：user模式：普通应用运行模式(不能访问所有的硬件)
+		特权模式：
+			非异常：sys（系统模式）
+			内部异常：
+					svc模式（管理）  上电、复位cpu的工作模式，软件中断的工作模式
+					undef模式        未识别指令的工作模式
+					abort模式（中止模式）操作受到保护的内存控制		 
+			外部异常：
+					irq模式
+					fiq模式
+	mon安全模式、hyp虚拟化模式
+	arm异常处理机制：
+					当异常发生时，arm会自动进行异常区分，跳转到异常向量表固定位置执行代码。
+	异常向量表：
+				异常向量表基地址设置：高位和地位  armv7后任意位置，由协处理器cp15的指令寄存器设置。								
+	arm寄存器有37个32位寄存器，31个通用寄存器，6个状态寄存器 这些寄存器不能同时被访问
+	r0~r12是通用寄存器
+	r13（sp）是栈指针寄存器，模式切换或者函数跳转时，用来存放通用寄存器的数值，存在sp指向的内存空间。
+	r14（lr）是链接寄存器，程序跳转时，保存返回地址到lr
+	r15（pc）是程序计数器，对pc写操作时，cpu会自动跳转到指定位置执行代码；
+							由于arm流水线处理机制（取指===》译码===》执行）三级流水线
+							对pc进行读操作时，读取到的是当前正在执行指令的下两条指令地址即当前指令地址+8
+	特殊寄存器
+			cpsr：当前程序状态寄存器 、、、、、spsr 物理状态寄存器 异常发生时，用来保存cpsr的寄存器
+			N   Z   C   V 、、、、、、、、、、         E    I  F  (M域)
+			31	30	29  28                             9    7  6   4~0位
+	     N 第31位 符号位       判断结果符号           1为负     0为正
+		 Z 第30位 零标志位     判断结果是否为零       1表示为零 0表示不为零
+		 C 第29位 进位标志位   判断运算结果有无进借位 加法：1表示有进位   0表示无进位
+													  减法：1表示无借位   0表示有借位	
+		 V 第28位 溢出位       运算结果有无溢出       1存在溢出 0不存在溢出
+		 E 第9位  大小端控制   1大端  0小端
+		 I 第7位  irq控制位    1屏蔽中断 0使能 
+		 F 第6位  fiq控制位    1屏蔽中断 0使能
+		 M域 第4~0位 模式域 
+指令：处理数据
+	  数据处理
+	  特殊寄存器
+	  内存操作
+	  栈操作（满减栈）
+	  块拷贝操作
+	  跳转
+	  伪指令： ldr、nop
+			   adr基于当前pc查找标号地址
+接口：
+	内存物理范围：0x40000000----0x80000000
+		io引脚资源
+启动流程：booting
+	GPIO操作：
+		1.设置引脚作用（根据链接关系查找引脚编号）GPXXCON
+			根据GPXXDAT完成引脚电平和程序的交互
+
+异步通信是一个通讯标准，uart是来实现异步通讯的电路。RS232是一种主机与主机之间的连接标准。
+R232：                                    				 R485：
+	三根线 RX,TX,GND 						 					两根线 
+	点对点	负逻辑 距离短 最长15m								网状 差分信号 距离长
+芯片间通信：同步
+			iic：两根线（SCL/SDA）  串行半双工	多主设备的总线 必须按照8位+1位ASK传递
+			spi: 四根线（SCK/SDO/SDI/CS） 全双工 可以不用有地址，用cs来选择通讯。
+				 可以按位发送：一个时钟周期一位数据
+			iic速率：100k
+					 400k
+					 3.4M 
+			地址：7位地址模式
+			SCL为高时，SDA必须稳定。
+			iic仲裁：保证同一时刻只有两个设备进行通信。利用电路与特性。
+					 如果速率一样，就看数据。
+	用的触摸屏管理芯片：ft5406，完成电容式触摸屏坐标数据采集存储/传输（IIC）；			
+定时器：
+		wdt看门狗电路，防止程序失去控制。里面有个定时器。（复位电路）
+		pwm脉宽调制，调节占空比。（pwm输出）
+中断：
+	soc厂商设置的特殊电平信号。
+程序实现中断的流程：
+	1.中断信号使能（产生）。
+	2.中断信号传递区分  pL390 160个中断号
+	3.中断函数的设计（项目决定）
+外部中断：
+		中断信号可修改
+ADC:模数转换电路
+	速率、量程、误差
+	模式
+		start模式
+		连续模式
+linux系统组成：
+		bootloader 运行在内存，存储在flash
+				   加载和引导操作系统内核的代码，为操作系统内核运行做环境准备。
+				   uboot制作bootloader
+		kernel		
+		
+		
+		
+		
+		rootfs  被内核第一挂载的文件系统
+				文件系统，文件的组织形式
+				init进程、linux指令、系统配置文件
+				sysv init进行 在电脑上
+				嵌入式平台上 busybox的init
+				ext2/ext3/ext4 (emmc/sd)
+				ramdisk.img/cramfs
+		
+嵌入式的根文件系统都是用busybox来制作。
+内核裁剪
+		make menuconfig  以图形化的形式增加或者减少内核源代码的多少。
+		1./driver/char/Makefile 最后一行添加 obj-$(CONFIG_MOD) += mod.o
+		2./driver/char/Kconfig 加入
+								config MOD
+									bool "this is test mod"       [] y/n
+									//tristate "this is test mod"   <> y/n/m
+        3.在内核顶层目录下 make menuconfig 寻找this is test mod 设置 y/n/m
+		
+加载引导操作系统内核
+		设置bootargs参数
+		1.setenv bootargs ........
+		2.saveenv 保存修改到存储
+		minicom：dnw 0x40008000
+		pc：   sudo dnw arch/arm/boot/zImage
+		minicom:bootm 0x40008000
+内核报错：
+		painc错误：
+				操作系统内核无法执行时的提醒。
+		Oops错误：
+				非法使用指针
+				Oops错误可以返回PC的值
+				
+			addr2line 通过行号查找文件位置
+内核模块：
+		增加或删除不影响操作系统正常执行的代码。
+		
+#include		<linux/init.h>
+#include 		<linux/module.h>
+静态编译：将内核模块源文件加载到内核代码中编译的编译方式
+		将mod.c编译连接到zImage
+		1.拷贝mod.c到	/home/linux/kernel/linux-3.5/driver/char/
+		2.修改Makefile  /home/linux/kernel/linux-3.5/driver/char/Makefile
+		3.在/home/linux/kernel/linux-3.5/driver/char/Kconfig下最后一行添加obj -y = mod.o
+						
+		
+		静态加载：模块直接链接到内核镜像中去 zImage
+		动态加载：生成***.ko文件
+				1.拷贝mod.c到	/home/linux/kernel/linux-3.5/driver/char/
+				2.修改Makefile  /home/linux/kernel/linux-3.5/driver/char/Makefile
+				3.在/home/linux/kernel/linux-3.5/driver/char/Kconfig下最后一行添加obj -m = mod.o
+				
+				4.mv /home/linux/kernel/linux-3.5/driver/char/mod.c /home/linux/nfs/module1/mod/
+				5.编写makefile
+					obj-m := mod.o
+					module:
+						make -C /home/linux/kernel/linux-3.5 M=$(shell pwd) modules
+					.PHONY:clean
+					clean:
+						rm *.o *.ko *.mod.* modules.* Module.*
+				6.make
+					
+				在板子操作系统内核正常运行的情况下
+				insmod ***.ko   动态加载.ko文件
+				lsmod  			查看.ko文件
+				rmmod mod 		动态删除
+				modinfo mod  	查看mod信息
+动态编译：不需要编译内核源码的编译方式
+		动态加载：生成***.ko文件
+				insmod ***.ko
+				lsmod
+				rmmod mod
+				
+		Makefile：		obj-m +=mod.o
+							make -C /home/linux/kernel/linux-3.5 M=$(shell pwd) modules
+						.PHONY:clean
+						clean:
+							rm *.ko *.mod.* Module.* module.* *.o
+内核内存空间的申请：（在高1G范围内申请）
+		kmalloc();申请的空间 物理地址连续 128k以上不建议使用
+		vmalloc();申请的空间 虚拟地址连续，物理地址不一定连续
+		void *vmalloc(unsigned long size) 
+		EXPORT_SYMBOL(vmalloc);标号导出，可以被其他模块使用。
+驱动模块：
+	字符设备：按字节流操作设备，不能随机访问，没有缓存。
+	块设备：可以随机访问，最小单位是块。有缓存。
+	网络设备
+	
+	字符设备和块设备都有设备号。
+linux的系统调用是利用软件中断实现的。
+软件中断： svc #12
+字符设备驱动：
+		32位设备号：高12位   +   低20位   （0-255）
+					主设备号     次设备号
+					设备分类	 设备编号
+linux可以根据设备节点信息的设备号，在内核中查找对应的设备驱动。	
+linux下每一个字符设备在内核中都存在一个struct cdev结构体。包含有设备号信息和操作方法集合。
+#include <linux/cdev.h>
+
+ 12 struct cdev {
+ 13     struct kobject kobj;                                                                         
+ 14     struct module *owner;
+ 15     const struct file_operations *ops; /***/  操作方法集合
+ 16     struct list_head list;    
+ 17     dev_t dev;  //设备号     dev_t    设备号类型
+ 18     unsigned int count;  
+ 19 };	
+ struct file_operations {
+   ssize_t (*read) (struct file *, char __user *, size_t, loff_t *);
+	 ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+	 int (*open) (struct inode *, struct file *);
+	 int (*release) (struct inode *, struct file *);
+}；
+
+字符设备驱动编写流程：
+		cat /proc/devices 查看系统已使用过的设备节点
+	1.编写test.c
+		模块入口module_init(hello_kernel)；
+		模块出口module_exit(bye_kernel)；
+		模块许可MODULE_LICENSE("GPL");
+		
+		int ma=250;
+		int mi=0;
+		定义cdev结构体 
+					static struct cdev mycdev；
+		
+		定义fileoperation
+					static struct file_operations ops={
+						.open = myopen,
+						.write = mywrite,
+						.read = myread,
+						.release = myclose,
+					};
+		
+		static int myopen(struct inode * inode, struct file * file){}
+		static int myclose(struct inode * inode, struct file * file){}
+		static ssize_t myread (struct file *file, char __user * buf, size_t len, loff_t * loff);
+		static ssize_t mywrite (struct file *file, const char __user * buf, size_t len, loff_t * loff);
+		
+		static __init int hello_kernel(void){
+			
+		//完成32位设备号  
+		dev_t dev_num=MKDEV(ma，mi);
+		//申请设备号
+		int ret = register_chrdev_region(dev_num,1,"mytest");
+		if(ret <　0){
+				return -1；
+		}
+		
+		//绑定cdev和ops 注册操作方法
+		cdev_init(&mycdev,&ops);
+		//注册cdev到内核
+		ret = cdev_add（&mycdev，dev_num，1）；
+		if(ret < 0)
+		{
+			注销设备号；
+		}
+		
+		return 0；
+		}
+		
+		static __exit void bye_kernel(void){
+			dev_t dev_num；
+			dev_num=MKDEV(ma，mi);
+			cdev_del(&mycdev);//删除cdev
+			unregister_chrdev_region(dev_num,1);//注销设备号
+		}
+		2.编写makefile生成test.ko
+		3.insmod test.ko
+		4.在nfs/module1下创建设备节点 mknod /dev/mytest c 250 0
+		5.arm-linux-gcc test.c -o app
+		6../app
+	总的来说就是：完成32位的设备号MKDEV ===》申请设备号(register_chrdev_region) 
+				  ===》完成cdev的注册===》cdev_init()把cdev和fileoperation关联起来，注册操作方法 
+				  ===》添加cdev到内核cdev_add()
+	进程的状态：运行、就绪、睡眠、停止、僵尸
+	用户空间每一个进程在内核中都有一个task_struct结构体描述进程状态
+	struct task_struct {
+1230     volatile long state;    /*进程状态  -1 unrunnable, 0 runnable, >0 stopped */
+1231     void *stack;
+1232     atomic_t usage;                                                                          
+1233     unsigned int flags; /* per process flags, defined below */
+1234     unsigned int ptrace;
+
+	 #define TASK_INTERRUPTIBLE  1    				可中断睡眠状态
+ 186 #define TASK_UNINTERRUPTIBLE    2				不可中断睡眠状态	
+		
+	struct task_struct *get_current(void); //在内核被调用，可以得到用户空间进程在内核中的struct  task_struct结构体
+
+	阻塞io：能够将进程从运行态切换为睡眠态。
+	用等待队列实现阻塞io。
+	等待队列实现流程：
+					1.定义一个等待队列结构体 wait_queue_head_t wait_head
+					2.初始化结构体 
+					3.在需要阻塞的地方进行阻塞
+							wait_event_interruptible(wq, condition)		将进程切换为可中断的睡眠态
+							wait_event_timeout(wq, condition, timeout)	将进程切换为可中断的睡眠态,超时会唤醒
+							wait_event(wq,condition) 					将进程切换为不可中断的睡眠态
+									condition:(可以是表达式)条件为假的时候，实现阻塞；
+															条件为真的时候，不阻塞；
+					4.在需要唤醒的地方实现唤醒			
+							将condition改为真， wake_up_interruptiable(&wq)
+												wake_up(&wq)
+	用dmesg查看printk打印信息。
+	内核节拍：HZ arm是200，x86是1000
+	内核有一个64位全局变量 jiffies 记录系统运行时间。
+	RTC电路记录实时时间的电路。
+linux的中断管理：
+		linux为每个中断信号设计了struct irq_desc结构体
+		驱动开发人员只需要根据中断信号编号进行中断申请、中断设计处理函数
+		1.request_irq();完成指定中断信号编号的注册
+		2.disable_irq();关闭中断，等待中断处理函数结束
+		3.free_irq();释放中断信号编号
+内核延时函数：msleep、ssleep、udelay
+
+
+中断上下文：中断函数的执行环境，被中断调用的函数都是中断上下文。
+进程上下文：函数调用
+request_irq注册的函数执行时不能被中断（不可重载）
+中断顶半部：request_irq注册的函数执行（中断接收）
+中断底半部：中断延时处理
+底半部可以被顶半部中断
+底半部实现机制：
+	1.tasklet机制：属于软件中断的实现，短时间、不可睡眠、不可调度 
+									   调用时效性好
+	2.工作队列：可长时间、可睡眠、可调度  
+				调用时效性差
+	3.内核定时器
+1.tasklet实现：
+	1.定义结构体DECLARE_TASKLET(key_task,key_delay,20)===》2.编写结构体函数===》3.向内核增加tasklet  tasklet_schedule(&key_task)  	系统维护的结构体
+505 struct tasklet_struct
+506 {
+507     struct tasklet_struct *next;
+508     unsigned long state;
+509     atomic_t count;
+510     void (*func)(unsigned long);   //tasklet机制需要执行函数
+511     unsigned long data;            //void (*func)(unsigned long data);  函数的参数
+512 };
+		DECLARE_TASKLET(name, func, data)//定义struct tasklet_struct结构体
+											name 结构体名字
+											func  结构体的函数，底半部执行
+											data  func执行时的参数
+		向内核增加tasklet   
+			在request_irq注册函数退出之前tasklet_schedule(struct tasklet_struct *t)
+2.workqueue实现：
+	1.定义结构体work_struct===>2.编写内核函数===》向内核增加workqueue  schedule_work（key_work）
+		 struct work_struct {                                                                          
+ 80     atomic_long_t data;
+ 81     struct list_head entry;
+ 82     work_func_t func;        // 系统调用的函数 typedef void (*work_func_t)(struct work_struct *work);
+ 83 #ifdef CONFIG_LOCKDEP
+ 84     struct lockdep_map lockdep_map;
+ 85 #endif
+ 86 };
+		 #define DECLARE_WORK(n, f)  //定义work_struct结构体
+		struct delayed_work n = __DELAYED_WORK_INITIALIZER(n, f) // n是结构体名，f是结构体内核函数
+		向内核增加workqueue   
+			在request_irq注册函数退出之前schedule_work(struct work_struct *work); 
+3.内核定时器的实现：
+	1.定义结构体 struct timer_list===》2.初始化init_timer(timer) 
+		===》3.在需要推后处理任务的时候int mod_timer(struct timer_list *timer, unsigned long expires);
+							unsigned long expires  jiffies+3*HZ
+	struct timer_list {
+ 13     /*
+ 14      * All fields that change during normal runtime grouped to the
+ 15      * same cacheline
+ 16      */
+ 17     struct list_head entry;                                                                   
+ 18     unsigned long expires; //jiffies 数值  被调用的函数在jiffies为设置数值时执行
+ 19     struct tvec_base *base;
+ 20 
+ 21     void (*function)(unsigned long); // 被调用的函数
+ 22     unsigned long data;				// 被调用函数的参数
+ 23 
+ 24     int slack;
+ #ifdef CONFIG_TIMER_STATS
+ 27     int start_pid;
+ 28     void *start_site;
+ 29     char start_comm[16];
+ 30 #endif
+ 31 #ifdef CONFIG_LOCKDEP
+ 32     struct lockdep_map lockdep_map;
+ 33 #endif
+ 34 };
+ 35           
+ platform总线：platform_driver  
+			   platform_device 

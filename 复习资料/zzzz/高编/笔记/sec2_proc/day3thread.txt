@@ -1,0 +1,299 @@
+pthread 线程
+   
+	优点： 比多进程节省资源，可以共享变量。
+
+	概念：线程是轻量级进程，一般是一个进程中的多个任务。
+	进程是系统中最小的资源分配单位.
+	线程是系统中最小的执行单位。
+
+	特征：
+	1、共享资源
+	2、效率高  30%
+	3、三方库： pthread  clone 
+			3.1 编写代码头文件： pthread.h
+			3.2 编译代码加载库： -lpthread   library 
+			libpthread.so
+	缺点：
+	1，线程和进程相比，稳定性，稍微差些
+	2，线程的调试gdb，相对麻烦些。
+线程与进程区别：
+
+	资源：
+		线程比进程多了共享资源。  IPC
+		线程又具有部分私有资源。
+		进程间只有私有资源没有共享资源。
+	空间：
+		进程空间独立，不能直接通信。
+		线程可以共享空间，可以直接通信。
+
+3、线程的设计框架
+	创建多线程 ==》线程空间操作 ===》线程资源回收
+errno   strerror（errno）  perror();
+	3.1 创建多线程：
+	int pthread_create(
+		pthread_t *thread, const pthread_attr_t *attr,
+		void *(*start_routine) (void *), void *arg);
+	功能：该函数可以创建指定的一个线程。
+	参数：thread 线程id，需要实现定义并由该函数返回。
+		  attr   线程属性，一般是NULL，表示默认属性。
+		  start_routine 指向指针函数的函数指针。
+		  		本质上是一个函数的名称即可。称为
+				回调函数,是线程的执行空间。
+
+		  arg  回调函数的参数，即参数3的指针函数参数。
+	返回值：成功 0
+			失败 错误码
+
+注意：一次pthread_create执行只能创建一个线程。
+	  每个进程至少有一个线程称为主线程。
+	  主线程退出则所有创建的子线程都退出。 
+	  主线程必须有子线程同时运行才算多线程程序。
+	  线程id是线程的唯一标识，是CPU维护的一组数字。
+	  pstree 查看系统中多线程的对应关系。
+	  多个子线程可以执行同一回调函数。
+	ps -eLf 查看线程相关信息Low Weigth Process
+	ps -eLo pid,ppid,lwp,stat,comm
+2、pthread_t pthread_self(void); unsigned long int; %lu
+   功能：获取当前线程的线程id
+   参数：无
+   返回值：成功 返回当前线程的线程id
+   			失败  -1；
+			syscall(SYS_gettid);
+这个方法重启后失效
+alias gcc='gcc -g -pthread '
+unalias gcc 
+
+永久起作用
+cd ~ //家目录
+vim .bashrc
+alias gcc='gcc -g -pthread '  :wq
+
+source .bashrc  生效
+
+练习题：
+	设计一个多线程程序，至少有三个子线程
+	每个线程执行不同的任务，并实时打印执行
+	过程，同时表明身份。
+
+	eg: ./a.out  ==>tid =xxx...  zheng ...
+					tid2 = xxx wozai.
+					tid3 = xxx  wozai ssss
+
+
+线程的退出：
+	1： 自行退出 ==》自杀  ==》子线程自己退出
+		exit(1);
+		void pthread_exit(void *retval);
+		功能：子线程自行退出
+		参数： retval 线程退出时候的返回状态，临死遗言。
+		返回值：无
+
+			th
+			{
+				int a =10;
+
+				pthread_exit(10);
+			}
+			join(,&ret)
+	2： 强制退出 ==》他杀  ==》主线程结束子线程
+		int pthread_cancel(pthread_t thread);
+		功能：请求结束一个线程
+		参数：thread 请求结束一个线程tid2啊
+		返回值：成功 0
+				失败 -1；
+
+作业：
+	创建一个多线程程序，至少有10个子线程，
+	每个线程有会打印不同的数据，同时表明身份。
+
+	
+	线程的回收
+	1、线程的回收机制 ====》不同与进程没有孤儿线程和僵尸线程。
+				  ====》主线程结束任意生成的子线程都会结束。
+				  ====》子线程的结束不会影响主线程的运行。
+	char * retval ; retval++; 1 
+	int * retval; 
+  int pthread_join(pthread_t thread, void **retval);    
+  功能：通过该函数可以将指定的线程资源回收，该函数具有
+  	    阻塞等待功能，如果指定的线程没有结束，则回收线程
+		会阻塞。
+  参数：thread  要回收的子线程tid
+        retval  要回收的子线程返回值/状态。==》ptread_exit(值);
+  返回值：成功 0
+  		  失败 -1；
+
+  子线程的回收策略：
+  1、如果预估子线程可以有限范围内结束则正常用pthread_join等待回收。
+  2、如果预估子线程可能休眠或者阻塞则等待一定时间后强制回收。
+  3、如果子线程已知必须长时间运行则，不再回收其资源。
+  
+  
+  线程的参数，返回值
+  
+  
+  1、传参数
+		
+	传整数 ===》int add(int a,int b);  ///a b 形参
+				add(x,y);    ////x y 实参 
+
+		pthread_create(&tid,NULL,fun,x);
+
+		fun ==>void * fun(void * arg);
+		
+	练习：创建一个子线程并向该线程中传入一个字符在
+		  线程中打印输出。
+		  在此基础上向子线程中传入一个字符串，并在
+		  子线程中打印输出。
+
+		  
+		  add(int a, int b)
+		  {
+			int c = a+b;
+			char buf[]=""
+			return c;
+		  }
+					5
+		  int d = add(2,3);
+	传字符串
+		栈区字符数组：
+		字符串常量：
+		堆区字符串；
+			char *pc = (char *)malloc(128);
+			ptread_create(&tid,NULL,fun,pc);
+
+			pthread_join(tid,NULL);
+
+			free(pc);
+		
+			fun(void *arg)
+			{
+				char * pc = (char *)arg	;
+				printf("%s \n",pc);
+						%c
+			}
+
+	传结构体
+	1、定义结构体类型
+	2、用结构体定义变量
+	3、向pthread_create传结构体变量
+	4、从fun子线程中获取结构体数据
+
+练习：
+	定义一个包含不同数据类型的测试结构体
+	并向子线程传参数，同时在子线程中打印输出。
+
+
+	定义一个回调函数可以完成计算器的功能
+	定义一个数据结构体可以一次传入不同的数据
+	和计算方式并将结果打印输出。
+	//2 + 3.6 
+	// 2 + 3
+	// 8 * 6
+	typedef strcut
+	{
+		float a;
+		float b;
+		char c;//+ - * / 
+		float d;
+	}JSQ;
+	
+	
+
+返回值：pthread_exit(0) ===>pthread_exit(9);
+		pthread_join(tid,NULL); ===>pthread_join(tid,?);
+10;
+-10;
+int * p =malloc(4);
+*p = -10;
+1、pthread_exit(?) ==>? = void * retval;
+						  纯地址
+
+2、pthread_join(tid,?) ==>? = void **retval;
+							地址的地址
+原理：子线程退出的时候，可以返回一个内存地址
+	  改值所在的内存中可以存储任何数据，只要
+	  地址存在，则数据都可以正常返回。
+	
+	地址有三种：
+	0、栈区变量  错误，子线程结束该地址失效。
+	1、全局变量  失去意义，本质可以直接访问。
+
+	2、静态变量 
+	3、堆区变量
+
+
+	  主线程通过一个地址形式的变量来接受子进程
+	  返回的地址变量就可以将该地址中的数据取到。
+
+	练习：从子线程中申请一块堆区内存并存字符串
+      将该字符串以返回值形式返回到主线程并打印输出。
+	  	
+	作业：
+	从主线程中获取用户输入的信息并组织成一个结构体
+	变量并以函数传参数方式发给不同的子线程，子线程
+	拿到用户输入的数据后各个运算后以返回值形式返回
+	给主线程，并在主线程中分别输出。
+
+	设置分离属性，目的线程消亡，自动回收空间。
+	attribute
+	int pthread_attr_init(pthread_attr_t *attr);
+	功能，初始化一个attr的变量
+	参数：attr，需要变量来接受初始值
+	返回：0  成功，
+	非0 错误；
+       int pthread_attr_destroy(pthread_attr_t *attr);
+	  功能：销毁attr变量。
+	  attr，属性变量
+	  返回：0  成功，
+	非0 错误；
+	   
+	   
+
+	 int pthread_attr_setdetachstate(pthread_attr_t *attr
+, int detachstate);
+	功能：把一个线程设置成相应的属性
+	参数，attr，属性变量，有init函数初始化他。
+	detachstate：有2个可选值，
+	
+	PTHREAD_CREATE_DETACHED：设置分离属性。
+	
+	第二种设置分离属性：
+int pthread_detach(pthread_t thread);
+	功能，设置分离属性
+	参数，线程id号，填自己的id
+	
+	do{
+	
+	
+	}while()
+void pthread_cleanup_push(void (*routine)(void *)， void *arg);
+
+	功能：注册一个线程清理函数
+	参数，routine，线程清理函数的入口
+		arg，清理函数的参数。
+	返回值，无
+		
+void pthread_cleanup_pop(int execute);
+	功能：调用清理函数
+	execute，非0  执行清理函数
+			0 ，不执行清理
+			
+	返回值，无
+
+
+
+do
+{
+
+}while(1)
+
+process				thread
+fork				pthread_create 
+getpid,ppid,		pthread_self
+exit,				pthread_exit 
+wait,waitpid,		pthread_join 
+kill,				pthread_cancel
+atexit 				pthread_clean,
+exec				system--->fork->exec (ls)
+					
+

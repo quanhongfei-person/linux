@@ -1,0 +1,636 @@
+网络编程 
+	open system interconnect
+1、OSI 模型  ===》开放系统互联模型  ==》分为7层：
+	理想模型  ==》尚未实现
+		tftp 
+		b  /etc/passwd 
+		a /etc/123
+		应用层
+		表示层
+		会话层
+
+		传输层tcp  udp
+		网路层ip
+
+		链路层   arp
+		物理层         100Mb/8  bits   100MB
+
+  TCP/IP模型  ==》网际互联模型   ==》分为4层：
+  	实用模型  ===》工业标准
+  	
+		应用层   ====》应用程序
+		传输层   ====》端口号tcp udp
+		网络层   ====》IP 地址
+		物理层   ====》网卡 驱动  1GB
+pcap ,,,
+2、TCP/IP协议族：
+	www.taobao.com ---> 192.168.0.19
+	www.voa.com vpn  
+	dns 域名解析
+	DHCP
+	应用层： HTTP TFTP FTP SNMP DNS ...
+	传输层： TCP  UDP 
+	网络层： IP  ICMP RIP OSFP IGMP ...
+	物理层： ARP  RARP  ...   ip--->mac  
+	arp,,,,
+	192.160.0.110
+	
+	端口：
+    www.rfc.org   ===>网络协议
+	
+	TCP协议 ===》RFC 793 ===》传输控制协议
+	UDP协议 ===》RFC 768 ===》用户数据报协议
+
+	TCP： 有链接 可靠  实时 		  ====》手机通信
+	UDP： 无链接 不可靠 不实时  ====》发邮件、
+
+========================================================
+tcp  头
+
+
+TCP编程基础知识：
+
+	
+1、网络基础 ===》A B C D E 类
+
+010 3333344444
+IP地址 == 网络位 + 主机位
+
+IP地址的分类: 点分十进制   ipv4 
+	A类:	超大规模性网络
+					8	8	8	8
+		1.0.0.0 - 126.255.255.255  126.1.1.1 
+									126.1.1.2
+		255.0.0.0
+		私有:
+		10.0.0.0 - 10.255.255.255
+		127.0.0.1
+	B类:	大中规模型网络
+		128.0.0.0 - 191.255.255.255
+		128.1.x.x
+		255.255.0.0
+		私有:
+		172.16.0.0 - 172.31.255.255
+
+	C类:	中小规模型网络
+		192.0.0.0 - 223.255.255.255
+		255.255.255.0
+		私有:
+		192.168.0.0 - 192.168.255.255
+		静态路由
+		192.168.0.0
+		192.168.0.1  网关
+		192.168.0.255
+
+	D类:	组播和广播
+		224.0.0.0 - 239.255.255.255
+		192.168.0.255 ==  255.255.255.255
+		192.168.0.0 
+		192.168.0.1   网关
+		192.168.0.255 广播 
+
+	E类:	实验
+		240.0.0.0 - 255.255.255.255
+		
+   C 类网络：
+   	ip地址的前三组是网络地址，第四组是主机地址。
+	二进制的最高位必须是： 110xxxxx开头
+	十进制表示范围： 192.0.0.0 -223.255.255.255
+	默认网络掩码：   255.255.255.0
+	网络个数： 2^24 个 约 209 万个
+	主机个数： 2^8  个 254 个+2 ===》1 是网关 1是广播
+	私有地址： 192.168.x.x 局域网地址。
+  
+  vim  /etc/network/interfaces 
+  sudo /etc/init.d/networking restart      
+  sudo reboot
+	192.168.0.0
+	192.168.0.1  route 
+	192.168.0.255 boardcast
+	801.n.g 
+	单机上网的配置：
+	1、有ip地址
+	2、有网络接口并插入网线。
+	3、配置网络设置
+			ip: ifconfig ethX X.X.X.X/24 up
+			网关： route add default gw x.x.x.x
+			DNS：  vi /etc/resolv.conf  ==>nameserver 8.8.8.8
+			测试：ping www.baidu.com  
+			
+			netstat  -anp
+
+2、网络接口
+	1、sokcet  套接字 ==》BSD socket ==》用于网络通信的一组接口函数。
+	2、ip+port 地址+端口===》地址用来识别主机
+						     端口用来识别应用程序
+
+		  port分为TCP port / UDP port  范围都是： 1-65535
+		  约定1000 以内的端口为系统使用。
+			http 80
+				3306
+				telnet 21 
+				ssh 22
+3、网络字节序 ===》大端存储
+		12 00   小端
+		
+		
+		
+		00 12
+	数字转换函数：
+	#include <arpa/inet.h>
+	1236234687
+	主机转网络：uint32_t htonl(uint32_t hostlong);
+	ipv4 192.168.0.1 1~65535
+				uint16_t htons(uint16_t hostshort);
+	网络转主机：host to net 
+				net to host 
+				uint32_t ntohl(uint32_t netlong);
+				uint16_t ntohs(uint16_t netshort);
+				
+	字符串转换函数：
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
+
+	主机转网络：in_addr_t inet_addr(const char *cp);
+	inet_addr("192.168.1.20");
+	cli.sin_addr
+	网络转主机：char *inet_ntoa(struct in_addr in);
+
+client, server 
+browser
+b/s     
+p2p   peer   
+
+1、模式  C/S 模式  ==》服务器/客户端模型
+
+server:socket()-->bind()--->listen()-->accept()-->recv()-->close()
+client:socket()-->bind()-->connect()-->send()-->close();
+int on = 1;
+setsockopt(listfd, SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on));
+
+服务器端：
+
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+
+int socket(int domain, int type, int protocol);
+功能：程序向内核提出创建一个基于内存的套接字描述符
+
+参数：domain  地址族，PF_INET == AF_INET ==>互联网程序
+					  PF_UNIX == AF_UNIX ==>单机程序
+	  type    套接字类型：
+	  		  SOCK_STREAM  流式套接字 ===》TCP   
+			  SOCK_DGRAM   用户数据报套接字===>UDP
+			  SOCK_RAW     原始套接字  ===》IP
+	  protocol 协议 ==》0 表示自动适应应用层协议。
+
+返回值：成功 返回申请的套接字id
+		失败  -1；
+
+2、int bind(int sockfd, struct sockaddr *my_addr, 
+             socklen_t addrlen);
+功能：如果该函数在服务器端调用，则表示将参数1相关
+	  的文件描述符文件与参数2 指定的接口地址关联，
+	  用于从该接口接受数据。
+
+	  如果该函数在客户端调用，则表示要将数据从
+	  参数1所在的描述符中取出并从参数2所在的接口
+	  设备上发送出去。
+
+	  注意：如果是客户端，则该函数可以省略，由默认
+	        接口发送数据。
+参数：sockfd 之前通过socket函数创建的文件描述符，套接字id
+	  my_addr 是物理接口的结构体指针。表示该接口的信息。
+
+	  struct sockaddr      ////通用地址结构
+	  {
+		  u_short sa_family;  ////地址族
+		  char sa_data[14];   ////地址信息
+	  };
+
+	  转换成网络地址结构如下：
+	  struct _sockaddr_in    ///网络地址结构
+	  {
+		  u_short 		  sin_family; ////地址族
+		  u_short 		  sin_port;   ///地址端口
+		  struct in_addr  sin_addr;   ///地址IP
+		  char 			  sin_zero[8]; ////占位
+	  };
+
+	  struct in_addr
+	  {
+		  in_addr_t s_addr;
+	  }
+
+	  socklen_t addrlen: 参数2 的长度。
+返回值：成功 0
+		失败  -1；
+
+3、  int listen(int sockfd, int backlog);
+    功能：在参数1所在的套接字id上监听等待链接。
+	参数：sockfd  套接字id
+		  backlog 允许链接的个数。
+	返回值：成功  0
+			失败  -1；
+
+
+4、int accept(int sockfd, struct sockaddr *addr, 
+				socklen_t *addrlen);
+   功能：从已经监听到的队列中取出有效的客户端链接并
+   		 接入到当前程序。
+   参数：sockfd 套接字id
+   	     addr  如果该值为NULL ，表示不论客户端是谁都接入。
+		 	   如果要获取客户端信息，则事先定义变量
+			   并传入变量地址，函数执行完毕将会将客户端
+			   信息存储到该变量中。
+		 addrlen： 参数2的长度，如果参数2为NULL，则该值
+		 			也为NULL；
+				 如果参数不是NULL，&len;
+				  一定要写成len = sizeof(struct sockaddr);
+   返回值：成功 返回一个用于通信的新套接字id；
+ 从该代码之后所有通信都基于该id
+			   
+		   失败  -1；
+
+5、接受函数：/发送函数：
+	四组八个
+
+	read（）/write ()   ///通用文件读写，可以操作套接字。
+	recv() /send()      ///TCP 常用套接字读写
+	recvfrom()/sendto() ///UDP 常用套接字读写
+	recvmsg()/sendmsg() ///通用套接字读写
+
+ssize_t recv(int sockfd, void *buf, size_t len,
+             int flags);
+功能：从指定的sockfd套接字中以flags方式获取长度
+	  为len字节的数据到指定的buff内存中。
+参数：sockfd  
+		如果服务器则是accept的返回值的新fd
+		如果客户端则是socket的返回值旧fd
+	  buff 用来存储数据的本地内存，一般是数组或者
+	  动态内存。
+	  len 要获取的数据长度
+	  flags 获取数据的方式，0 表示阻塞接受。
+
+返回值：成功 表示接受的数据长度，一般小于等于len
+		失败  -1；
+
+
+6、close()  ===>关闭指定的套接字id；
+
+===================================================
+客户端：
+
+1、int connect(int sockfd, const struct sockaddr *addr,
+                   socklen_t addrlen);
+   功能：该函数固定有客户端使用，表示从当前主机向目标
+   		 主机发起链接请求。
+   参数：sockfd 本地socket创建的套接子id
+   	     addr 远程目标主机的地址信息。
+		 addrlen: 参数2的长度。
+   返回值：成功 0
+   		   失败 -1；
+
+2、int send(int sockfd, const void *msg, 
+		size_t len, int flags);
+   功能：从msg所在的内存中获取长度为len的数据以flags
+   		 方式写入到sockfd对应的套接字中。
+
+   参数：sockfd：
+   			如果是服务器则是accept的返回值新fd
+			如果是客户端则是sockfd的返回值旧fd
+
+		 msg 要发送的消息
+		 len 要发送的消息长度
+		 flags 消息的发送方式。
+
+  返回值：成功  发送的字符长度
+  		  失败  -1；
+     
+练习：
+1、	同桌之间互相分工，分别编写服务器和客户端程序
+	可以完成简单单向发送字符串功能。
+	客户端可以给服务器发送字符串
+
+2、修改以上程序，完成同桌/邻桌之间的简单聊天程序。
+
+
+作业：
+	考虑将以上程序优化后称为一个不用协调步伐的
+	实时聊天程序。
+
+	1、fork().
+	2、两个独立实体。
+
+	
+	1、客户端信息获取
+	accept(fd,NULL,NULL);
+	参数2 是客户端信息，要获取该信息需要事先定义变量。
+
+	struct sockaddr_in cliaddr;
+	socklen_t len = sizeof(struct sockaddr);
+
+	accept(fd,(struct sockaddr*)&cliaddr,&len);
+
+printf("cliaddr ip = %s \n",inet_ntoa(cliaddr.sin_addr));
+pirntf("cliaddr port = %d\n",ntohs(cliaddr.sin_port));
+
+
+2、客户端的信息bind
+	
+	在socket()===>bind()===>connect();
+
+	struct sockaddr_in localaddr;
+
+	localaddr.sin_family	= PF_INET;
+	localaddr.sin_port		= htons（6666）;///本地发送数据端口
+	localaddr.sin_addr.s_addr= inet_addr("192.168.1.100")  ///本机ip
+	socklen_t len = sizeof(struct sockaddr);
+	
+	int ret = bind(fd,(struct sockaddr*)&localaddr,len);
+
+3、常见测试工具编写
+	3.1 如何设计一个通用的客户端测试工具，可以完成给任意服务器发送消息。  
+	  ./tcp_client_test  serip  serport
+
+
+	3.2 如何设计一个通用的服务器端测试工具，可以接受任意客户端的链接信息。
+	./tcp_server_test  myip   myport 
+
+	ip= x.x.x.1 port = xx msg = xxxxxx;
+	ip= x.x.x.2 port = xx msg = xxxxxx;
+	ip= x.x.x.3 port = xx msg = xxxxxx;
+
+
+
+4、复杂数据传送
+	4.1  从客户端向服务器发送结构体数据并从在服务器端打印输出。
+	4.2  从客户端向服务器发送文件内存并打印输出。
+	4.3  从客户端向服务器发送整个文件，在服务器上存储该文件。
+
+===================================================================
+常用网络测试工具
+
+telnet  netstat  ping  arp   wireshark  tcpdump
+ssh2 
+secure crt 
+sudo ufw disable
+sudo apt-get install openssh-server openssh-client 
+1、telnet  远程登录工具，默认都是系统安装。
+	
+	使用格式： telnet ip地址  端口
+		   eg: telnet 192.168.1.1  8888
+	注意：如果没有写端口，则默认登录23 号端口。
+
+2、netstat  测试查看网络端口使用情况
+	netstat -anp 
+	netstat -n  ===>列出当前所有网络端口使用情况
+	netstat -n -t  ===>列出所有TCP通信的端口信息
+	netstat -n -u  ===>列出所有UDP通信的端口信息
+
+	netstat -n -i   ===>列出默认接口上的通信信息
+	netstat -lnp |grep 8888  ===>查看指定端口上的通信详情
+
+3、ping 命令  测试网路的联通状况
+	
+		ping ip地址
+		ping 域名
+
+4、arp 地址解析命令
+	
+		arp -an  ===>列出当前主机的地址ARP表
+		arp -d  ip地址
+
+5、抓包工具   tcp.port == 50000 && tcp.ip  == 192.168.0.183
+	5.1 wireshark  ==>可视化界面
+	tcpdump 
+		过滤规则：
+		1、根据ip地址过滤：ip.src == x.x.x.x
+						   ip.dst == x.x.x.x
+		2、根据端口过滤：tcp.srcport == xx;
+						 tcp.dstport == xx;
+						 udp.srcport == xx;
+						 udp.dstport == xx;
+		3、根据协议类型过滤：
+						tcp   udp  icmp .....
+		4、任意组合以上条件抓包：
+				如果与的关系：  and
+			ip.src == 192.168.1.100 and tcp.dstport == 9999
+				如果或关系 ：   or
+			ip.src == 192.168.1.100 or ip.dst == 192.168.1.100
+			
+			tcp host 192.168.1.100
+
+
+练习：
+	同桌之间用ping命令互相测试网络，用wireshark 抓包证明通信数据包存在。
+	将之前写的代码在指定端口启动，再次抓包，练习以上抓包过程。
+
+
+sudo tcpdump -n -i eth0 -xx src or dst www.taobao.com -AXX |less 
+
+	5.2 tcpdump  ==》命令行 ===>www.tcpdump.com
+
+	1、tcpdump -n ===>在默认的网卡上开始抓包。
+	2、根据ip过滤： tcpdump -n  src  x.x.x.x  
+				    tcpdump -n  dst x.x.x.x
+  抓192.168.0.130上面发出和接受到的数据包
+  sudo tcpdump -n -x src or dst  192.168.0.130 
+	3、查看包中的内容：
+					tcpdump -n -x src x.x.x.x
+					tcpdump -n -x dst x.x.x.x
+
+					tcpdump -n -x src x.x.x.x  >xxx.log
+
+	4、根据端口过滤：
+					tcpdump -n src port xx
+					tcpdump -n dst port xx
+					tcpdump -n -p tcp port xx
+					tcpdump -n udp port xx
+					tcpdump -n port xx
+	5、根据协议过滤：
+				    tcpdump -n -p icmp/tcp/udp
+
+	6、根据指定接口过滤：
+					tcpdump -n -i eth0
+					tcpdump -n -i lo
+
+	7、根据以上各种条件组合抓包：
+			与关系：  and
+			或关系：  or
+
+
+练习：
+	用tcpdump 测试所有过滤选项，查看抓到的包和
+	wireshark的形式是否相同。
+
+
+作业：
+	4.1  从客户端向服务器发送结构体数据并从在服务器端打印输出。
+	4.2  从客户端向服务器发送文件内存并打印输出。
+	4.3  从客户端向服务器发送整个文件，在服务器上存储该文件。
+
+
+
+	
+	TCP 编程之三次握手 与 四次挥手
+
+	1、TCP 是有连接的通信过程，需要三次握手建立链接。
+
+	两台主机之间的通信链路建立需要如下过程：
+
+	主机1  -----syn-----》主机2
+	主机1 《---ack syn--- 主机2
+	主机1  ----ack -----》主机2
+
+	通过抓包来验证三次握手：
+	1、 tcpdump -n -i lo tcp port 9999 ===>S  S. .
+	2、 wireshark  规则： tcp.port == 9999 ===>syn  syn ack  ack
+
+	问题：
+	1、三次握手分别是在服务器和客户端的那个函数上完成。
+	2、如何用代码形式测试以上过程。
+
+	结论：
+		客户端函数：connect()
+		服务器函数：listen()
+
+
+	while(1)
+	{
+		recv(newfd,buff,sizeof(buff),0);
+		recv(newfd,buff,sizeof(buff),O_NONBLOCK);
+	}
+
+	四次挥手
+
+	主机1  --- F A ---》主机2
+	主机1 《---A ----- 主机2   主机1 不在发送消息，但是有可能接受消息
+
+	主机1 《---F A --- 主机2
+	主机1  ----A ----》主机2  主机1 2 全部完毕
+	
+	ip头
+	
+(1)版本　占4位，指IP协议的版本。通信双方使用的IP协议版本必须一致。目前广泛使用的IP协议版本号为4（即IPv4）。关于IPv6，目前还处于草案阶段。 
+
+(2)首部长度　占4位，可表示的最大十进制数值是15。请注意，这个字段所表示数的单位是32位字长（1个32位字长是4字节），因此，当IP的首部长度为1111时（即十进制的15），首部长度就达到60字节。当IP分组的首部长度不是4字节的整数倍时，必须利用最后的填充字段加以填充。因此数据部分永远在4字节的整数倍开始，这样在实现IP协议时较为方便。首部长度限制为60字节的缺点是有时可能不够用。但这样做是希望用户尽量减少开销。最常用的首部长度就是20字节（即首部长度为0101），这时不使用任何选项。 
+
+(3)区分服务　占8位，用来获得更好的服务。这个字段在旧标准中叫做服务类型，但实际上一直没有被使用过。1998年IETF把这个字段改名为区分服务DS(Differentiated Services)。只有在使用区分服务时，这个字段才起作用。 
+
+(4)总长度　总长度指首部和数据之和的长度，单位为字节。总长度字段为16位，因此数据报的最大长度为216-1=65535字节。 
+在IP层下面的每一种数据链路层都有自己的帧格式，其中包括帧格式中的数据字段的最大长度，这称为最大传送单元MTU(Maximum Transfer Unit)。当一个数据报封装成链路层的帧时，此数据报的总长度（即首部加上数据部分）一定不能超过下面的数据链路层的MTU值。 
+
+(5)标识(identification)　占16位。IP软件在存储器中维持一个计数器，每产生一个数据报，计数器就加1，并将此值赋给标识字段。但这个“标识”并不是序号，因为IP是无连接服务，数据报不存在按序接收的问题。当数据报由于长度超过网络的MTU而必须分片时，这个标识字段的值就被复制到所有的数据报的标识字段中。相同的标识字段的值使分片后的各数据报片最后能正确地重装成为原来的数据报。 
+
+(6)标志(flag)　占3位，但目前只有2位有意义。 
+●　标志字段中的最低位记为MF(More Fragment)。MF=1即表示后面“还有分片”的数据报。MF=0表示这已是若干数据报片中的最后一个 
+●　标志字段中间的一位记为DF(Don’t Fragment)，意思是“不能分片”。只有当DF=0时才允许分片。 
+
+(7)片偏移　占13位。片偏移指出：较长的分组在分片后，某片在原分组中的相对位置。也就是说，相对用户数据字段的起点，该片从何处开始。片偏移以8个字节为偏移单位。这就是说，每个分片的长度一定是8字节（64位）的整数倍。 
+
+(8)生存时间　占8位，生存时间字段常用的的英文缩写是TTL(Time To Live)，表明是数据报在网络中的寿命。由发出数据报的源点设置这个字段。其目的是防止无法交付的数据报无限制地在因特网中兜圈子，因而白白消耗网络资源。最初的设计是以秒作为TTL的单位。每经过一个路由器时，就把TTL减去数据报在路由器消耗掉的一段时间。若数据报在路由器消耗的时间小于1秒，就把TTL值减1。当TTL值为0时，就丢弃这个数据报。 
+
+(9)协议　占8位，协议字段指出此数据报携带的数据是使用何种协议，以便使目的主机的IP层知道应将数据部分上交给哪个处理过程。 
+
+(10)首部检验和　占16位。这个字段只检验数据报的首部，但不包括数据部分。这是因为数据报每经过一个路由器，路由器都要重新计算一下首部检验和（一些字段，如生存时间、标志、片偏移等都可能发生变化）。不检验数据部分可减少计算的工作量。 
+
+(11)源IP地址　占32位。 
+
+(12)目的IP地址　占32位。
+	
+	http://61.133.63.5:8405/showdatab.aspx?subid=14623
+	
+	
+	apache
+	
+	
+GET / HTTP/1.1
+Host: 192.168.0.123
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:49.0) Gecko/20100101 Firefox/49.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+
+
+
+HTTP/1.1 200 OK
+Date: Fri, 17 Nov 2017 03:10:20 GMT
+Server: Apache/2.2.22 (Ubuntu)
+Last-Modified: Thu, 03 Aug 2017 05:42:18 GMT
+ETag: "a2d94-252-555d2d7fb9e3e"
+Accept-Ranges: bytes
+Vary: Accept-Encoding
+Content-Encoding: gzip
+Content-Length: 366
+Keep-Alive: timeout=5, max=100
+Connection: Keep-Alive
+Content-Type: text/html
+
+
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Expires" content="-1">
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-control" content="no-cache">
+	<title>
+		
+	</title>
+	</head>
+		<?php  echo 'hello this is php'?>
+	<body>
+		<h1>It works!</h1>
+		<p>This is the default web page for this server.</p>
+		<p>The web server software is running but no content has been added, yet.</p>
+		<h1>world...!!!!!!!!!!!!!!!!!!!!!!</h1>
+		<p>:29.0103</p>
+		<p>SO2:189.01023</p>
+		<p>:150.66778</p>
+	</body>
+</html>
+
+
+
+
+GET / HTTP/1.1\r\n
+get /login?na=123&pass=123
+Host: 61.133.63.5:8405
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:49.0) Gecko/20100101 Firefox/49.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1\r\n\r\n
+
+	java 
+php,jsp,asp,
+
+61.133.63.5:8405/showdatab.aspx?subid=14623
+HTTP/1.1 200 OK
+Cache-Control: private
+Content-Type: text/html; charset=utf-8
+Content-Encoding: gzip
+Vary: Accept-Encoding
+Server: Microsoft-IIS/7.5
+X-AspNet-Version: 2.0.50727
+X-Powered-By: ASP.NET
+Date: Thu, 07 Dec 2017 07:33:34 GMT
+Content-Length: 911
+
+`I%&/m{JJt`$@iG#)*eVe]f@{{;N'?\fdlJ!?~|?"~7NO<y<ML_~Iwr7Ooxw7ulYymzt/yu`euGG9L-eY?^mFX>:oj><=nO.CLueGl*O(yU/euW>ZUMQM1>j,k8kV~f=)fw~	YqrnzEl/?~~'NSy72+W_^_Oxsw_}/?9/Lw&|Qz=tGjh!xEV_2?oOb>mu~,.pVTY	|dwMjh}MOOL!Wv?z_y{{P	,=s3c?[?/?Q* tAA@?:?3?..~q/<7W?=Co}:_MwY{?O/#G~:.o	~6Hm"Rj3#+}C<]@
+
+write(fd,buf,911);
+
+123.151.137.18
+
+get  / http1.1
+if(get /login?na=123&pass=123)
+{
+	execv(login,na,pass );
+}

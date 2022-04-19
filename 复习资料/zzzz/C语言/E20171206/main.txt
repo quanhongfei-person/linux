@@ -1,0 +1,25 @@
+E20181206
+#include <stdio.h>
+
+#if 0
+int main(void)
+{
+	printf("Hello World!\n");
+	return 0;
+}
+#endif
+
+#define X 789456123
+
+int main(void)
+{
+	int buffer_of_size;
+	int n;
+	int m;
+	n = 123456;
+
+	printf("%d\n", n);
+	printf("%p\n", &n);
+
+	return 0;
+}

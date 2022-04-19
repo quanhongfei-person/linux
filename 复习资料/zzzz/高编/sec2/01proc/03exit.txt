@@ -1,0 +1,22 @@
+#include<stdio.h>
+#include <stdlib.h>
+
+void clean()
+{
+
+	printf("这里清理函数的地方。。。\n");
+}
+
+int main(int argc, const char *argv[])
+{
+	atexit(clean);	
+
+	printf("hello");
+	exit(1);
+	printf("hello");
+	return 0;
+	printf("hello");
+	printf("hello");
+	printf("hello");
+	printf("hello");
+}

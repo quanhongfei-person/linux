@@ -1,0 +1,40 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             RESET,CODE
+    2 00000000                 ENTRY
+    3 00000000         start
+    4 00000000 E3A03001        mov              r3, #1
+    5 00000004 E3E00000        mvn              r0, #0      ;r0=0xffffffff
+    6 00000008 E3C01902        bic              r1, r0, #(0x1<<15)
+    7 0000000C E1C02783        bic              r2, r0, r3, lsl #15
+    8 00000010                 END
+Command Line: --debug --xref --cpu=ARM920T --apcs=interwork --depend=bic.d -obi
+c.o -IC:\Keil\ARM\INC -IC:\Keil\ARM\INC\Samsung --list=bic.lst bic.S
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 1 in file bic.S
+   Uses
+      None
+Comment: RESET unused
+start 00000000
+
+Symbol: start
+   Definitions
+      At line 3 in file bic.S
+   Uses
+      None
+Comment: start unused
+2 symbols
+326 symbols in table

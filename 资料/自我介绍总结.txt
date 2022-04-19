@@ -1,0 +1,123 @@
+Good afternoon evenyone, my name is Quan，I am 27 years old. 
+I graduated from Xi'an Shiyou University in 2019 and passed College English Test Band four during college.
+           naɪnˈtiːn
+The first company is Shanghai Shangtai. I worked as a Junior Software Engineer.
+                 ˌendʒɪˈnɪə
+My first task was the music player module, which can be embedded in the current platform using Linux and C.
+
+After that,i start the development of HMI for automobile central control,I was mainly responsible for btsetting and btcall modules.
+due to it mainly develop language is C++,
+in this process, I learned and mastered the idea of object-oriented  encap sulation   inheritance 
+and understood the importance of standard coding habit.    ɪnˌkæpsjuˈleɪʃn  ɪnˈherɪtəns
+ ˌʌndəˈstʊd    
+Now, I'm working on EulerOS network package development. I have gained good hands on programmer languages 
+like C and C++ to accomplish the project development and mastered the application program in Linux operation system. 
+     əˈkämpliSH
+A three-years experience has urged me to be an eligible software engineer. I am looking forward to contributing to my future position. 
+
+All that, thank you!
+
+
+Good afternoon evenyone, my name is Quan，I am 27 years old. 
+I graduated from Xi'an Shiyou University in 2019 and passed College English Test Band four during college.
+           
+The first company is Shanghai Shangtai. I worked as a Junior Software Engineer.
+                
+My first task was the music player module, which can be embedded in the current platform using Linux and C.
+
+After that,i start the development of HMI for automobile central control,I was mainly responsible for btsetting and btcall modules.
+due to it mainly develop language is C++,
+in this process, I learned and mastered the idea of object-oriented  encap sulation   inheritance 
+and understood the importance of standard coding habit.   
+    
+Now, I'm working on EulerOS network package development. I have gained good hands on programmer languages 
+like C and C++ to accomplish the project development and mastered the application program in Linux operation system. 
+
+A three-years experience has urged me to be an eligible software engineer. I am looking forward to contributing to my future position. 
+
+All that, thank you!
+
+
+大家下午好，我叫全，今年 27 岁。
+我2019年毕业于西安石油大学，大学期间通过了大学英语四级考试。
+           
+第一家公司是上海尚泰。我是一名初级软件工程师。
+                
+我的第一个任务是音乐播放器模块，它可以使用 Linux 和 C 嵌入到当前平台中。
+
+之后开始了汽车中控HMI的开发，主要负责btsetting和btcall模块。
+由于它主要开发语言是C++，
+在这个过程中，学习并掌握了面向对象封装继承的思想
+并了解标准编码习惯的重要性。
+    
+现在，我正在从事 EulerOS 网络包的开发。我已经掌握了编程语言
+喜欢C和C++完成项目开发，掌握Linux操作系统中的应用程序。
+
+三年的经验促使我成为一名合格的软件工程师。我期待着为我未来的职位做出贡献。
+
+所有这些，谢谢！
+
+
+
+自我介绍：
+	大家下午好，我叫权红飞，今年27岁，2015年-2019年就读于西安石油大学，大学期间通过了英语四级考试，并对C语言、数据结构、系统编程、网络编程等进行了系统学习；
+	
+	2019年毕业的第一份工作签的上海商泰汽车，主要从事车机系统软件开发，期间完整参与公司两个项目, 
+	
+	2020年回到西安入职江苏润和，项目前期开发交付件安全传输系统，是下游针客户开发一款操作简单的安全交付系统，
+	后来从事华为EulerOS国产操作系统开发，这是和Redhat centos fadore Ubuntu等相同的Linux发行版平台，我主要负责网络软件包开发，至今已有两年时间；
+	
+	今天面试的岗位是贵公司的软件工程师，希望可以获得此次工作机会，谢谢;
+
+
+
+
+	
+Good afternoon, everyone. My name is Quan Hongfei. I am 27 years old. I am studying at Xi'an Petroleum University as an undergraduate student. During this period, I passed the CET-4 test.
+
+And systematically study C language, data structure, system programming, network programming;
+
+After graduating in 2019, I joined Shanghai Shangtai Automobile, mainly engaged in the development of HMI system software for vehicles and machines. During this period, I fully participated in the audio and video development project; since the main development language of the project is C++, during the project development process, I learned and mastered C++ and Understand the importance of coding conventions.
+
+Now, I work for Jiangsu Runhe and mainly develop EulerOS network package. I am proficient in shell, C, C++ language and familiar with Linux operating system.
+
+The job interviewed today is a software engineer in your company, I hope to get this job opportunity, thank you;
+
+
+
+
+
+
+good afternoon everyone. My name is Quan Hongfei. I am 27 years old. I graduated from Xi'an Shiyou University. 
+During this time, I passed the College English Test Band four
+And systematically learn C language, data structure, system programming, network programming;
+大家下午好。 我叫权红飞。 我今年 27 岁。 我毕业于西安石油大学。 在此期间，我通过了CET-4考试。
+并系统学习C语言、数据结构、系统程序设计、网络程序设计；
+
+After graduating in 2019, I was joined Shangtai Automobile, mainly engaged in the development of HMI system software for vehicles. 
+During the period, I fully participated in the audio and video development project; 
+Since the main development language of the project is C++, during the project development process, 
+I learned and mastered C++ and understood the importance of coding conventions.
+2019年毕业后我加入商泰汽车，主要从事车机HMI系统软件开发。 期间全面参与音视频开发项目； 
+由于项目的主要开发语言是C++，在项目开发过程中，我学习并掌握了C++，理解了编码约定的重要性。
+
+Now working in Jiangsu Runhe, mainly developing EulerOS network package. 
+Proficient in shell, C, C++ language, familiar with Linux operating system.
+现在在江苏润和工作，主要开发EulerOS网络包。 精通shell、C、C++语言，熟悉Linux操作系统。
+
+The position interviewed today is a software engineer in your company, I hope to get this job opportunity, thank you;
+今天面试的职位是贵公司的软件工程师，希望能得到这个工作机会，谢谢；
+
+
+
+
+大家下午好。 我叫权红飞。 我今年 27 岁。 我毕业于西安石油大学。 在此期间，我通过了CET-4考试。
+
+并系统学习C语言、数据结构、系统程序设计、网络程序设计；
+
+2019年毕业后我加入商泰汽车，主要从事车机HMI系统软件开发。 期间全面参与音视频开发项目； 
+由于项目的主要开发语言是C++，在项目开发过程中，我学习并掌握了C++，理解了编码约定的重要性。
+
+现在在江苏润和工作，主要开发EulerOS网络包。 精通shell、C、C++语言，熟悉Linux操作系统。
+
+今天面试的职位是贵公司的软件工程师，希望能得到这个工作机会，谢谢；

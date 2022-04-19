@@ -1,0 +1,18 @@
+		<!DOCTYPE html><!-- ver html5 dsfasdfa -->
+<html lang="zh-cn">
+	<head>
+		<meta charset="utf-8">
+		<title>中文测试。。。。</title>
+	</head>
+	<body bgcolor="#ff69b4">
+		<h1 align="center">这里是测试body测试内容。。。</h1>
+		<h2>这里是测试body测试内容。。。</h2>
+		<h4>这里是测试body测试内容。。。</h4>
+		<h6>这里是测试body测试内容。。。</h6>
+		<p> 段落1</p><hr>
+		<p align="right"> 段落2</p><!-- 这个是段落到 备注-->
+		<b>粗的字体</b>
+		你好<br>还好；<br><i>是否是倾斜字体</i><br><del>是否是删除字体</der><br><u>下划线字体</u>就阿斯讲道理看风景绿卡
+	</body>
+</html>
+xianzai 

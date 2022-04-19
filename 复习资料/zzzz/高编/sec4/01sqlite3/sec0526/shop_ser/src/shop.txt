@@ -1,0 +1,373 @@
+/*
+ ============================================================================
+ Name        : shop.c
+ Author      : 
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sqlite3.h>
+
+#define err_msg(msg) do{perror(msg);exit(1);}while(0)
+typedef struct sockaddr *SA;
+
+int if_strcmp(const char *path, struct stat buf, char *url, int conn) {
+	char path1[256] = { 0 };
+	if (0 == strcmp(url + 1, path)) {
+		sprintf(path1, "/home/linux/WROX/sec0526/%s", path);
+		int st = stat(path1, &buf);
+		if (-1 == st)
+			err_msg("stat");
+		char send_cmd[1024] = { 0 };
+		sprintf(send_cmd, "HTTP/1.1 200 OK\r\n");
+		sprintf(send_cmd, "%sContent-Type: image/jpeg; charset=utf-8\r\n",
+				send_cmd);
+		sprintf(send_cmd, "%sServer: Microsoft-IIS/7.5\r\n", send_cmd);
+		sprintf(send_cmd, "%sContent-Length: %ld\r\n\r\n", send_cmd,
+				buf.st_size);
+
+		send(conn, send_cmd, strlen(send_cmd), 0);
+		printf("%s", send_cmd);
+		int fd = open(path1, O_RDONLY);
+		if (-1 == fd)
+			err_msg("open ");
+		char buff[4096] = { 0 };
+		while (1) {
+			bzero(buff, 4096);
+			int rd_num = read(fd, buff, 4096);
+			if (0 == rd_num)
+				break;
+			send(conn, buff, rd_num, 0);
+
+		}
+		close(fd);
+	}
+	return 0;
+}
+
+int send_html(const char *path, struct stat buf, int conn) {
+	char path1[256] = { 0 };
+	sprintf(path1, "/home/linux/WROX/sec0526/%s", path);
+	int st = stat(path1, &buf);
+	if (-1 == st)
+		err_msg("stat");
+	char send_cmd[1024] = { 0 };
+	sprintf(send_cmd, "HTTP/1.1 200 OK\r\n");
+	sprintf(send_cmd, "%sContent-Type: text/html; charset=utf-8\r\n", send_cmd);
+	sprintf(send_cmd, "%sServer: Microsoft-IIS/7.5\r\n", send_cmd);
+	sprintf(send_cmd, "%sContent-Length: %ld\r\n\r\n", send_cmd, buf.st_size);
+	send(conn, send_cmd, strlen(send_cmd), 0);
+	printf("%s", send_cmd);
+	int fd = open(path1, O_RDONLY);
+	if (-1 == fd)
+		err_msg("open ");
+	char buff[4096] = { 0 };
+	while (1) {
+		bzero(buff, 4096);
+		int rd_num = read(fd, buff, 4096);
+		if (0 == rd_num)
+			break;
+		send(conn, buff, rd_num, 0);
+
+	}
+	close(fd);
+
+	return 0;
+}
+
+unsigned char FromHex(unsigned char x) {
+	if (0 == x)
+		return -1;
+	unsigned char y;
+	if (x >= 'A' && x <= 'Z')
+		y = x - 'A' + 10;
+	else if (x >= 'a' && x <= 'z')
+		y = x - 'a' + 10;
+	else if (x >= '0' && x <= '9')
+		y = x - '0';
+
+	return y;
+}
+
+int urlDecode(char* dest, const char* src) {
+	if (NULL == src || NULL == dest) {
+		return -1;
+
+	}
+	int len = strlen(src);
+	int i = 0;
+	for (i = 0; i < len; i++) {
+
+		if ('+' == src[i])
+			strcat(dest, "");
+		else if ('%' == src[i]) {
+			//if(i+2len)return -1;
+			unsigned char high = FromHex((unsigned char) src[++i]);
+			unsigned char low = FromHex((unsigned char) src[++i]);
+			unsigned char temp = high * 16 + low;
+			char temp2[5] = { 0 };
+			sprintf(temp2, "%c", temp);
+			strcat(dest, temp2);
+
+		}
+	}
+	return 0;
+}
+
+int handle_1(void *arg, int col, char **result, char **title) {
+
+	//int flag = 0;
+	*(int*)arg = *(int*) arg + 1;
+	FILE* fp = fopen("/home/linux/WROX/sec0526/4.html", "a");
+	if (NULL == fp)
+		err_msg("fopen 4.html");
+
+	char buf_html[2048] = { 0 };
+	//<a href="1.html"><img src="abc.jpg"></a>
+	sprintf(buf_html, "<body background=\'img/003.jpg\'>");
+	sprintf(buf_html,
+			"%s<table><tr><td width=\'140\'><a href=\'%s_5.html\'><img src=\'%s\'></a></td>",
+			buf_html,result[0], result[19]); //<a href=\'5.html\'><img src=\'%s\'></a>
+	sprintf(buf_html, "%s<td ><p><h3>%s</h3></p>", buf_html, result[3]);
+	sprintf(buf_html, "%s<p><h5>%s</h5></p>", buf_html, result[16]);
+	sprintf(buf_html, "%s<p><h4><font color=\'red\'>¥ %s</font></h4></p>", buf_html,result[11]);
+//	sprintf(buf_html, "%s<p><h5>%s</h5></p>", buf_html, result[16]);
+	sprintf(buf_html,"%s</td></tr></table>",buf_html);
+
+
+
+//	if (4 == flag) {
+//		sprintf(buf_html, "%s</tr><tr>", buf_html);
+//	}
+	int len = sizeof(buf_html);
+	fwrite(buf_html, len, 1, fp);
+	fclose(fp);
+
+	return 0;
+}
+
+int handle_2(void *arg, int col, char **result, char **title) {
+
+	FILE* fp = fopen("/home/linux/WROX/sec0526/5.html", "a");
+	if (NULL == fp)
+		err_msg("fopen 4.html");
+
+	char buf_html[2048] = { 0 };
+	//<a href="1.html"><img src="abc.jpg"></a>
+	sprintf(buf_html,"<body background=\'img/004.jpg\'>");
+	sprintf(buf_html, "%s<table><tr><td width=\'230\'><img src=\'%s\'></td>", buf_html,result[21]); //<a href=\'5.html\'><img src=\'%s\'></a>
+	sprintf(buf_html, "%s<td width=\'400\' align=\'left\'><p><h5>%s</h5></p>", buf_html, result[16]);
+	sprintf(buf_html,
+			"%s<p><h3><font color=\'red\'>¥ %s </font><s><font color=\'blue\'>%s</font></s></h3></p></td></tr></table>",
+			buf_html, result[11], result[10]);
+	sprintf(buf_html, "%s<p><h4>%s</h4></body></html></p>", buf_html,
+			result[18]);
+	int len = sizeof(buf_html);
+	fwrite(buf_html, len, 1, fp);
+	fclose(fp);
+	return 0;
+}
+
+int main(void) {
+	int listfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (-1 == listfd)
+		err_msg("sock&");
+	struct sockaddr_in ser, cli;
+	struct stat file_stat;
+	bzero(&ser, sizeof(ser));
+	bzero(&cli, sizeof(cli));
+	bzero(&file_stat, sizeof(file_stat));
+	ser.sin_addr.s_addr = INADDR_ANY;
+	ser.sin_family = AF_INET;
+	ser.sin_port = htons(50000);
+	int ret = bind(listfd, (SA) &ser, sizeof(ser));
+	if (-1 == ret)
+		err_msg("bind");
+	listen(listfd, 3);
+	socklen_t len = sizeof(cli);
+	while (1) {
+		int conn = accept(listfd, (SA) &cli, &len);
+		if (-1 == conn)
+			err_msg("zccept");
+		printf("对方的ip是%s, 端口是%d\n", inet_ntoa(cli.sin_addr),
+				ntohs(cli.sin_port));
+		pid_t pid = fork();
+		if (pid > 0) {
+			close(conn);
+			continue;
+		}
+		if (0 == pid) {
+			char buf[4096] = { 0 };
+			recv(conn, buf, 4096, 0);
+			printf("%s", buf);
+			char *method = NULL;
+			char *url = NULL;
+			char *ver = NULL;
+			method = strtok(buf, " ");
+			url = strtok(NULL, " ");
+			ver = strtok(NULL, "\r\n");
+			if (0 == strcmp(url, "/")) {
+				send_html("1.html", file_stat, conn);
+
+			}
+
+			//GET /img/1.jpg HTTP/1.1
+			if (strstr(url, "/img")) {
+				char path[256] = { 0 };
+				strcpy(path, url + 1);
+				if_strcmp(path, file_stat, url, conn);
+			}
+
+			//GET /images/200905/goods_img/32_G_1242110760868.jpg/ HTTP/1.1
+			if (strstr(url, "/images")) {
+				char path[256] = { 0 };
+				strcpy(path, url + 1);
+				if_strcmp(path, file_stat, url, conn);
+			}
+
+			//GET /login?us=zhang3&0pw=123456\0 HTTP/1.1
+			if (strstr(url, "login")) {
+				char *start = index(url, '=');
+				char * end = index(url, '&');
+				*end = '\0';
+				//end=NULL;
+				char name[128] = { 0 };
+				char pass[128] = { 0 };
+				strcpy(name, start + 1);
+				end += 1;
+				start = index(end, '=');
+				strcpy(pass, start + 1);
+
+				if (0 == strcmp(name, "zhang3")
+						&& 0 == strcmp(pass, "123456")) {
+					send_html("2.html", file_stat, conn);
+				} else {
+					send_html("3.html", file_stat, conn);
+				}
+			}
+
+			//GET /fun?us=%E8%AF%BA%E5%9F%BA%E4%BA%9A HTTP/1.1
+			if (strstr(url, "fun")) {
+				char *start = index(url, '=');
+				char *key = NULL;
+				char keywords[128] = { 0 };
+				key = strtok(start, " ");
+
+				urlDecode(keywords, key);
+				//printf("%s\n",keywords);
+
+				sqlite3* db;
+				ret = sqlite3_open("/home/linux/WROX/sec0526/shop.db", &db);
+				if (SQLITE_OK != ret) {
+					fprintf(stderr, "open shop.db：%s\n", sqlite3_errmsg(db));
+					sqlite3_close(db);
+					exit(1);
+				}
+				FILE* fp = fopen("/home/linux/WROX/sec0526/4.html", "w+");
+				if (NULL == fp)
+					err_msg("fopen 4.html");
+
+				char buf_html[1024] = { 0 };
+				sprintf(buf_html,
+						"<!DOCTYPE html> <html><head><meta charset=\"utf-8\"><title>数码产品特卖专区</title></head><body>");
+				int len = sizeof(buf_html);
+				fwrite(buf_html, len, 1, fp);
+				fclose(fp);
+
+				int exist_flag = 0;
+				char* errmsg;
+				char sql_cmd[512] = { 0 };
+				bzero(&sql_cmd, 512);
+				sprintf(sql_cmd,
+						"select * from goods where goods_name like \'%%%s%%\'",
+						keywords);
+				ret = sqlite3_exec(db, sql_cmd, handle_1, &exist_flag, &errmsg);
+				if (SQLITE_OK != ret) {
+					fprintf(stderr, "exec %s:%s\n", sql_cmd, errmsg);
+					sqlite3_free(errmsg);
+					sqlite3_close(db);
+					exit(1);
+				}
+				fp = fopen("/home/linux/WROX/sec0526/4.html", "a+");
+				if (NULL == fp)
+					err_msg("fopen 4.html");
+				sprintf(buf_html, "</body></html>");
+				len = sizeof(buf_html);
+				fwrite(buf_html, len, 1, fp);
+				fclose(fp);
+
+				send_html("4.html", file_stat, conn);
+				sqlite3_close(db);
+
+			}
+
+			//GET /4_5.html HTTP/1.1
+			if (strstr(url, "5.html")) {
+				char *mid = NULL;
+				mid = index(url, '_');
+				*mid = '\0';
+				char goods_id[5] = { 0 };
+				strcpy(goods_id, url+1);
+
+				sqlite3* db;
+				ret = sqlite3_open("/home/linux/WROX/sec0526/shop.db", &db);
+				if (SQLITE_OK != ret) {
+					fprintf(stderr, "open shop.db：%s\n", sqlite3_errmsg(db));
+					sqlite3_close(db);
+					exit(1);
+				}
+				FILE* fp = fopen("/home/linux/WROX/sec0526/5.html", "w+");
+				if (NULL == fp)
+					err_msg("fopen 5.html");
+
+				char buf_html[1024] = { 0 };
+				sprintf(buf_html,
+						"<!DOCTYPE html> <html><head><meta charset=\"utf-8\"><title>数码产品特卖专区</title></head><body>");
+				int len = sizeof(buf_html);
+				fwrite(buf_html, len, 1, fp);
+				fclose(fp);
+
+				char* errmsg;
+				char sql_cmd[512] = { 0 };
+				bzero(&sql_cmd, 512);
+				sprintf(sql_cmd, "select * from goods where goods_id = \"%s\" ",
+						goods_id);
+				ret = sqlite3_exec(db, sql_cmd, handle_2, NULL, &errmsg);
+				if (SQLITE_OK != ret) {
+					fprintf(stderr, "exec %s:%s\n", sql_cmd, errmsg);
+					sqlite3_free(errmsg);
+					sqlite3_close(db);
+					exit(1);
+				}
+
+				send_html("5.html", file_stat, conn);
+				sqlite3_close(db);
+			}
+
+			fflush(stdout);
+			close(conn);
+		}
+		if (pid < 0) {
+			err_msg("fork");
+		}
+
+	}
+	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
+	return EXIT_SUCCESS;
+}

@@ -1,0 +1,39 @@
+
+
+
+#include<stdio.h>
+#include<pthread.h>
+#include<string.h>
+#include<stdlib.h>
+
+typedef struct
+{
+	float a;
+	float b;
+	char c;
+}JSQ;
+
+void*th1(void*arg)
+{
+	 static float ret;
+	JSQ *jsq=(JSQ*)arg;
+	if(jsq->c=='+')
+	{
+		ret=jsq->a+jsq->b;
+	}
+	pthread_exit(&ret);
+}
+
+int main(int argc, const char *argv[])
+{
+	pthread_t tid;
+	JSQ jsq;
+	void*ret=NULL;
+	printf("请输入计算:");fflush(stdout);
+	scanf("%f%c%f",&jsq.a,&jsq.c,&jsq.b);
+	pthread_create(&tid,NULL,th1,&jsq);
+	pthread_join(tid,&ret);
+	printf("结果是%f\n",*(float*)ret);
+	return 0;
+}
+

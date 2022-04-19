@@ -1,0 +1,26 @@
+#include<stdio.h>
+#include<pthread.h>
+#include<stdlib.h>
+#include<string.h>
+void* th1(void* arg)
+{
+
+	int i=3;
+	char *buf= malloc(50);
+	strcpy(buf,"我消亡了。。。");
+	while(i--)
+	{
+		printf("++++++\n");
+	}
+	pthread_exit(buf);
+}
+int main(int argc, const char *argv[])
+{
+	pthread_t tid;
+	void* ret=NULL;
+	pthread_create(&tid,NULL,th1,NULL);
+	pthread_join(tid,&ret);
+	printf("ret is %s\n",(char*)ret);
+	free(ret);
+	return 0;
+}

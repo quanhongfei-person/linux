@@ -1,0 +1,222 @@
+/*
+ ============================================================================
+ Name        : 01ser.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include<string.h>
+#include <arpa/inet.h>
+#include<time.h>
+#include <unistd.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+#include<fcntl.h>
+
+#define err_msg(msg) do{perror(msg);exit(1);}while(0)
+
+int send_file(char* filename, char* filetype,int conn)
+{
+	char file_buf[4096]={0};
+	int fd = open(filename, O_RDONLY);
+	if (-1 == fd)
+		{
+		char err_buf[512]={0};
+		sprintf(err_buf,"open %s error send_file function\n",filename);
+		err_msg(err_buf);
+
+		}
+	struct stat st;
+	stat(filename, &st);
+	char http_head[512] = { 0 };
+	sprintf(http_head,"HTTP/1.1 200 OK\r\nSrver: Apache/2.2.22 (Ubuntu)\r\nAccept-Ranges: bytes\r\nContent-Length: %ld\r\nContent-Type: %s\r\n\r\n",
+			st.st_size,filetype);
+	write(conn, http_head, strlen(http_head));
+	while (1)
+	{
+		int ret = read(fd, file_buf, 4096);
+		if (ret <= 0)
+			break;
+		write(conn, file_buf, ret);
+
+	}
+	close(fd);
+
+	return 0;
+}
+
+unsigned char ToHex(unsigned char x)
+{
+	return x>9? x+55: x+48;
+}
+unsigned char FromHex(unsigned char x)
+{
+	if(0 == x ) return -1;
+	unsigned char y;
+	if(x>='A' &&x<='Z') y = x-'A'+10;
+	else if(x>='a' &&x <='z') y = x-'a'+10;
+	else if(x>='0' && x<='9') y = x-'0';
+
+	return y;
+}
+
+int  urlDecode(  char* dest, const char* src)
+{
+	if(NULL ==src || NULL == dest)
+	{
+		return -1;
+
+	}
+	int len = strlen(src);
+	int i =0 ;
+	for(i = 0 ;i<len;i++)
+	{
+
+		if('+' == src[i]) strcat(dest,"");
+		else if('%'==src[i])
+		{
+			//if(i+2len)return -1;
+			unsigned char high = FromHex((unsigned char)src[++i]);
+			unsigned char low = FromHex((unsigned char)src[++i]);
+			unsigned char temp = high*16 +low;
+			char temp2[5]={0};
+			sprintf(temp2,"%c",temp);
+			strcat(dest , temp2);
+
+
+
+		}
+	}
+	return 0;
+}
+int main(void)
+{
+	int listfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (-1 == listfd)
+		err_msg("sock");
+	struct sockaddr_in ser, cli;
+	bzero(&ser, sizeof(ser));
+	bzero(&cli, sizeof(cli));
+	ser.sin_family = AF_INET;
+	ser.sin_port = htons(8000);
+	ser.sin_addr.s_addr = INADDR_ANY; //man 7 ip
+	int ret = bind(listfd, (struct sockaddr *) &ser, sizeof(ser));
+	if (-1 == ret)
+		err_msg("bind");
+	ret = listen(listfd, 3);
+	if (-1 == ret)
+		err_msg("listen");
+	socklen_t len = sizeof(cli);
+
+	while (1)
+	{
+		char recv_buf[4096] = { 0 };
+		char file_buf[4096] = { 0 };
+		int conn = accept(listfd, (struct sockaddr *) &cli, &len);
+		if (-1 == conn)
+			err_msg("accept");
+		read(conn, recv_buf, 4096);
+		printf("recv:%s\n", recv_buf);
+		char * head;
+		//GET / HTTP/1.1
+		head = strtok(recv_buf, "\r\n");
+		char * method = NULL;
+		char * url = NULL;
+		char * version = NULL;
+		method = strtok(head, " ");
+		url = strtok(NULL, " ");
+		version = strtok(NULL, "\0");
+
+		if (0 == strcmp(url, "/"))
+		{
+			int fd = open("3.html", O_RDONLY);
+			if (-1 == fd)
+				err_msg("open 3.html");
+			struct stat st;
+			stat("3.html", &st);
+			char http_head[512] = { 0 };
+			sprintf(http_head,
+					"HTTP/1.1 200 OK\r\nSrver: Apache/2.2.22 (Ubuntu)\r\nAccept-Ranges: bytes\r\nContent-Length: %ld\r\nContent-Type: text/html\r\n\r\n",
+					st.st_size);
+			write(conn, http_head, strlen(http_head));
+			while (1)
+			{
+				ret = read(fd, file_buf, 4096);
+				if (ret <= 0)
+					break;
+				write(conn, file_buf, ret);
+
+			}
+			close(fd);
+
+		}
+
+		if (0 == strcmp(url, "/3.jpg"))
+		{
+
+			struct stat st;
+			stat("3.jpg", &st);
+			int fd = open("3.jpg", O_RDONLY);
+			if (-1 == fd)
+				err_msg("open 3.jpg");
+			char http_head[512] = { 0 };
+			sprintf(http_head,
+					"HTTP/1.1 200 OK\r\nServer: Apache/2.2.22 (Ubuntu)\r\nAccept-Ranges: bytes\r\nContent-Length: %ld\r\nContent-Type: image/jpeg\r\n\r\n",
+					st.st_size);
+			write(conn, http_head, strlen(http_head));
+			while (1)
+			{
+				ret = read(fd, file_buf, 4096);
+				if (ret <= 0)
+					break;
+				write(conn, file_buf, ret);
+
+			}
+			close(fd);
+
+		}
+
+		if (strstr(url, "login"))
+		{
+			//  /login?username=123&userpass=123\0
+			char *username = NULL;
+			char * userpass = NULL;
+
+			strtok(url, "=");
+			username = strtok(NULL, "&");
+			strtok(NULL, "=");
+			userpass = strtok(NULL, "\0");
+			char china[20]={0};
+			//%E5%A5%BD%E4%BA%BA
+			urlDecode(china,username);
+			printf("name in china :%s\n",china);
+			if (0 == strcmp(username, "zhangsan")
+					&& 0 == strcmp(userpass, "123"))
+			{
+				//success
+				send_file("success.html","text/html",conn);
+			} else
+			{
+				//failure..
+				send_file("failure.html","text/html",conn);
+			}
+
+		}
+
+		close(conn);
+
+	}
+
+	close(listfd);
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

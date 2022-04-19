@@ -1,0 +1,114 @@
+					int flag = 0;
+					char picture[256] = {0};
+					char picture2[256] = {0};
+					char sql_cmd2[256] = {0};
+					char picture3[256] = {0};
+					char *q = NULL;
+					char *p = NULL;
+					char *errmsg = NULL; 
+
+					p = picture;
+					q = picture3;
+					printf("%s\n", url);
+					strncpy(p, url, strlen(url)-6);
+					printf("%s\n", picture);
+					while (*p != '\0')
+					{
+						*q = *(picture+1);
+						q++;
+						p++;
+					}
+					printf("picture2:%s\n", picture2);
+
+					sprintf(picture3, "%s.jpg", picture3);
+			//		sprintf(picture2, "./%s.jpg", picture3);
+
+					printf("%s\n", picture);
+					printf("----------------------\n");
+					sprintf(sql_cmd2, "select goods_img, goods_name,market_price, shop_price, keywords, goods_desc from goods where goods_img = '%s';", picture2);
+					int Ret = sqlite3_open("123.db", &db);
+					if (Ret != SQLITE_OK)
+					{
+						fprintf(stderr, "open db :%s\n", sqlite3_errmsg(db));
+						sqlite3_close(db);
+						exit(1);
+					}
+					Ret = sqlite3_exec(db, sql_cmd2, select_handle2, &flag, &errmsg);
+					if (Ret = SQLITE_OK)
+					{
+						fprintf(stderr, "exec sql %s:%s\n", sql_cmd2, errmsg);
+						sqlite3_free(errmsg);
+						sqlite3_close(db);
+						exit(1);
+					}
+					if (flag == 1)
+					{	
+						int fd = open("xinxi5.html", O_WRONLY|O_CREAT|O_TRUNC,0664);
+						if (-1 == fd)
+						{
+							perror("fail to open");
+							return -1;
+						}
+					    write(fd, xinxi, 4096);
+				
+						close(fd);
+						sendfile("xinxi5.html", "text/html", revent[i].data.fd);
+					}
+					else
+					{
+						sendfile("failure.html", "text/html", revent[i].data.fd);
+					}
+					sqlite3_close(db);
+
+				}
+
+				if (strstr(url, "name="))
+				{
+					char *name1 = NULL;
+					char *pass1 = NULL;
+					int flag = 0;
+					int Ret = sqlite3_open("yonghu.db", &db);
+					if (Ret != SQLITE_OK)
+					{
+						fprintf(stderr, "open db :%s\n", sqlite3_errmsg(db));
+						sqlite3_close(db);
+						exit(1);
+					}
+					strtok(url, "=");
+					name1 = strtok(NULL, "&");
+					strtok(NULL, "=");
+					pass1 = strtok(NULL, "\0");
+					char sql_cmd[256] = {0};
+					char *errmsg = NULL;
+
+					sprintf(sql_cmd, "select * from yonghu where name = '%s' and pass = '%s';", name1, pass1);
+					
+					Ret = sqlite3_exec(db, sql_cmd, select_handle, &flag, &errmsg);
+					if (Ret = SQLITE_OK)
+					{
+						fprintf(stderr, "exec sql %s:%s\n", sql_cmd, errmsg);
+						sqlite3_free(errmsg);
+						sqlite3_close(db);
+						exit(1);
+					}
+					if (flag == 1)
+					{
+						sendfile("chazhao.html", "text/html", revent[i].data.fd);
+					}
+					else
+					{
+						sendfile("failure.html", "text/html", revent[i].data.fd);
+					}
+					sqlite3_close(db);
+				}
+				
+					del_fd(epfd, revent[i].data.fd);
+					close(revent[i].data.fd);
+			}
+		}
+	}
+	
+	close(listfd);
+
+	return 0;
+}

@@ -1,0 +1,45 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+  #include <sys/types.h>
+       #include <sys/socket.h>
+  #include <netinet/in.h>
+       #include  <netinet/ip.h>
+#include<time.h>
+typedef struct sockaddr* SA;
+int main(int argc, const char *argv[])
+{
+	int conn = socket(AF_INET,SOCK_DGRAM,0);    //SOCK_DGRAM,UDP////
+	if(-1 == conn)
+	{
+		perror("conn");
+		exit(1);
+	}
+	struct sockaddr_in ser,cli;
+	bzero(&ser,sizeof(ser));
+	bzero(&cli,sizeof(cli));
+
+	ser.sin_addr.s_addr = INADDR_ANY;
+	ser.sin_port = htons(50000);
+	ser.sin_family = AF_INET;
+	int ret = bind(conn,(SA)&ser,sizeof(ser));
+	if(-1 == ret)
+	{
+		perror("bind");
+		exit(1);
+	}
+	while(1)
+	{
+	char buf[1024]={0};
+	int len = sizeof(cli);
+	recvfrom(conn,buf,1024,0,(SA)&cli,&len);
+
+	time_t tm;
+	time(&tm);
+	sprintf(buf,"%s %s",buf,ctime(&tm));
+	sendto(conn,buf,strlen(buf)+1,0,(SA)&cli,sizeof(cli));
+	}
+	close(conn);
+	return 0;
+}

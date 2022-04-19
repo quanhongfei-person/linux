@@ -1,0 +1,68 @@
+
+队列：
+	队列是只允许在一段进行插入，而在另一端进行删除操作的线性表。
+	允许插入的称谓队尾，允许删除的一端队头。
+	顺序队列。
+	循环队列，
+	常用操作，入队，出队。
+#ifndef __HEAD_H__
+#define __HEAD_H__
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <error.h>
+#include <errno.h>
+
+#define error_exit(_errmsg_)	error(EXIT_FAILURE, errno, _errmsg_)
+typedef int DATATYPE;
+typedef struct queue {
+	DATATYPE *data;
+	int tlen;
+	int head;
+	int tail;
+}SeqQueue;
+
+int DestroySeqQueue(SeqQueue *queue);
+DATATYPE QuitSeqQueue(SeqQueue *queue);
+int EnterSeqQueue(SeqQueue *queue, DATATYPE data);
+int IsEmptySeqQueue(SeqQueue *queue);
+int IsFullSeqQueue(SeqQueue *queue);
+SeqQueue *CreateSeqQueue(int len);
+
+#endif
+
+
+
+#ifndef __HEAD_H__
+#define __HEAD_H__
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <error.h>
+#include <errno.h>
+
+#define error_exit(_errmsg_)	error(EXIT_FAILURE, errno, _errmsg_)
+
+typedef int DATATYPE;
+
+typedef struct node {
+	DATATYPE data;
+	struct node *next;
+}QueueNode;
+
+typedef struct queue {
+	QueueNode *head;
+	int tlen;
+	int clen;
+	QueueNode *tail;
+}LinkQueue;
+int DestroyLinkQueue(LinkQueue *queue);
+DATATYPE QuitLinkQueue(LinkQueue *queue);
+int EnterLinkQueue(LinkQueue *queue, DATATYPE data);
+int IsFullLinkQueue(LinkQueue *queue);
+int IsEmptyLinkQueue(LinkQueue *queue);
+LinkQueue *CreateLinkQueue(int len);
+
+#endif

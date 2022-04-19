@@ -1,0 +1,29 @@
+					arm开发环境搭建
+
+	1.前期准备
+
+		① 准备内核源码：linux-3.5
+		② 交叉编译器：  arm-linux-4.5
+		③ 安装 minincom, dnw
+		④ SD卡，串口线（DB9）,网线，USB
+
+	2.uboot编译
+		（1） 确定板子类型      （make tiny4412_config）
+		 (2） make               生成 u-boot.bin 可执行文件
+		（3） 烧录至SD卡
+	
+	3.配置minicom,dnw
+
+	4.内核移植
+		（1）确定工具链     arm-linux-gcc
+		 (2) 确定平台       cp  tiny4412_linux_defconfig  .config
+		 (3) 内核裁剪       make menuconfig
+		 (4) 编译 make      生成zImage
+	
+	5.用dnw 下载内核至板子 0x40008000位置
+		
+		（1）dnw 0x40008000
+		 (2) dnw zImge            (arch/arm/boot)
+		 (3) bootm  0x40008000    (引导内核)
+
+	6.利用busybox制作根文件系统

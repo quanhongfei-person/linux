@@ -1,0 +1,44 @@
+/*
+ ============================================================================
+ Name        : 01thread.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include<pthread.h>
+#include<unistd.h>
+int A =  0;
+pthread_mutex_t mutex;
+void* th(void*arg)
+{
+
+	int i =5000;
+	while(i--)
+	{
+		pthread_mutex_lock(&mutex);
+		int temp = A;
+		printf("A is %d\n",temp+1);
+		A = temp+1;
+		pthread_mutex_unlock(&mutex);
+
+
+	}
+	return NULL;//===> pthread_exit(NULL);
+}
+int main(void)
+{
+	pthread_t tid1,tid2;
+	pthread_mutex_init(&mutex,NULL);
+	pthread_create(&tid1,NULL,th,NULL);
+	pthread_create(&tid2,NULL,th,NULL);
+	pthread_join(tid1,NULL);
+	pthread_join(tid2,NULL);
+	pthread_mutex_destroy(&mutex);
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

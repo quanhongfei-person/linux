@@ -1,0 +1,23 @@
+
+
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+
+int main(int argc, const char *argv[])
+{
+	char src[256]={0};
+	ssize_t ret = readlink("./soft2",src,256);
+	if(-1 == ret)
+	{
+		perror("readlink failure...\n");
+		exit(1);
+	}
+	else
+	{
+		printf("读取成功 %s\n",src);
+
+	}
+	
+	return 0;
+}

@@ -1,0 +1,179 @@
+E20181207
+#include <stdio.h>
+
+#if 0
+int main(void)
+{
+	int n ;
+	n = 2147483647;
+//	n = n + 1;
+	printf("%d\n", n);
+	return 0;
+}
+
+
+int main(void)
+{
+	int i;
+	unsigned n;
+	n = 0xFFFFFFFF;
+	sizeof(n);
+	printf("%d\n", sizeof(n));
+
+	return 0;
+}
+
+
+int main(void)
+{
+	signed short int n;
+	unsigned short m;
+	n = -123;
+	printf("%d\n", sizeof(m));
+	printf("%d\n", n);
+	return 0;
+}
+
+
+int main(void)
+{
+	signed long int n; //int 
+	unsigned long int m;
+	printf("%d\n", sizeof(n));
+
+	return 0;
+}
+
+
+int main(void)
+{
+	unsigned long long int n; 
+	printf("%u\n", sizeof(n));
+	return 0;
+}
+
+
+int main(void)
+{
+	//float double
+	double f;
+	f = -6.25;
+	printf("%u\n", sizeof(f));
+	return 0;
+}
+
+int main(void)
+{
+	float f;
+	f = 0.9f;
+	printf("%u\n", sizeof(0.9f));
+	printf("%f\n", -6.25);
+	printf("%f\n", -6.25f);
+	if(f == 0.9f)
+	{
+		printf("Yes\n");
+	}
+	else
+	{
+		printf("No\n");
+	}
+	return 0;
+}
+
+
+int main(void)
+{
+	int n;
+	n = -123456789;
+	unsigned long long m;
+	m = 123456789ull;
+	printf("%u\n",sizeof(-123456789ull));
+	return 0;
+}
+
+
+int main(void)
+{
+	long long m = -123456789;
+	short int s = 12345;
+	printf("%d\n", s);
+	return 0;
+}
+
+
+int main(void)
+{
+	unsigned int n = 0;
+	int m = -6;
+
+	if((n + m) > 0)
+	{
+		printf("Yes\n");
+	}
+	else
+	{
+		printf("No\n");
+	}
+
+
+	return 0;
+}
+
+
+int main(void)
+{
+	//"a" char[]  'a' char
+	signed char c;
+	c = '\x30'; 
+	printf("%c\n", c);
+//	printf("1234567890\n");
+//	printf("ABCDEFG\r123\n", c);
+//	printf("*ab*c\t*de\rf\tg\n");
+	
+	return 0;
+}
+
+
+int main(void)
+{
+	int k = 10;
+	int n = 3;
+	
+	int i;
+
+	srandom(time(NULL));
+	for(i = 0;i < 10;++i)
+	{
+		n = random();
+		printf("%d,", n % 50 + 50);
+	}
+	printf("\b \n");
+
+	return 0;
+}
+
+
+int main(void)
+{
+	float i;
+	i = 10.235;
+	printf("%f\n", i++);
+	printf("%f\n", i);
+	return 0;
+}
+#endif
+
+int main(void)
+{
+	int i = 2;
+	int k;
+	k = 100;
+	k = ++i + ++i + ++i;
+//	i++;
+//	i++;
+//	i++;
+//	k = i + i + i;
+//	k = i+++i+++i++;
+	printf("%d\n", k);
+	return 0;
+}

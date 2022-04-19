@@ -1,0 +1,42 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             RESET,CODE
+    2 00000000                 ENTRY
+    3 00000000         start
+    4 00000000 E3A00002        mov              r0, #2
+    5 00000004 E3500001        cmp              r0, #1
+    6 00000008 B3A01004        movlt            r1, #4
+    7 0000000C C3A01002        movgt            r1, #2
+    8 00000010 13A01005        movne            r1, #5
+    9 00000014 03A01006        moveq            r1, #6
+   10 00000018                 END
+Command Line: --debug --xref --cpu=ARM920T --apcs=interwork --depend=cmp.d -ocm
+p.o -IC:\Keil\ARM\INC -IC:\Keil\ARM\INC\Samsung --list=cmp.lst cmp.S
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 1 in file cmp.S
+   Uses
+      None
+Comment: RESET unused
+start 00000000
+
+Symbol: start
+   Definitions
+      At line 3 in file cmp.S
+   Uses
+      None
+Comment: start unused
+2 symbols
+326 symbols in table

@@ -1,0 +1,1 @@
+bic.o: bic.S

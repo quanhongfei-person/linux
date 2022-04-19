@@ -1,0 +1,64 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include<sqlite3.h>
+int first_flag =  0;
+int handle(void* arg,int col,char**result,char**title)
+{
+	int i=0;
+	/*if(0  == first_flag)
+	{
+		first_flag = 1;
+	for(i=0;i<col;i++)
+	{
+		printf("%s\t",title[i]);
+	}
+	printf("\n");
+	}
+	for(i=0;i<col;i++)
+	{
+		printf("%s\t",result[i]);
+	}
+	printf("\n");
+	*/
+	*(int*)arg = 1;
+	return 0;
+}
+int main(int argc, const char *argv[])
+{3.
+	sqlite3* db;
+	int ret = sqlite3_open("aaa.db",&db);
+	if(SQLITE_OK!=ret)
+	{
+		fprintf(stderr,"open aaa.db：%s\n",sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+	char* errmsg;
+	int exist_flag = 0 ;
+	char sql_cmd[]="select * from user4 where name ='小师妹' and age=22;";
+	ret = sqlite3_exec(db,sql_cmd,handle,&exist_flag,&errmsg);
+		if(SQLITE_OK!=ret)
+	{
+		fprintf(stderr,"exec %s:%s\n",sql_cmd,errmsg);
+		sqlite3_free(errmsg);
+		sqlite3_close(db);
+		exit(1);
+	}
+		if(0==exist_flag)
+		{
+			printf("小师妹不再这里\n");
+		}
+		else
+		{
+		
+			printf("小师妹再这里\n");
+		
+		}
+
+	
+		sqlite3_close(db);
+
+	return 0;
+}

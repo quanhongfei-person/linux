@@ -1,0 +1,264 @@
+多路io
+
+
+	IO模型
+
+	1、阻塞IO  
+	2、非阻塞IO  EAGAIN  忙等待
+	3、IO多路复用
+	4、信号驱动IO  SIGIO
+	5, 并行模型 进程，线程
+
+
+	1、阻塞IO ===》最常用 默认设置
+
+	   IO：
+		   scanf()/printf() ====>默认的IO设备
+
+		   fgetc()/fputc()  ====》标准IO
+		   fgets()/fputs()
+		   fread()/fwrite()
+		   
+		   read()/write()  ====》文件IO,pipe fifo
+
+		   recv()/send()   ====>tcp socket
+		   recfrom()/sendto() ===>udp socket
+
+		   scanf  fgetc  fgets fread read recv recvfrom  ==>阻塞等待
+
+	2、非阻塞IO ===》在阻塞IO的基础上调整其为不再阻塞等待。
+
+		2.1 在程序开始阶段调整文件的打开方式为非阻塞：
+			===》open()===>fifo()的同步。
+			open("fifo",O_RDONLY|O_NONBLOCK);
+			====>read() 不再阻塞。
+
+		2.2 在程序执行阶段调整文件的执行方式为非阻塞：
+			===》fcntl() ===>动态调整文件的阻塞属性
+
+	#include <unistd.h>
+	#include <fcntl.h>
+	int fcntl(int fd, int cmd, ... /* arg */ );
+	功能：修改指定文件的属性信息。
+	参数：fd 要调整的文件描述符
+		  cmd 要调整的文件属性宏名称
+		  ... 可变长的属性值参数。
+	返回值：成功  不一定，看cmd
+			失败  -1；
+
+	eg：修改文件的非阻塞属性：
+		int flag ;
+		flag  = fcntl(fd,F_GETFL,0);  ///获取fd文件的默认属性到flag变量中。
+		flag  = flag | O_NONBLOCK;    ///将变量的值调整并添加非阻塞属性
+		fcntl(fd,F_SETFL,flag);       ///将新属性flag设置到fd对应的文件生效。
+
+		以上代码执行后的阻塞IO将变成非阻塞方式。
+
+	练习：编写fifo测试函数，完成fcntl控制的非阻塞方式读写。
+		  修改之前的tcp，udp程序用fcntl测试其非阻塞特性。
+
+		  如果是recv()/recvfrom（）===》参数flags == MSG_DONTWAIT
+		  如果是read()   ====>fcntl()
+
+	3、IO 多路复用 ===》并发服务器 ===》TCP协议
+
+		基于TCP协议的多并负服务器模型：
+
+		1、简单循环服务器
+			http 
+			web 服务器，apache--》cgi，php，perl，IIS--》asp，NGIX，Nlighty
+			
+			while(1)
+			{
+				newfd = accept();
+					recv();
+				close(newfd);
+			}
+
+			特点：可以多并发的接入多个客户端的信息。
+			缺点：数据通信过程短，客户端只能一次有效。
+				  实时性效果差。
+
+		2、fork循环服务器===>每次有链接则fork一个子进程为该
+							链接处理通信过程，父进程继续等待新链接。
+
+			while(1)
+			{
+				newfd  = accept();
+				pid = fork()
+				if(pid  == 0)
+				{
+					///接收数据
+				}
+				if(pid < 0)
+				{
+					perror("fork");
+					return -1;
+				}
+				waitpid()
+			}
+			
+			特点：可以完成多个进程的实时交互，信息的完整性可以保证。
+
+			缺点：回收资源不方便，每次fork 占用系统资源多。
+				  可能出现僵尸进程
+
+		验证的问题：
+		1、如何回收所有子进程资源
+		2、如何用压力测试证明服务器的负载。
+
+
+
+		3、select循环服务器 ===> 用select函数来动态检测有数据流动的文件描述符
+
+
+	#include <sys/select.h>
+
+	#include <sys/time.h>
+	#include <sys/types.h>
+	#include <unistd.h>
+
+	int select(int nfds, fd_set *readfds, fd_set *writefds,
+				fd_set *exceptfds,
+				struct timeval *timeout);
+	功能：完成指定描述符集合中有效描述符的动态检测。
+		  该函数具有阻塞等待功能，在函数执行完毕后
+		  目标测试集合中将只保留最后有数据的描述符。
+
+	参数：nfds 描述符的上限值，一般是链接后描述符的最大值+1；
+		  readfds 只读描述符集
+		  writefds 只写描述符集
+		  exceptfds 异常描述符集
+		  以上三个参数都是 fd_set * 的描述符集合类型
+		  timeout  检测超时 如果是NULL表示一直检测不超时 。
+
+	返回值：超时 0
+			失败  -1
+			成功 >0
+
+
+		为了配合select函数执行，有如下宏函数：
+		void FD_CLR(int fd, fd_set *set);
+		功能：将指定的set集合中编号为fd的描述符号删除。
+
+		int  FD_ISSET(int fd, fd_set *set);
+		功能：判断值为fd的描述符是否在set集合中，
+			  如果在则返回真，否则返回假。
+
+		void FD_SET(int fd, fd_set *set);
+		功能：将指定的fd描述符，添加到set集合中。
+
+		void FD_ZERO(fd_set *set);
+		功能：将指定的set集合中所有描述符删除。
+
+
+		select poll epoll的区别
+
+1. select
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+void FD_CLR(int fd, fd_set *set);
+int FD_ISSET(int fd, fd_set *set);
+void FD_SET(int fd, fd_set *set);
+void FD_ZERO(fd_set *set);
+
+select的调用一般要注意几点：
+① readfds等是指针结果参数，会被函数修改，所以一般会另外定义一个allread_fdset，保持全部要监听读的句柄，将它的拷贝传递给select函数，返回可读的句柄集合，类型fdset支持赋值运算符=；
+② 要注意计算nfds，当新增监听句柄时比较容易修改，当减少监听句柄时较麻烦些，如果要精确修改需要遍历或者采用最大堆等数据结构维护这个句柄集，以方便的找到第二大的句柄，或者干脆在减少监听句柄时不管nfds；
+③ timeout如果为NULL表示阻塞等，如果timeout指向的时间为0，表示非阻塞，否则表示select的超时时间；
+④ select返回-1表示错误，返回0表示超时时间到没有监听到的事件发生，返回正数表示监听到的所有事件数（包括可读，可写，异常），通常在处理事件时 会利用这个返回值来提高效率，避免不必要的事件触发检查。（比如总共只有一个事件，已经在可读集合中处理了一个事件，则可写和异常就没必要再去遍历句柄集 判断是否发生事件了）；
+⑤ Linux的实现中select返回时会将timeout修改为剩余时间，所以重复使用timeout需要注意。
+
+select的缺点在于：
+① 由于描述符集合set的限制，每个set最多只能监听FD_SETSIZE（在Linux上是1024）个句柄（不同机器可能不一样）；
+② 返回的可读集合是个fdset类型，需要对所有的监听读句柄一一进行FD_ISSET的测试来判断是否可读；
+③ nfds的存在就是为了解决select的效率问题（select遍历nfds个文件描述符，判断每个描述符是否是自己关心的，对关心的描述符判断是否发生事件）。但是解决不彻底，比如如果只监听0和1000两个句柄，select需要遍历1001个句柄来检查事件。
+
+2. poll
+poll的功能和select类似，返回值意义一致。只不过调用方式不同，效率较高，解决了select的缺点①，一定程度上解决③。
+int poll(struct pollfd fds[], nfds_t nfds, int timeout);
+poll的调用注意以下几点：
+① nfds表示监听的fds的长度，如果fds[i].fd < 0，则poll忽略这样的pollfd；
+② timeout是以ms为单位的超时时间；一般需要自定义INFTIM=-1，表示永远等下去；0表示立即返回不等待；
+③ poll在处理流设备时能提供额外的信息；
+④ 使用poll不需要显式地监听异常事件，使用poll如果pollfd异常，则内核会设置revents的POLLERR位；
+⑤ POLLIN等价于POLLRDNORM | POLLRDBAND； POLLOUT 等价于POLLWRNORM；POLLIN | POLLRDPRI 等价于select的读；POLLOUT | POLLWRBAND 等价于select的写；
+
+和select相比，poll的优点是：
+① 不再局限于FD_SETSIZE个监听描述符，只要能打开的描述符，都可以监听；
+② timeout参数不会被函数修改，分辨率较低些（但实际上没有影响）；
+③ 监听描述符集合不再是值结果参数，而是event表示监听事件，revents表示触发的事件；
+④ poll的效率比select稍高（poll只遍历输入的监听数组中的描述符，如果数组中的fd<0，则poll忽略fd，当监听的描述符离散时效 率稍高于select，比如监听0和1000两个句柄，则poll只需要遍历两个描述符，而select需要遍历1001个描述符；当监听描述符连续 时，poll和select效率相当，底层实现也是一致的）。
+
+poll和select共同的问题是性能较差：遍历所有的文件描述符，当监听描述符个数增加时，监听效率降低，并且select和poll每次都要在用户态和内核态拷贝监听的描述符参数。
+
+3. epoll
+int epoll_create(int size)；
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)；
+            typedef union epoll_data {
+                void *ptr;
+                int fd;
+                __uint32_t u32;
+                __uint64_t u64;
+            } epoll_data_t;
+
+            struct epoll_event {
+                __uint32_t events;      /* Epoll events */
+                epoll_data_t data;      /* User data variable */
+            };
+
+int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);
+
+epoll 解决了select和poll的几个性能上的缺陷：
+		①不限制监听的描述符个数（poll也是），只受进程打开描述符总数的限制；
+		②监听性能不随着监听描述 符数的增加而增加，是O(1)的，不再是轮询描述符来探测事件，而是由描述符主动上报事件；
+		③使用共享内存的方式，不在用户和内核之间反复传递监听的描述 符信息；
+		④返回参数中就是触发事件的列表，不用再遍历输入事件表查询各个事件是否被触发。
+		epoll显著提高性能的前提是：监听大量描述符，并且每次触发事件的描述符文件非常少。
+		epoll的另外区别是：
+				①epoll创建了描述符，记得close；
+				②支持水平触发和边沿触发。
+
+epoll使用注意事项：
+① int epoll_create(int size)；    //创建epoll文件描述符
+参数size并不是限制了epoll所能监听的描述符最大个数，只是对内核初始分配内部数据结构的一个建议。返回是epoll描述符。-1表示创建失败。
+
+② int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)；    //epoll文件描述符的控制接口
+epoll_ctl控制对指定描述符fd执行op操作，event是与fd关联的监听事件。
+op操作有三种：添加EPOLL_CTL_ADD，删除EPOLL_CTL_DEL，修改EPOLL_CTL_MOD。分别添加、删除和修改对fd的监听事件。
+重复添加fd会怎样（event相同或不相同）：添加失败（errno：17， File exists）
+删除和修改不存在的fd会怎样：删除或修改失败（errno：9，Bad file descriptor）
+event是与监听的fd相关联的事件信息，event->events描述了要监听的事件类型，有以下类型：
+EPOLLIN 可读
+EPOLLOUT 可写
+EPOLLRDHUP 套接口对端close或shutdown写，在ET模式下比较有用
+EPOLLPRI 紧急数据可读
+EPOLLERR 异常条件
+EPOLLHUP 挂起，EPOLLERR和EPOLLHUP始终由epoll_wait监听，不需要用户设置
+EPOLLET 边沿触发模式，在描述符状态跳变时才上报监听事件。（监听默认都是LT模式）
+EPOLLONESHOT 只一次有效，设置oneshot标记，描述符在触发一次事件之后自动失效（fd还被监听），不会再上报任何事件，直到使用EPOLL_CTL_MOD重新激活，设置新的监听事件为止（可不可以和之前的事件一样？）。
+event->data是个共用体，可以存放和fd绑定的描述符信息，比如就存放描述符本身fd，或者一个结构体信息，包括fd，ip，port等等。
+在epoll_wait返回时，只会返回一个event列表，需要从列表元素中获取fd等信息。
+返回0表示控制成功，返回-1表示失败。
+
+③ int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);
+//等待epfd上的io事件，最多返回maxevents个事件
+timeout = -1 的行为是block；timeout = 0 是立即返回
+
+④ epoll监听ET事件时，fd必须是非阻塞套接口。比如监听可读事件，当ET上报可读后，需要一直读fd直到遇到EAGAIN错误为止，以免遗留数据在缓冲区中。如果fd是阻塞的，则会读到阻塞了。
+EAGAIN错误对于非阻塞套接口来说不是错误，只是说没有数据可读或者没有空间可写。
+EWOULDBLOCK就是EAGAIN，值都是11。
+selset/poll/epoll的LT模式监听的fd可以是阻塞模式的。
+
+⑤ 多路复用监听io事件时，如果对某个套接口监听可写事件，总是会返回可写而事实上可能没有数据要写。处理方法：①只有在有数据要写时才把要写的套接口加入 监听列表中，数据全部写完之后从监听列表中删除它；②在有数据写时，首先尝试直接写，当直接写没有把数据全部写入发送缓冲区时再把这个套接口加入可写事件 监听列表。（这种方式效率较高，需要套接口是非阻塞的，前一种方式可以是阻塞的吗？）
+可以是阻塞的。
+		
+		
+		
+	作业：
+		使用以上任意一个并发服务器模型，完成如下功能：
+		可以向服务器发送一个消息，并在服务器端打印
+		输出该消息的来源ip+port。同时将所有的连接终端
+		的个数统计出来。
+		
+		
+		

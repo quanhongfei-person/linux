@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+ #include <netinet/in.h>
+       #include <netinet/ip.h>
+#include<string.h>
+#include <arpa/inet.h>
+#include<time.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include <unistd.h>
+
+#define err_msg(msg) do{perror(msg);exit(1);}while(0)
+int main(void)
+{
+	int listfd =socket(AF_INET ,SOCK_STREAM,0);
+	if(-1 ==listfd) err_msg("sock");
+	struct sockaddr_in ser,cli;
+	bzero(&ser,sizeof(ser));
+	bzero(&cli,sizeof(cli));
+	ser.sin_family =AF_INET;
+	ser.sin_port = htons(50000) ;
+	ser.sin_addr.s_addr = inet_addr("127.0.0.1");//本地回环，自己联自己//
+	int ret = bind(listfd,(struct sockaddr *)&ser,sizeof(ser));
+	if(-1 == ret) err_msg("bind");
+	ret = listen(listfd,3);
+	if(-1 == ret) err_msg("listen");
+	socklen_t len = sizeof(cli);
+	int conn = accept(listfd,(struct sockaddr *)&cli,&len);
+	if(-1 ==conn) err_msg("accept");
+	printf("对方的ip是%s, 端口是%d\n",inet_ntoa(cli.sin_addr),ntohs(cli.sin_port));
+//	while(1)
+//	{	
+	/*	char buf[1024]={0};
+		read(conn,buf,1024);
+		time_t tm;
+		time(&tm);
+		sprintf(buf, "%s %s",buf,ctime(&tm));
+		write(conn,buf,strlen(buf));*/
+
+
+
+		
+		int fd=open("./1.mp4",O_RDONLY);
+		while(1)
+		{
+			char buf2[1024]={0};
+			size_t rt=read(fd,buf2,1024);
+			if(rt==0) break;
+			write(conn,buf2,rt);
+			
+		}
+		close(fd);
+
+
+
+
+
+//	}
+	close(conn);
+	close(listfd);
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

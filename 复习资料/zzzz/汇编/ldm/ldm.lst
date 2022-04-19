@@ -1,0 +1,47 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             RESET,CODE
+    2 00000000                 ENTRY
+    3 00000000         start
+    4 00000000 E3A00101        mov              r0, #0x40000000
+    5 00000004 E59F1010        ldr              r1, =0x11111111
+    6 00000008 E59F2010        ldr              r2, =0x22222222
+    7 0000000C E59F3010        ldr              r3, =0x33333333
+    8 00000010 E59F4010        ldr              r4, =0x44444444
+    9 00000014 E880001E        stm              r0, {r1,r2,r3,r4}
+   10 00000018 E89001E0        ldm              r0, {r5,r6,r8,r7}
+   11 0000001C                 END
+              11111111 
+              22222222 
+              33333333 
+              44444444 
+Command Line: --debug --xref --cpu=ARM920T --apcs=interwork --depend=ldm.d -old
+m.o -IC:\Keil\ARM\INC -IC:\Keil\ARM\INC\Samsung --list=ldm.lst ldm.S
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 1 in file ldm.S
+   Uses
+      None
+Comment: RESET unused
+start 00000000
+
+Symbol: start
+   Definitions
+      At line 3 in file ldm.S
+   Uses
+      None
+Comment: start unused
+2 symbols
+328 symbols in table

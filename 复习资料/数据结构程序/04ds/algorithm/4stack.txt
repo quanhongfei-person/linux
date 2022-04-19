@@ -1,0 +1,16 @@
+栈:   3231+54234*66547
+		栈是限定仅在表尾进行插入和删除操作的线性表。
+		先进后出、后进先出
+		
+
+		栈顶:允许操作的一端
+		栈底:不允许操作的一端
+		入栈，出栈。
+	顺序栈	链式栈
+	30+2\5
+	1.创建			CreateSeqStack
+	2.销毁			DestroySeqStack
+	3.判断是否为空栈	IsEmptySeqStack
+	4.判断是否为满栈	IsFullSeqStack
+	5.压栈			PushSeqStack
+	6.出栈			PopSeqStack

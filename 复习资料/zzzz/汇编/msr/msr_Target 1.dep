@@ -1,0 +1,2 @@
+Dependencies for Project 'msr', Target 'Target 1': (DO NOT MODIFY !)
+F (.\msr.S)(0x5B7BAFDE)(--cpu ARM920T -g --apcs=interwork -I "C:\Keil\ARM\INC" -I "C:\Keil\ARM\INC\Samsung" --list "msr.lst" --xref -o "msr.o" --depend "msr.d")

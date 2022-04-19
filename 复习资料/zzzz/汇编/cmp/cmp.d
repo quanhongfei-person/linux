@@ -1,0 +1,1 @@
+cmp.o: cmp.S

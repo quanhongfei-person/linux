@@ -1,0 +1,581 @@
+标准io； stdio.h
+1，标准io的概念 1975 Dennis r IO库，C语言的标准，ANSI c 
+	IO  input  output
+	I： 键盘是标准输入设备 ====》默认输入就是指键盘  /dev/input
+	O： 显示器是标准输出设备 ==》默认输出就是指显示器
+	Linux操作系统当中IO都是对文件的操作
+	C一部分，任何支持标准C的系统都可使用标准IO实现文件存储
+	标准IO在UNIX上是对文件IO的封装
+   
+  一般都是对普通文件操作是一种有缓存的IO 在文件IO和用户程序之间，加入缓冲区，可以有效减少系统调用的效率，节省系统IO调度资源
+2，文件的概念，作用
+	linux中一切都是文件。文件用来存储数据（数据，指令）；
+3，linux中文件的类型，
+	7种，
+		d[目录] ,
+		-[普通文件],
+		l[链接],
+		p[管道],
+		s[套接字],
+		c[字符设备],
+		b[块设备]. 
+	hello  oellh，，512 
+io的分类
+标准io，
+	stdio.h
+	Dennis Ritchie
+	标准IO：
+	ANSI C 设计的一组用文件IO 封装的操作库函数
+	头文件： stdio.h  ==》标准输入输出头文件
+	         /usr/include/stdio.h
+			<>   是系统库函数,默认路径在/usr/include/
+			eg : ====》stdio.h  ===>stdio.c==>libc.so ==>/usr/lib
+			""   是用户自定义函数,默认是当前路径
+			eg : ===>xxx.h  ===>xxx.c
+			
+			man  man  ==>所有man的帮助
+			man  xxx == man 1 xxx ===>查看当前xxx命令
+			man 2 xxx  ===>查看xxx对应的系统调用函数
+			man 3 xxx  ===》查看xxx对应的标准库函数
+
+注意：如果没有命令则直接man xxx 会显示其函数
+      如果没有系统调用则显示系统库函数帮助
+	printf scanf 
+	sprintf
+	getchar putchar gets puts\n
+	getc putc fgets fputs fread fwrite ftell
+	rewind fseek
+文件io，系统调用,底层软件
+文件内容的分类， 文本文件，二进制文件     
+struct FILE{}
+流:   FILE*
+	数据从文件当中流入和流出所体现出来的字节
+	流叫做流
+
+	流的分类:
+		二进制流: 2001 \n
+			二进制数据的流
+		文本流:
+			ASCII码数据的流 \n
+FILE 结构定义的对象 FILE * 称之为流对象,也叫文件流指针。
+流对象 ===》头 《===数据====》尾
+FIlE 结构体，
+struct _IO_FILE {
+  int _flags;		/* High-order word is _IO_MAGIC; rest is flags. */
+#define _IO_file_flags _flags
+
+  /* The following pointers correspond to the C++ streambuf protocol. */
+  /* Note:  Tk uses the _IO_read_ptr and _IO_read_end fields directly. */
+  char* _IO_read_ptr;	/* Current read pointer */
+  char* _IO_read_end;	/* End of get area. */
+  char* _IO_read_base;	/* Start of putback+get area. */
+  char* _IO_write_base;	/* Start of put area. */
+  char* _IO_write_ptr;	/* Current put pointer. */
+  char* _IO_write_end;	/* End of put area. */
+  char* _IO_buf_base;	/* Start of reserve area. */
+  char* _IO_buf_end;	/* End of reserve area. */
+  /* The following fields are used to support backing up and undo. */
+  char *_IO_save_base; /* Pointer to start of non-current get area. */
+  char *_IO_backup_base;  /* Pointer to first valid character of backup area */
+  char *_IO_save_end; /* Pointer to end of non-current get area. */
+
+  struct _IO_marker *_markers;
+
+  struct _IO_FILE *_chain;
+
+  int _fileno;
+#if 0
+  int _blksize;
+#else
+  int _flags2;
+#endif
+  _IO_off_t _old_offset; /* This used to be _offset but it's too small.  */
+
+#define __HAVE_COLUMN /* temporary */
+  /* 1+column number of pbase(); 0 is unknown. */
+  unsigned short _cur_column;
+  signed char _vtable_offset;
+  char _shortbuf[1];
+
+  /*  char* _save_gptr;  char* _save_egptr; */
+
+  _IO_lock_t *_lock;
+#ifdef _IO_USE_OLD_IO_FILE
+};
+
+1,打开文件  FILE 
+2，io操作，，读写操作
+3，关闭文件
+
+1， fopen，
+
+2， 读写操作相关， 
+	fgetc/fputc,,,,,,一个字符，
+	fgetc(int c ,FILE*strem);
+	fgets/fputs....,,一次一行。。。
+	fread/fwrite....自定义大小，，二进制
+
+	struct person
+	{
+		char name[10];
+		int age;
+		char phone[15];
+	};
+	person son[10]; 
+3，fclose..
+
+gcc -g 
+gdb a.out 
+
+gdb的使用步骤：ddd
+	1，下断
+	2，run，
+	3，next，step， 需要你去观察指定的变量，指针，结构
+
+	0 STDIN_FILENO	  stdin   <- FILE *
+	1 STDOUT_FILENO   stdout   1024
+	2 STDERR_FILENO   stderr 
+	find  / -type s 2>/dev/null
+
+	pid_t  int 
+添加vim -t ，查找结构体，类型名
+cd /usr	
+sudo ctags --languages=c,c++  -R 
+cd ~ 
+vim .vimrc
+在最后加入这两行
+"set tags=/usr/tags;
+"set autochdir
+ctrl+] 进入主题
+ctrl+t 返回上一级主题
+测试 vim -t FILE
+缓冲区，类型，
+pid_t 
+printf("abc");
+while(1);
+行缓冲，1k， terminal，主要用于人机交互stdout
+	缓存区满或者遇到\n刷新	1024
+				行缓存多是关于终端的一些操作
+				1.遇到\n刷新
+				2.缓存区满刷新
+				3.程序结束刷新
+				4.fflush刷新  fflush(stdout);
+				
+全缓冲，4k，主要用于文件的读写
+	缓存区满刷新缓存区 4096
+			对普通文件进行标准IO操作，建立
+			的缓存一般为全缓存
+			刷新条件:
+				1.缓存区满刷新
+				2.程序结束刷新
+				3.fflush来刷新  fflush(fp);
+无缓冲，0k  主要用于出错处理信息的输出 stderr 
+	不对数据缓存直接刷新
+	printf();==>>stdout 
+	fprintf(stderr,);
+				界面交互	出错处理
+使用gdb查看，FILE结构体，或使用写入数据测试缓冲区。
+缓冲区的大小是可以设置
+
+fputc("\n");
+
+#include <stdio.h>
+
+void setbuf(FILE *stream, char *buf);
+功能，关闭或开启缓冲。
+注意，buf如果不为NULL，buf的大小应
+该是8K
+int setvbuf(FILE *stream, char *buf, int mode, size_t size);
+功能：setvbuf，设置缓冲区，大小，类型
+参数：
+stream，需要修改的流指针
+buf，需要咱么给他一个空间
+mode，模式，行，全，无，3选1
+_IONBF unbuffered
+
+_IOLBF line buffered
+
+_IOFBF fully buffered
+size，buf的大小。
+
+
+文件操作的步骤，
+1，打开->> FILE * fp 
+2，读写
+3，关闭
+
+函数，参数比较多，man手册
+fopen,fclose
+fgetc,fputc,
+getc / putc / getchar / putchar / fgetc / fputc
+gets / puts / fgets / fputs 
+
+fread / fwrite 
+ftell / rewind / fseek / 
+fflush  
+fdopen / freopen 
+		搜索str相关的函数。
+		man -k str|grep err
+	/etc/passwd
+	passwd 
+	../passwd 
+FILE *fopen(const char *path, const char *mode);
+功能:
+	打开一个文件并建立一个流
+参数:
+	path:要打开文件的路径
+	mode:
+		r	只读
+		文件不存在报错
+		文件存在则只读打开
+
+		r+	读写
+		文件不存在报错
+		文件存在则读写打开
+
+		w	只写
+		文件不存在则创建
+		文件存在则清0只写打开
+
+		w+	写读
+		文件不存在则创建
+		文件存在则清0写读打开
+
+		a	追加可写
+		文件不存在则创建
+		文件存在则追加只写打开
+
+		a+	追加读写
+		文件不存在则创建
+		文件存在则追加读写打开
+
+返回值:
+	成功返回建立的文件流指针
+	失败返回NULL
+
+	
+fputc
+int fputc(int c, FILE *stream);
+功能:
+	向流中写入一个字符
+参数:
+	c:要写入的字符
+	stream:文件流指针
+返回值:
+	成功返回写入的字符ASCII码值
+	失败返回EOF
+
+	cp 1 2 
+	$?
+	cat 2 
+	
+fgetc
+int fgetc(FILE *stream);
+功能:
+	从流中读取一个字符
+参数:
+	stream:文件流指针
+返回值:
+	成功返回读到字符的ASCII码值
+	读到文件末尾返回EOF
+	失败返回EOF -1
+	c= fgetc(stdin);
+	fputc(c,stdout);
+	获取键盘上面的输入，显示到屏幕。。
+	
+fgetc()/fputc()面试题：
+如何用最短的代码实现用户任意输入并打印输出。
+要求用fgetc/fputc函数实现。
+
+while(1) 
+	fputc(fgetc(stdin),stdout);
+
+fgetc()函数的结束判断。
+
+1、EOF 宏来判断 ===》系统预制的文件结束标记
+end of file  -1
+   c = fgetc(fp);
+   if(EOF == c) ///file end;
+
+   
+   if(!feof(fp))
+
+   
+   while(1)
+   {
+		c=fgetc(fp);
+		if(feof(fp))
+		break;
+   }
+2、feof() 函数判断
+int feof(FILE *stream);
+功能：判断当前参数stream的文件流指针是否到达文件结尾。
+	  如果到达文件结尾则返回真，否则返回假
+	  注意：该操作一定要在一次IO操作之后判断。
+参数：stream 要判断结尾的文件流对象
+返回值：成功到达结尾是 真
+		否则 是假
+
+练习：
+1、编写代码实现一个自己的类似cat的程序。
+   要求用fgetc/fputc 实现，尽量不要使用printf
+
+2、用fgetc和fputc完成一个自己的mycpy程序
+   可以将指定的任意一个文本文件拷贝到另一个文件。
+
+缺点：
+	效率低下
+
+	
+按行获取数据：fgets()/fputs()    123\n
+aa\nabbccddbbbcc\n   fp
+aaa\n
+ aaa\n\0
+ 
+原型：   
+char buf[5]={0};
+	fgets(buf,5,stdin);
+char *fgets(char *s, int size, FILE *stream);
+功能：从stream流对象关联的文件中获取size大小字节的文本数据
+	  并存储到s对应的本地内存(栈区数组，堆区内存)
+参数： s 要存储数据的本地内存
+	   size 要获取的数据长度，单位字节。
+	   stream 要获取的目标文件流对象，
+	    可以是stdin ，程序会阻塞等待
+		如果是普通文件fp 则指向文件第一行数据
+返回值：成功 返回指向有效数据的首地址，一般等于s的地址
+	    失败 或者 文件末尾 NULL；
+
+原型：
+"aa\0bbcc"
+int fputs(const char *s, FILE *stream);
+功能：从s所在的本地内存中获取一行数据，并写入stream对应的文件
+      流对象。
+参数： s 要写的信息，一般是固定的字符串或者有数据的数组。
+	   stream 要写入的目标文件流对象
+
+返回值：成功 返回写入的字符长度单位字节
+		失败 -1；
+char buf[50];
+gets(buf);
+		
+		gets和fgets的区别:
+			1.gets是危险的，因为没有规范读
+			  到数据的上限
+			2.gets会去掉从终端读入的\n字符
+			3.fgets会读到n个数据，如果n个
+			  数据中存在\n字符则立即停止当
+			  前的读取操作
+			4.fgets不会去掉从流中读到的\n字
+			符
+			char buf[1024];
+			
+			5.fgets(buff, sizeof(buff), stdin);
+			  gets(buff);
+练习：
+	使用fgets和fputs函数完成用户任意输入信息并显示输出
+	尽量不要使用printf和scanf 以及栈区内存。
+	当用户输入quit的时候程序结束。
+
+	eg:  ./a.out
+	pls input str: asdfasfdasdfasdf
+	output str:
+
+	
+	如何使用以上函数完成两个文件的合并操作。
+	./a.out  1.txt  2.txt  ===>xxx.txt
+
+	struct person
+	{
+		char name[20];
+		int age;
+		char sex;
+		char addr[100];
+	};
+	
+	
+	person per;
+	
+	二进制文件读写：  fread()/fwrite()
+int a = 2 ;
+vim -t size_t 
+读：
+size_t  fread(void  *ptr,  size_t size, size_t nmemb, FILE *stream);
+功能：从指定的stream流对象中获取nmemeb个大小为size字节的数据块到ptr
+      所在的本地内存中。
+参数：ptr 要存储数据的本地内存一般是数组或者结构体指针
+	  size 单个数据块的元数据大小。最小单元的大小
+	  nmemb 要获取的数据块的个数，拷贝的数据块个数。
+	  stream 要获取数据的源文件流对象，如果是stdin表示从
+	  键盘获取数据，如果是fp文件则表示从普通文件获取。
+返回值：成功 小于等于nemeb的整数，表示获取的数据长度
+		失败 小于0，结尾 0；
+
+写：
+size_t fwrite(const void  *ptr,  size_t  size,size_t nmemb, FILE *stream);
+功能：从ptr所在本地内存中取出nmemb个大小为size的数据块写入到stream流对应
+     的文件流对象中。
+参数：ptr 要写的数据块地址，一般是数组或者结构体指针
+	  size  要写的数据块元数据大小，单位是字节
+	  nmemb 要写的数据块的个数
+	  stream 要写的目标文件流对象。如果是stdout则表示数据会
+	  写到终端屏幕显示，如果是fp的普通文件则会写入到文件中。
+
+返回值：成功 小于等于nmemb 的个数。
+		失败 <0
+
+int a  =10;
+		
+		
+练习：
+1、使用fread和fwrite的方式完成用户输入信息并打印输出。
+
+
+作业：
+	使用fread和fwrite方式完成任意普通文件的拷贝功能。
+
+
+while(fgets(buf,1024,src))
+{
+
+}
+	if(feof(src))
+	{
+		
+	}
+	if(ferror(src))
+	{
+		clearerr(stream);
+	}
+ferror
+	检测一个流是否出错
+clearerr
+void clearerr(FILE *stream);
+	清除一个流出错的标记
+
+if (feof(fp)) {
+	printf("到达文件末尾!\n");
+} else {
+	printf("未到达文件末尾!\n");
+}
+
+if (ferror(fp)) {
+	printf("出错!\n");
+	clearerr(fp);
+} else {
+	printf("未出错!\n");
+}
+
+练习：
+	根据以上知识点设计一个程序能测试出来普通文件的默认缓存区大小是4096字节。
+
+
+
+作业：
+	以主函数传参的方式启动程序，同时创建参数对应的文件。
+	并获取用户输入的任意信息，i将该信息存储到参数对应的文件中。
+	当用户输入 'q'
+
+	eg: ./a.out  /root/xxx.txt
+
+标准IO之文件定位：
+fseek()   ftell()  rewind()
+
+int fseek(FILE *stream, long offset, int whence);
+功能：将stream流文件中的文件指针从whence位置开始
+      偏移offset字节的长度。
+参数：stream  要移动文件指针的目标文件流对象。
+	  注意：不支持设备文件，一般用于普通文件。
+	  offset  要在文件内偏移的距离，单位字节。
+	  		  如果值为整数，则向文件末尾偏移
+			  如果值为负数，则向文件开头偏移
+	  whence  偏移的起始位置,由系统定义的三个宏开始。
+	  	SEEK_SET  文件的开头位置 
+		SEEK_CUR  文件的当前位置
+		SEEK_END  文件的末尾位置
+
+返回值：	
+	成功： 返回 0
+	失败：  -1；
+
+如果从文件的指定位置向后偏移过程中已经超过了文件
+的当前末尾位置，则会自动以'\0'来填充文件内容，从
+而形成一种被称为"空洞文件" 的特殊文件。
+
+练习：
+	分别用不同的起始位置和不同的文件打开方式
+	测试文件的偏移操作，并查找存在的问题。
+	1、a/a+ 方式打开文件，fseek无效
+	2、fseek函数可能执行失败，则数据默认添加文件末尾。
+
+
+rewind()  等效于：fseek(stream,0L,SEEK_SET);
+
+long ftell(FILE *stream);
+功能：获取当前文件流指针的具体位置，一般以文件
+     开头到当前指针的字节数为返回值。
+参数：stream 要返回指针距离的文件流对象
+返回值：成功 获取到的距离长度，单位是字节
+		失败 -1；
+
+
+文件定位与文件基本操作的练习：
+
+使用以上标准io的知识点，完成一个大文件的分块写操作。
+将多个普通文件，每隔100字节分别写入到一个独立的大
+文件中。
+
+./a.out 1.txt 2.txt 3.txt  dst 
+
+dst ===>1.txt的内容 100 空  2.txt 内 100空  3.txt内容。
+
+
+作业：
+	使用fread和fwrite方式完成任意普通文件的拷贝功能。
+	1.c 100字节，， 2（50） 3（50）
+	2，统计文本文件的行数
+	
+	
+	fopen();
+	fclose();
+	
+	fputc/fgetc
+	fputs/fgets
+	fwrite/fread
+	
+	fseek,
+	ftell,
+	rewind,
+	
+	
+
+1,实现插入功能，
+2，统计文本文件中a-z，出现的次数。
+	
+
+
+	
+	int main(int argc, const char *argv[])
+{
+	
+
+	while(fgets(buf,1024,fp))
+	{
+	
+	}
+	return 0;
+}
+	
+	
+	
+	hello
+	
+	
+	a = 0
+	b = 0;
+	h =1;
+	e =1;
+	l =2;
+	o = ;
+	
+	

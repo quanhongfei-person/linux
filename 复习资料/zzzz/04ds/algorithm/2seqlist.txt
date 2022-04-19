@@ -1,0 +1,45 @@
+线性表
+	零个或多个数据元素的有限序列
+	元素之间是有顺序了。如果存在多个元素，第一个元素无前驱，最有一个没有后继，其他的元素只有一个前驱和一个后继。
+	当线性表元素的个数n（n>=0）定义为线性表的长度，当n=0时，为空表。在非空的表中每个元素都有一个确定的位置，如果a1是第一个元素，那么an就是第n个元素。
+	
+线性表的常规操作
+typedef struct	person {
+	char name[32];
+	char sex;
+	int age;
+	int score;
+}DATATYPE;
+//typedef int Datatype;
+typedef struct list {
+	DATATYPE *head;
+	int tlen;
+	int clen;
+}SeqList;
+
+SeqList *CreateSeqList(int len);
+int DestroySeqList(SeqList *list);
+int ShowSeqList(SeqList *list);
+int InsertTailSeqList(SeqList *list, DATATYPE data);
+int IsFullSeqList(SeqList *list);
+int IsEmptySeqList(SeqList *list);
+int InsertPosSeqList(SeqList *list, DATATYPE data, int pos);
+int FindSeqList(SeqList *list, char *name);
+int ReviseSeqList(SeqList *list, char *old, DATATYPE new);
+int DeleteSeqList(SeqList *list, char *name);
+int ClearSeqList(SeqList *list);
+内存泄露检测工具
+sudo apt-get install valgrind
+valgrind ./all
+
+
+
+线性表顺序存储的优点，缺点
+优点
+	1，无需为表中的逻辑关系增加额外的存储空间
+	2，可以快速随机访问元素O(1)  head[5]
+缺点
+	1，插入，删除元素需要移动元素o(n)
+	2，无法动态存储。
+
+	

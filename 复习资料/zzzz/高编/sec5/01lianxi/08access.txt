@@ -1,0 +1,21 @@
+
+
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+
+int main(int argc, const char *argv[])
+{
+
+	int ret = access("./pslog", R_OK|W_OK);
+	if(-1 ==ret)
+	{
+		printf("pslog no read, write");
+	}
+	else
+	{
+		printf("pslog read write ok\n");
+	}
+
+	return 0;
+}

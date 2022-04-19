@@ -1,0 +1,75 @@
+/*
+ * 02find.c
+ *
+ *  Created on: Mar 24, 2018
+ *      Author: linux
+ */
+#include<stdio.h>
+#include<string.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include<unistd.h>
+#include<errno.h>
+#include<stdlib.h>
+#include <sys/stat.h>
+
+
+void do_find(char* file_path,char* file_name)
+{
+	struct dirent* dir_info;
+	DIR* dir;
+	dir = opendir(file_path);
+	if(NULL == dir)
+	{
+		fprintf(stderr,"opendir %s:%s\n",file_path,strerror(errno));
+		exit(1);
+
+	}
+	while(dir_info=readdir(dir))
+	{
+		if(dir_info->d_name[0] == '.')
+			continue;
+		if(DT_REG==dir_info->d_type)
+		{
+			if(0 == strcmp(dir_info->d_name,file_name))
+			{
+				printf("找到目标文件，%s/%s\n",file_path,file_name);
+			}
+
+		}
+		if(DT_DIR==dir_info->d_type)
+		{
+			char new_path[256]={0};
+			sprintf(new_path,"%s/%s",file_path,dir_info->d_name);
+			do_find(new_path,file_name);
+		}
+
+
+	}
+
+	closedir(dir);
+	return ;
+
+
+}
+
+
+int main()
+{
+	char find_file[256]={0};
+	char find_path[256]={0};
+
+	printf("请输入要找的到文件名：\n");
+	fgets(find_file,256,stdin);
+	find_file[strlen(find_file)-1]='\0';
+
+	printf("请起始路径：\n");
+	fgets(find_path,256,stdin);
+	find_path[strlen(find_path)-1]='\0';
+	do_find(find_path,find_file);
+
+	return 0;
+
+}
+
+

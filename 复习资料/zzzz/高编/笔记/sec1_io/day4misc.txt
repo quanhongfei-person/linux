@@ -1,0 +1,465 @@
+
+
+1.getpwuid
+struct passwd *getpwuid(uid_t uid);
+功能:
+	根据用户id到/etc/passwd文件下解析获得
+	结构体信息
+参数:
+	uid:用户id
+返回值:
+	成功返回id对应用户的信息
+	失败返回NULL
+
+2.getpwnam
+struct passwd *getpwnam(const char *name);
+功能:
+	根据用户名到/etc/passwd文件下解析获得
+	结构体信息
+
+struct passwd 
+{
+char   *pw_name;       /* username */
+char   *pw_passwd;     /* user password */
+uid_t   pw_uid;        /* user ID */
+gid_t   pw_gid;        /* group ID */
+char   *pw_gecos;      /* user information */
+char   *pw_dir;        /* home directory */
+char   *pw_shell;      /* shell program */
+           };
+
+3.getgrgid
+struct group *getgrgid(gid_t gid);
+功能:
+	根据gid到/etc/group文件中解析组信息
+参数:
+	gid:组id
+返回值:
+	成功返回组信息
+	失败返回NULL
+4.struct group *getgrnam(const char *name);
+功能:
+	根据组名到/etc/group文件中解析组信息
+
+struct group 
+{
+char   *gr_name;       /* group name */
+char   *gr_passwd;     /* group password */
+gid_t   gr_gid;        /* group ID */
+char  **gr_mem;        /* group members */
+           };
+
+ char ** == &char*
+ gr_mem == &gr_mem[0]
+ char *
+ gr_mem[0] -> "zhangsan"
+ gr_mem[1] -> "lisi"
+ gr_mem[2] -> NULL
+ 
+ 
+ 
+ struct passwd *getpwnam(const char *name);
+
+
+功能： 获得/etc/passwd中相关的信息通过name
+参数：name，指定，要找谁的信息
+返回：
+	成功返回passwd的结构体指针
+	NULL，失败
+	
+	
+ struct passwd 
+ {
+char   *pw_name;       /* username */
+char   *pw_passwd;     /* user password */
+uid_t   pw_uid;        /* user ID */
+gid_t   pw_gid;        /* group ID */
+char   *pw_gecos;      /* user information */
+char   *pw_dir;        /* home directory */
+char   *pw_shell;      /* shell program */
+           };
+
+		   
+		   
+		   
+		   
+ struct group *getgrnam(const char *name);
+ 
+ 功能,从/etc/group,获取相关组的信息。
+ 参数：name，指定组名
+ 返回：如果成功返回group的指针
+		NULL 失败
+struct group {
+char   *gr_name;       /* group name */
+char   *gr_passwd;     /* group password */
+gid_t   gr_gid;        /* group ID */
+char  **gr_mem;        /* group members */
+};
+struct group * info;
+info ->gr_mem[0]        lisi
+						zhangsan
+						NULL，
+
+char buf[10]="hello"
+char *buf[10]={"hello","nihao","asdfasdf"}
+		argv[]
+把 zhaosi加入linux的组
+ sudo useradd -m -s /bin/bash zhaosi 
+ sudo usermod zhaosi -aG linux
+
+
+链接文件:
+	file.txt -> hello.c
+	
+	软链接文件、符号链接文件
+	硬链接文件
+命令行：ln -s  123 softlink  快捷方式
+1.symlink
+int  symlink(const  char  *oldpath, const char *newpath);
+功能:
+	创建一个链接向oldpath文件的新符号链接文件
+参数:
+	oldpath:被链接向的文件的路径
+	newpath:新符号链接文件
+返回值:
+	成功返回0
+	失败返回-1
+
+2.readlink
+ssize_t  readlink(const  char *path, char *buf, size_t bufsiz);
+功能:
+	读取符号链接文件指向的文件名或目录名
+参数:
+	path:符号链接文件的路径
+	buf:保存内容空间的地址
+	bufsz:保存空间的大小
+返回值:
+	成功返回实际写入的字节数
+	失败返回-1
+
+3.remove
+int remove(const char *pathname);
+功能:
+	删除一个文件
+参数:
+	pathname:删除文件的路径
+返回值:
+	成功返回0
+	失败返回-1
+
+4.rename 
+int  rename(const  char  *oldpath,  const char *newpath);
+功能:
+	将一个老的路径名改为新的路径
+参数:
+	oldpath:老路径名
+	newpath:新路径名
+返回值:
+	成功返回0
+	失败返回-1
+
+5.link ln 1 2 
+int  link(const char *oldpath, const char *newpath);
+功能:
+	创建一个硬链接文件
+参数:
+	oldpath:要链接向的文件
+	newpath:创建的新硬链接文件
+返回值:
+	成功返回0
+	失败返回-1
+
+6.unlink
+int unlink(const char *pathname);
+功能:
+	删除一个文件,如果该文件对应的数据块硬
+	链接即将为0则回收该数据块,不为0让其
+	硬链接个数-1
+参数:
+	pathname:要删文件的路径
+返回值:
+	成功返回0
+	失败返回-1
+7.access
+  int access(const char *pathname, int mode);
+  功能：测试当前用户对pathname这个文件的读写执行的权限。
+	参数：pathname，需要测试的文件。
+	mode：
+	R_OK |W_OK|X_OK
+	返回值：
+	返回：0，说明具有对应的全向
+	-1，失败；
+	
+	
+8.umask   
+	mode_t umask(mode_t mask);
+	功能：设置umask的值，这个值只和新建文件，新建目录有关。
+	参数：，mask新的掩码值
+	返回：旧的掩码值。
+
+9.chmod
+	 int chmod(const char *path, mode_t mode);
+	 
+	 功能：设置文件的相应的权限，设置的权限不会和umask值相减
+	 参数：
+	 path，需要被设置权限的文件名，
+	 mode，需要指定的权限；
+	 返回值：
+	 0成功
+	 -1，失败；
+
+
+
+10.truncate
+
+出错相关函数接口
+#include <errno.h>
+ open(); ==-1  errno 
+errno.h头文件中声明errno是一个外部存储整型变量
+extern int errno;
+
+errno == 0	没有任何错误
+errno置位	
+
+add(int a, int b)
+{
+	return a+b;
+}
+
+add("asdf","dafas");
+
+1.perror
+void perror(const char *s);-->strerror()
+功能:
+	打印s字符串和errno对应的错误信息
+参数:
+	s:要打印在终端上的出错信息
+返回值:
+	缺省
+
+2.strerror
+char *strerror(int errnum);
+功能:
+	打印errnum出错码对应的出错信息
+参数:
+	errnum:出错errno号
+返回值:
+	成功返回对应的错误信息
+
+3.error ===>>>exit();
+void error(int status, int errnum, const char *format, ...);
+功能:
+	程序出错打印对应出错原因和用户输入字符串并退出
+参数:
+	status:程序退出的状态
+	 EXIT_FAILURE    1  
+	 EXIT_SUCCESS    0   
+	errnum:错误码
+	format:
+		类似printf打印
+返回值:
+	缺省
+	__FILE__ 表示是那个文件
+	__LINE__表示第几行
+	__func__表示在那个函数
+	__DATE__
+
+						libc.so
+静态库和动态库  gcc -lc
+printf();
+静态库:
+	程序编译时加载到程序当中
+动态库:
+	link  
+	程序执行时加载到程序当中
+gcc  4
+pre   -E #define #ifndef #endif 
+complie -S
+asm  obj -c 
+link  libc 
+
+静态库和动态库的区别:
+	1.静态库会是体积变大
+	  动态库不会使体积变大  
+
+	2.静态库加载后不再依赖库文件,可以单独执行使用
+	  动态库依赖于库文件,必须在执行前将动态库
+	  加载到内存当中
+	
+	3.多个程序可以共同使用一份动态库文件
+	 
+gcc 预编译，
+	编译  静态库
+	汇编
+	link 动态、
+
+	
+.a   静态库
+.so  动态库
+
+libXXXX.a
+libXXXX.so
+libaaa.so 
+gcc  -laaa    -lc   libc.so
+tar
+制作静态库:
+	1.gcc -c filename.c -o filename.o
+	2.ar crs libfilename.a filename1.o filename2.o filename3.o 
+	3.gcc main.c -o main -lfilename -L./
+
+制作动态库:
+	1.gcc -c -fPIC filename.c -o filename.o
+	2.gcc -shared filename.o -o libfilename.so
+	3.将libfilename.so拷贝到 /usr/lib下面  /lib
+	4.gcc main.c -o main -lfilename
+	
+	gcc main.c -loper=====liboper.a liboper.so 
+	
+	
+	gcc -fPIC -shared  filename.c -o libfilename.so
+	gcc main.c ./libfilename.so 
+	-fPIC 作用于编译阶段，告诉编译器产生与位置无关代码(Position-Independent Code)，
+	这里有一个-fPIC参数
+	PIC就是position independent code
+	PIC使.so文件的代码段变为真正意义上的共享
+	如果不加-fPIC,则加载.so文件的代码段时,代码段引用的数据对象需要重定位, 重定位会修改代码段的内容,这就造成每个使用这个.so文件代码段的进程在内核里都会生成这个.so文件代码段的copy.每个copy都不一样,取决于 这个.so文件代码段和数据段内存映射的位置.
+  则产生的代码中，没有绝对地址，全部使用相对地址，故而代码可以被加载器加载到内存的任意
+  位置，都可以正确的执行。这正是共享库所要求的，共享库被加载时，在内存的位置不是固定的。
+
+注意：
+1、当静态库和动态库同名时， gcc命令将优先使用动态库
+2、gcc -shared 参数使其生成是动态库而不是普通执行程序
+3、功能函数可以没有头文件，但是在工程应用中最好加上头文件并声明功能函数
+4、无论静态库，动态库，都是由.o文件创建 源程序hello.c通过gcc先编译成.o文件
+5、在linux下，库文件一般放在/usr/lib和/lib下，
+6、静态库的名字一般为libxxxx.a，其中xxxx是该lib的名称
+7、动态库的名字一般为libxxxx.so.major.minor，xxxx是该lib的名称，major是主版本号，minor是副版本号
+
+
+op.h
+stdio.h   man 
+
+/*	
+	功能：
+	参数： 
+	返回值：
+	
+*/
+int add(int a, int b)
+
+
+
+使用场合：
+
+1、如果对空间要求比较高，空间有限的时候考虑用动态库，
+2、如果对空间要求不高，对速度要求特别高的时候可以考虑用静态库
+3、动态库需要和可执行程序一起打包，而静态库不需要。
+
+
+练习：
+尝试将计算器程序中的加法  减法 乘法 除法的功能制作成动态库
+的方式，并通过main程序调用计算结果。
+
+ldd 可执行文件名，查看可执行文件使用了哪些库文件
+linux@ubuntu:~/202/sec1/04misc/lib/static$ ldd a.out
+	linux-gate.so.1 =>  (0xb771c000)
+	./liboper.so (0xb7717000)
+	libc.so.6 => /lib/i386-linux-gnu/libc.so.6 (0xb755b000)
+	/lib/ld-linux.so.2 (0xb771d000)
+	
+	nm是用来查看库文件相关的信息。
+linux@ubuntu:~$ nm liboper.a
+
+operate.o:
+00000000 T add
+0000000d T sub
+
+1111111111.
+1，gcc -fPIC -shared add.c sub.c mul.c div.c -o libop.so
+2，gcc main.c ./libop.so
+
+
+2222222
+
+
+1，标准io
+，FILE*  pos，fd，buff；流，
+linebuf,
+fullbuf,
+nobuf,
+
+
+1，打开  fopen（，“”）：
+2，读写
+	fgetc/fputc;
+	fgets/fputs;
+	fread,/fwrite
+3，关闭fclose;
+fseek,ftell,rewind,.
+feof ,,ferror,
+
+2 file io
+syscall ,
+
+1，打开  open（，“”）： fd,
+2，读写
+	read/write
+3，关闭close;
+lseek.
+
+3,opendir,readdir closedir
+
+stat 
+st_mode;32bit rwx type 
+st_size
+st_inode, st_mtime
+
+time ,localtime ,ctime, asctime,gmtime.
+mkdir
+rmdir
+rename,remove 
+
+.so
+.a
+
+show()
+{
+	opendir();
+	readir();
+	close();
+}
+main()
+{
+	show("/etc");
+}
+
+minishell,,
+
+
+gcc vim gdb make  
+
+makefile  
+
+main()
+{
+	getcwd(path)
+	
+	printf([......]);
+	
+	fgets();linebuf.... //ls /etc
+						//ln -s 1 2
+	p1 = strtok();//ls
+	p2 = strtok(); // /etc
+	if(strcmp(p1,ls))
+		do_ls(p2);
+
+
+}
+
+
+
+
+
+
+	
+	

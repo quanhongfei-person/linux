@@ -1,0 +1,19 @@
+#include<stdio.h>
+#include<stdlib.h>
+int swap(int *a,int *b)
+{
+
+	a = malloc(4);
+	b= malloc(4);
+//	*a = 5;
+//	*b=6;
+}
+
+int main(int argc, const char *argv[])
+{
+	int a =2;
+	int b = 3;
+
+	swap(&a,&b);
+	return 0;
+}

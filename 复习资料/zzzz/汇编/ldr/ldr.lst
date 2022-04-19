@@ -1,0 +1,49 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             RESET,CODE
+    2 00000000                 ENTRY
+    3 00000000         start
+    4 00000000 E3E00000        mvn              r0, #0
+    5 00000004 E59F300C        ldr              r3, =0x12345678
+    6 00000008 E3A01101        mov              r1, #0x40000000
+    7 0000000C         ; str r0, [r1, #4]  ;*£¨r1+4£© = r0
+    8 0000000C         ; ldr r2, [r1, #4]  ;r2 = *(r1+4)
+    9 0000000C         ; str r0, [r1], #4  ; *r1=r0  r1=r1+4
+   10 0000000C         ; ldr r3, [r1], #4   ;r3=*r1  r1=r1+4
+   11 0000000C E5813008        str              r3, [r1, #8]
+   12 00000010 E5A10004        str              r0, [r1, #4]! ;*£¨r1+4£© = r0 r
+                                                            1=r1+4
+   13 00000014 E5B12004        ldr              r2, [r1, #4]! ;r2 = *(r1+4) r1=
+                                                            r1+4
+   14 00000018                 END
+              12345678 
+Command Line: --debug --xref --cpu=ARM920T --apcs=interwork --depend=ldr.d -old
+r.o -IC:\Keil\ARM\INC -IC:\Keil\ARM\INC\Samsung --list=ldr.lst ldr.S
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 1 in file ldr.S
+   Uses
+      None
+Comment: RESET unused
+start 00000000
+
+Symbol: start
+   Definitions
+      At line 3 in file ldr.S
+   Uses
+      None
+Comment: start unused
+2 symbols
+328 symbols in table

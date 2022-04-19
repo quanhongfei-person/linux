@@ -1,0 +1,83 @@
+
+
+
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include <sys/types.h>          /* See NOTES */
+       #include <sys/socket.h>
+  #include <sys/socket.h>
+       #include <netinet/in.h>
+       #include <netinet/ip.h>
+typedef struct sockaddr* SA;
+int main(int argc, const char *argv[])
+{
+	int listfd = socket(AF_INET,SOCK_STREAM,0);
+	if(-1 == listfd)
+	{
+		perror("listfd");
+		exit(1);
+	}
+	struct sockaddr_in ser,cli;
+	bzero(&ser,sizeof(ser));
+	bzero(&cli,sizeof(cli));
+	ser.sin_family = AF_INET;
+	ser.sin_addr.s_addr = htonl(INADDR_ANY);
+	ser.sin_port = htons(50000);
+	int ret = bind(listfd,(SA)&ser,sizeof(ser));
+	if(-1 == ret)
+	{
+		perror("bind");
+		exit(1);
+	}
+
+	listen(listfd,3);
+	int len = sizeof(cli);
+	int recv_num = 0;
+	int send_num =  0;
+
+	while(1)
+	{
+		int conn = accept(listfd,(SA)&cli,&len);
+		if(-1 == conn)
+		{
+			perror("accept");
+			exit(1);
+		}
+		pid_t pid =fork();
+		if(pid>0)
+		{
+			close(conn);
+			continue;
+		}
+		if(0 == pid)
+		{
+			while(1)
+			{
+				char recv_buf[1024]={0};
+				if(recv(conn,recv_buf,1024,0)>0)
+				{	
+					printf("对方到ip是%s,recv_num:%d,send_num:%d\n",
+					recv_buf,++recv_num,send_num);
+				}
+				else 
+				{
+					printf("有人断开。。。\n");
+					exit(1);
+				}
+				char send_buf[1024]={0};
+				strcpy(send_buf,"ser:127.0.0.1:50000");
+				if(send(conn,send_buf,strlen(send_buf)+1,0)>0)
+					send_num++;
+			}
+		}
+		if(pid<0)
+		{
+			perror("fork");
+			exit(1);
+		}
+	}
+	close(listfd);
+	return 0;
+}

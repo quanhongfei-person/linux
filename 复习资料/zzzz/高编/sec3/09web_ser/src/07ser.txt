@@ -1,0 +1,142 @@
+/*
+ ============================================================================
+ Name        : 07ser.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include<string.h>
+#include <arpa/inet.h>
+#include<time.h>
+#include <unistd.h>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#define err_msg(msg) do{perror(msg);exit(1);}while(0)
+typedef struct sockaddr* SA;
+//unix socket
+int main(void)
+{
+	int listfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (-1 == listfd)
+		err_msg("socket");
+	struct sockaddr_in ser, cli;
+	bzero(&ser, sizeof(ser));
+	bzero(&cli, sizeof(cli));
+	ser.sin_addr.s_addr = INADDR_ANY;
+	ser.sin_family = AF_INET;
+	ser.sin_port = htons(50000);
+
+	int ret = bind(listfd, (SA) &ser, sizeof(ser));
+	if (-1 == ret)
+		err_msg("bind");
+	listen(listfd, 3);
+	socklen_t len = sizeof(cli);
+	while (1)
+	{
+		int conn = accept(listfd, (SA) &cli, &len);
+		if (-1 == conn)
+			err_msg("accept");
+		char buf[4096] = { 0 };
+
+		recv(conn, buf, 4096, 0);
+		printf("%s", buf);
+		//GET / HTTP/1.1
+		char *method = NULL;
+		char* url = NULL;
+		char* ver = NULL;
+		method = strtok(buf, " ");
+		url = strtok(NULL, " ");
+		ver = strtok(NULL, "\r\n");
+		if (0 == strcmp(url, "/"))
+		{
+
+			int fd = open("/home/linux/20180113/sec3/07web_ser/3.html",
+					O_RDONLY);
+			if (-1 == fd)
+				err_msg("open 3.html");
+			while (1)
+			{
+				bzero(buf, 4096);
+				int rd_num = read(fd, buf, 4096);
+				if (0 == rd_num)
+					break;
+				send(conn, buf, rd_num, 0);
+
+			}
+			close(fd);
+		}
+		//GET /login?us=123\0pw=123\0 HTTP/1.1
+		if (strstr( url,"login"))
+		{
+			char *start = index(url, '=');
+			char * end = index(url, '&');
+			*end = '\0';
+			//end=NULL;
+			char name[128] = { 0 };
+			char pass[128] = { 0 };
+			strcpy(name, start + 1);
+			end += 1;
+			start = index(end, '=');
+			strcpy(pass, start + 1);
+
+			if (0 == strcmp(name, "zhang3") && 0 == strcmp(pass, "123"))
+			{
+				// 报文头
+				HTTP/1.1 200 OK
+				Content-Type: text/html; charset=utf-8
+				Server: Microsoft-IIS/7.5
+				Content-Length: 904
+
+				int fd = open("/home/linux/20180113/sec3/07web_ser/1.html",
+						O_RDONLY);
+				if (-1 == fd)
+					err_msg("open 1.html");
+				while (1)
+				{
+					bzero(buf, 4096);
+					int rd_num = read(fd, buf, 4096);
+					if (0 == rd_num)
+						break;
+					send(conn, buf, rd_num, 0);
+
+				}
+				close(fd);
+			} else
+			{
+				int fd = open("/home/linux/20180113/sec3/07web_ser/4.html",
+						O_RDONLY);
+				if (-1 == fd)
+					err_msg("open 4.html");
+				while (1)
+				{
+					bzero(buf, 4096);
+					int rd_num = read(fd, buf, 4096);
+					if (0 == rd_num)
+						break;
+					send(conn, buf, rd_num, 0);
+
+				}
+				close(fd);
+
+			}
+
+		}
+
+		fflush(stdout);
+		close(conn);
+	}
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

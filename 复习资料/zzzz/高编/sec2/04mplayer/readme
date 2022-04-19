@@ -1,0 +1,32 @@
+这里是mplay的帮助文档
+本程序提供一下命令功能
+1，list	显示指定目录下到flv,mp4文件 ls ls /home/linux
+2，play 播放指定的媒体文件  paly 1.flv  play 
+3，pause 在播放中暂停
+4，quit  退出正在播放的文件
+5，exit  退出本程序
+
+
+
+main()
+{
+
+	printf("mplayer>");
+	fgets(cmdline);
+	strtok();
+	strtok();
+	if(cmdline== list)
+	{
+		opendir();readdir() if(mp4,flv){printf()file_name;}
+	}
+	if(cmdline == play)
+	{
+		fork();if(0 == pid){execle(mplayer);}
+		
+	}
+	if(cmdline == pause){ write(fifo,"pause\n");}
+	if(cmdline == quit){ write(fifo,"quit\n");}
+	if(cmdline==exit)exit(0);
+	
+
+}

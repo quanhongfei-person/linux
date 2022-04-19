@@ -1,0 +1,73 @@
+E20181208
+#include <stdio.h>
+#if 0
+int main(void)
+{
+	int n;
+	n = 2147483647;
+	n = n + 1;
+	printf("%d\n", n);
+	return 0;
+}
+
+int main(void)
+{
+	int n;
+	unsigned int m;
+	m = 0xCF178DFE;
+	printf("%d\n", m);
+	return 0;
+}
+
+
+int main(void)
+{
+	signed short int s;
+	unsigned short int m;
+	printf("%u\n", sizeof(m));
+	return 0;
+}
+
+
+int main(void)
+{
+	signed long int l;//long <=> int 
+	unsigned long int ll;
+	printf("%d\n", sizeof(ll));
+	return 0;
+}
+
+
+int main(void)
+{
+	signed long long int n;
+	unsigned long long int m;
+	printf("%d\n", sizeof(n));
+	return 0;
+}
+
+int main(void)
+{
+	printf("%f\n",1.23e-3);
+	float f;
+	f = -6.25;
+	printf("%u\n", sizeof(f));
+	return 0;
+}
+#endif
+
+int main(void)
+{
+	float f;
+	f = 0.9f;
+	printf("%u\n", sizeof(0.9f));
+	if(f == 0.9f)
+	{
+		printf("Yes\n");
+	}
+	else
+	{
+		printf("No\n");
+	}
+	return 0;
+}

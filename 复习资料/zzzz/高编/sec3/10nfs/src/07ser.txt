@@ -1,0 +1,248 @@
+/*
+ ============================================================================
+ Name        : 07ser.c
+ Author      : yas
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include<string.h>
+#include <arpa/inet.h>
+#include<time.h>
+#include <unistd.h>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#define err_msg(msg) do{perror(msg);exit(1);}while(0)
+typedef struct sockaddr* SA;
+//unix socket
+int send_file(int conn, char* filename)
+{
+	char buf[4096] = { 0 };
+	int fd = open(filename, O_RDONLY);
+	if (-1 == fd)
+		err_msg("open 3.html");
+	while (1)
+	{
+		bzero(buf, 4096);
+		int rd_num = read(fd, buf, 4096);
+		if (0 == rd_num)
+			break;
+		send(conn, buf, rd_num, 0);
+
+	}
+	close(fd);
+	return 0;
+}
+int main(void)
+{
+	char current_path[1024] = { 0 };
+	getcwd(current_path, 1024);
+	printf("path is %s\n", current_path);
+	int listfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (-1 == listfd)
+		err_msg("socket");
+	struct sockaddr_in ser, cli;
+	bzero(&ser, sizeof(ser));
+	bzero(&cli, sizeof(cli));
+	ser.sin_addr.s_addr = INADDR_ANY;
+	ser.sin_family = AF_INET;
+	ser.sin_port = htons(50000);
+
+	int ret = bind(listfd, (SA) &ser, sizeof(ser));
+	if (-1 == ret)
+		err_msg("bind");
+	listen(listfd, 3);
+	socklen_t len = sizeof(cli);
+	while (1)
+	{
+		int conn = accept(listfd, (SA) &cli, &len);
+		if (-1 == conn)
+			err_msg("accept");
+		char buf[4096] = { 0 };
+
+		recv(conn, buf, 4096, 0);
+		printf("%s", buf);
+		//GET / HTTP/1.1
+		char *method = NULL;
+		char* url = NULL;
+		char* ver = NULL;
+		method = strtok(buf, " ");
+		url = strtok(NULL, " ");
+		ver = strtok(NULL, "\r\n");
+		if (0 == strcmp(url, "/"))
+		{
+
+			int fd = open("../3.html", O_RDONLY);
+			if (-1 == fd)
+				err_msg("open 3.html");
+			while (1)
+			{
+				bzero(buf, 4096);
+				int rd_num = read(fd, buf, 4096);
+				if (0 == rd_num)
+					break;
+				send(conn, buf, rd_num, 0);
+
+			}
+			close(fd);
+		}
+		//GET /login?us=123\0pw=123\0 HTTP/1.1
+		if (strstr(url, "login"))
+		{
+			char *start = index(url, '=');
+			char * end = index(url, '&');
+			*end = '\0';
+			//end=NULL;
+			char name[128] = { 0 };
+			char pass[128] = { 0 };
+			strcpy(name, start + 1);
+			end += 1;
+			start = index(end, '=');
+			strcpy(pass, start + 1);
+
+			if (0 == strcmp(name, "zhang3") && 0 == strcmp(pass, "123"))
+			{
+				// 报文头
+
+				int fd = open("../5.html",
+						O_RDONLY);
+				if (-1 == fd)
+					err_msg("open 5.html");
+				while (1)
+				{
+					bzero(buf, 4096);
+					int rd_num = read(fd, buf, 4096);
+					if (0 == rd_num)
+						break;
+					send(conn, buf, rd_num, 0);
+
+				}
+				close(fd);
+			}
+			else
+			{
+				int fd = open("../4.html",
+						O_RDONLY);
+				if (-1 == fd)
+					err_msg("open 4.html");
+				while (1)
+				{
+					bzero(buf, 4096);
+					int rd_num = read(fd, buf, 4096);
+					if (0 == rd_num)
+						break;
+					send(conn, buf, rd_num, 0);
+
+				}
+				close(fd);
+
+			}
+
+		}
+
+		if (strstr(url, "vedio"))
+		{
+			send_file(conn, "../5.html");
+			pid_t pid = fork();
+			if (pid > 0)
+			{
+
+			}
+			if (pid < 0)
+			{
+				err_msg("fork");
+			}
+			if (0 == pid)
+			{
+				execlp("/nfs/mplay", "mplay",NULL);  /*execlp()会从PATH 环境变量所指的目录中查找符合参数file的文件名，找到后便执行该文件，
+														然后将第二个以后的参数当做该文件的argv[0]、argv[1]……，最后一个参数必须用空指针(NULL)作结束。
+														如果用常数0来表示一个空指针，则必须将它强制转换为一个字符指针，否则它将解释为整形参数，
+														如果一个整形数的长度与char * 的长度不同，那么exec函数的实际参数就将出错。
+														如果函数调用成功,进程自己的执行代码就会变成加载程序的代码,execlp()后边的代码也就不会执行了.*/
+				printf("cant find the app\n");
+				exit(0);
+
+			}
+
+		}
+
+		if (strstr(url, "beep"))
+		{
+			send_file(conn, "../5.html");
+			pid_t pid = fork();
+			if (pid > 0)
+			{
+
+			}
+			if (pid < 0)
+			{
+				err_msg("fork");
+			}
+			if (0 == pid)
+			{
+				execlp("/nfs/start", "start",NULL);
+				printf("cant find the app\n");
+				exit(0);
+
+			}
+
+		}
+		if (strstr(url, "beep_off"))
+		{
+			send_file(conn, "../5.html");
+			pid_t pid = fork();
+			if (pid > 0)
+			{
+
+			}
+			if (pid < 0)
+			{
+				err_msg("fork");
+			}
+			if (0 == pid)
+			{
+				execlp("/nfs/stop", "stop");
+				printf("cant find the app\n");
+				exit(0);
+
+			}
+
+		}
+		if (strstr(url, "camera"))
+		{
+			send_file(conn, "../5.html");
+			pid_t pid = fork();
+			if (pid > 0)
+			{
+
+			}
+			if (pid < 0)
+			{
+				err_msg("fork");
+			}
+			if (0 == pid)
+			{
+				execlp("/nfs/vedio_test", "vedio_test");
+				printf("cant find the app\n");
+				exit(0);
+
+			}
+
+		}
+		fflush(stdout);
+		close(conn);
+	}
+	puts("!!!done!!!"); /* prints !!!done!!! */
+	return EXIT_SUCCESS;
+}

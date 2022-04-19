@@ -1,0 +1,980 @@
+1.与零值比较
+	int n：if（n == 0） if（n != 0）  
+	bool flag：if（flag）  if（！flag）    非零为真，零为假，只能这样写
+	float x：const float EPSINON 0.0000001  if（x >= -EPSINON && x<=EPSINON）
+	char *p：if（p == NULL） if(p !=NULL)
+
+2.计算 Linux下的32 位 C程序   sizeof
+	char str[] = "hello";       6
+	char *P=str;                   4
+	int n=10;                       4
+	void *p= malloc(100)   4
+	void func(char str[100]) 4
+
+4.指针数组  ：int *a[10]
+   数组指针  :   int (*p)[10];
+   函数指针  ： int （*p)(int);
+   函数指针数组：int (*a[10])(int),每一个指针指向一个int func(int)的函数
+
+5.typedef union {long i; int k[5]; char c;} DATE;         20字节
+      struct data { int cat; DATE cow; double dog;} too;   32字节
+      DATE max;
+      则语句 printf("%d",sizeof(struct date)+sizeof(max));的执行结果是：__52___
+
+6.int main()
+      {
+	char a;
+	char *str=&a;
+	strcpy(str,"hello");   
+ 	printf(str);
+	return 0;
+      }
+      以上代码的问题？
+	将一个字符串复制进一个字符变量指针str所指地址，str是字符指针，但并没有分配内存空间，将会发生异常
+
+7.char* s="AAA";
+   printf("%s",s);
+   s[0]='B';
+   printf("%s",s);
+   以上代码的问题？
+	"AAA"是字符串常量，s是指针，指向这个字符串常量，所以声明的时候就有问题。
+	应该改为const char * s = "AAA",又因为是常量，所以对s[0]赋值操作时不合法的
+
+9.c和c++中的struct有什么不同？
+	c和c++中struct的主要区别是c中的struct不可以含有成员函数，而c++中的struct可以。
+	c++中struct和class的主要区别在于默认的存取权限不同，struct默认为public，而class默认为private。
+
+10.void getmemory(char *p)
+    {
+	p=(char *) malloc(100);
+	strcpy(p,“hello world”);
+     }   函数调用结束后形参p释放
+     int main( )
+    {
+	char *str=NULL;
+	getmemory(str);  //str仍然是null
+	printf(“%s/n”,str);
+	free(str);
+	return 0;
+      }会出现什么问题？
+	程序崩溃，getmemory中的malloc 不能返回动态内存， free（）对str操作很危险。
+
+11. char szstr[10];
+         strcpy(szstr,"0123456789");     strcpy时会复制字符串结束标记
+         产生什么结果？为什么？ 
+	长度不一样，出现段错误
+
+12.数组和链表的区别
+	1.存储方式：数组是一块连续的空间，一般在声明时就确定了长度，链表是一块可以不连续的空间，长度不固定
+	2.数据查找：数组的查找比较容易，查找操作可以直接使用偏移地址，而链表则需要按顺序遍历结点，效率低
+	3.结点的插入和删除：链表可以快速插入和删除，而数组的插入和删除可能需要大量的数据移动
+	4.越界问题：数组有越界问题，链表不存在越界问题
+
+13、 void main()
+       {
+	char aa[10];
+	printf(“%d”,strlen(aa));
+      }    
+      会出现什么问题？打印结果是是多少？
+	sizeof()和初不初始化没有关系，strlen()和初始化有关，打印结果值未知。
+
+14.15.16结构类型变量存储时存在内存对齐问题
+
+19.(void *)ptr 和 (*(void**))ptr的结果是否相同？其中ptr为同一个指针。
+	一样
+
+20.要对绝对地址0x100000赋值：*(unsigned int)0x100000 = 1234;
+     要想让程序跳转到绝对地址是0x100000去执行：首先要将0x100000强制转换成函数指针：(void (*)())0x100000
+				             然后再调用它:*((void (*)())0x100000)();
+
+21.const与define的比较，const有什么优点
+	   const常量有数据类型，而宏定义没有数据类型。编译器会对前者进行类型安全检查，
+	   而对后者只进行替换，没有类型安全检查，并且在字符替换可能会产生预料不到的错误
+
+22.引用和指针的区别：
+	1.引用被创建的同时必须初始化，指针则可以再任何时候被初始化
+	2.不能有NULL引用，引用必须与合法的存储单元关联，指针则可以是NULL
+	3.一旦引用被初始化，就不能改变引用的关系，指针可以随时改变所指的对象
+
+23.bool add(int a,int b,int *c)
+   {
+	*c = a+b;
+	return ((a>0&&b>0&&(*c<a||*c<b)) || (a<0&&b<0&&(*c>a||(*c>b)));   //判断是否有溢出，上溢出和下溢出
+   }
+
+24.如何判断一段程序是由c编译程序还是由c++编译程序编译的
+	#ifdef __cplusplus   //判断是否定义了预定义的内置宏cplusplus
+
+25.什么是内存泄漏、内存溢出
+	泄漏：程序中己动态分配的堆区内存由于某种原因程序未释放或无法释放，造成系统内存的浪费，导致程序运行速度减慢甚至系统崩溃等严重后果
+	溢出：程序在申请内存时，没有足够的内存空间供其使用 原因，没有及时回收
+	二者的关系：
+		内存泄漏不会抛出异常，大多数时候程序看起来运行正常
+		内存溢出会抛出异常
+
+26.关键字volatile有什么含意? 并给出三个不同的例子。
+	volatile的本意是“易变的” 因为访问寄存器要比访问内存单元快的多,所以编译器一般都会作减少存取内存的优化。
+	当要求使用volatile声明变量值的时候，系统总是重新从它所在的内存读取数据，即使它前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的变量，
+	编译器对访问该变量的代码就不再进行优化，从而可以提供对特殊地址的稳定访问；如果不使用valatile，则编译器将对所声明的语句进行优化。
+	（简洁的说就是：volatile关键词影响编译器编译的结果，用volatile声明的变量表示该变量随时可能发生变化，与该变量有关的运算，不要进行编译优化，以免出错）
+	volatile总结：1.告诉编译器不能做任何优化
+		      2.用volatile定义的变量会在程序外被改变,每次都必须从内存中读取，而不能重复使用放在cache或寄存器中的备份
+	volatile使用场景：1.	中断服务程序中修改的供其它程序检测的变量需要加volatile
+		            2.	多任务环境下各任务间共享的标志应该加volatile
+		            3.存储器映射的硬件寄存器通常也要加voliate，因为每次对它的读写都可能有不同意义
+
+27.在某工程中，要求设置一绝对地址为0x67a9的整型变量的值为0xaa66。编译器是一个纯粹的ANSI编译器。写代码去完成这一任务。
+	int *p =null;
+	P = (int *)0x67a9;
+	*p = 0xaa66;
+
+28.头文件中的 ifndef/define/endif 
+	作用：防止头文件被重复引用
+	note：“被重复引用”是指一个头文件在同一个cpp文件中被include了多次，这种错误常常是由于include嵌套造成的。
+	           比如：存在a.h文件#include "c.h"而此时b.cpp文件导入了#include "a.h" 和#include "c.h"此时就会造成c.h重复引用。
+	头文件被重复引用引起的后果：
+		有些头文件重复引用只是增加了编译工作的工作量，不会引起太大的问题，仅仅是编译效率低一些，但是对于大工程而言编译效率低下那将是一件多么痛苦的事情。
+		有些头文件重复包含，会引起错误，比如在头文件中定义了全局变量(虽然这种方式不被推荐，但确实是C规范允许的)这种会引起重复定义。
+
+29.#include  <filename.h>和  #include “filename.h”  有什么区别
+	#include<filename.h>系统检索头文件时会先从系统文件里开始找，用于系统文件较快。
+	#include"filename.h"系统检索头文件时先从程序所处目录开始查找，用于自定义文件较快。
+
+30.const 关键字作用
+	1.欲阻止一个变量被改变，可使用const，在定义该const变量时，需先初始化，以后就没有机会改变他了；
+ 	2.对指针而言，可以指定指针本身为const，也可以指定指针所指的数据为const，或二者同时指定为const；
+	3. 在一个函数声明中，const可以修饰形参表明他是一个输入参数，在函数内部不可以改变其值；
+
+32.static的作用
+	作用：1.修饰变量
+		静态全局变量：全局变量前加static修饰，该变量就成为了静态全局变量。我们知道，全部变量在整个工程都可以被访问（一个文件中定义，其它文件使用的时候添加extern关键字声明 ），
+			       而在添加了static关键字之后，这个变量就只能在本文件内被访问了。因此，在这里，static的作用就是限定作用域。
+		静态局部变量：局部变量添加了static修饰之后，该变量就成为了静态局部变量。我们知道局部变量在离开了被定义的函数后，就会被销毁，而当使用static修饰之后，
+			       它的作用域就一直到整个程序结束。因此，在这里static的作用就是限定生命周期。
+	           2.修饰函数
+		修饰函数则该函数成为静态函数，函数的作用域仅限于本文件，而不能被其它文件调用。
+	1. static全局变量与普通的全局变量有什么区别 ?
+		普通全局变量：①在函数外面定义的变量
+		（外部变量 ）  ②若在使用全局变量之前，在前面找不到变量的定义，需要声明后才能使用
+			       ③全局变量不初始化，默认为0
+			       ④声明只针对全局变量
+			       ⑤全局变量只定义一次，但可以声明多次
+			       ⑥静态全局变量，是在编译阶段就已经分配空间，函数没有调用前它就已经存在，整个程序运行结束自动释放
+			       ⑦不同文件编译时，全局变量只能定义一次，可以声明多次
+		note：C语言中全局变量的建议写法：定义一个全局变量，建议初始化（如果定义一个全局变量没有初始化，无法确定是定义还是声明）
+					        声明一个全局变量，建议加extern。
+		静态全局变量：①静态全局变量和普通全局变量的区别在于文件作用域不同
+		（内部变量）   ②extern只适用于普通全局变量
+			       ③普通全局变量，所有文件都能使用，前提是需要声明，静态全局变量只能在本文件使用
+			       ④一个文件只能有一个static全局变量的定义，不同文件间的static全局变量，就算名字相同，也是没有关系的两个静态全局变量		
+　　              	全局变量本身就是静态存储方式， 静态全局变量当然也是静态存储方式。 这两者在存储方式上并无不同。
+　	  　	这两者的区别在于非静态全局变量的作用域是整个源程序， 当一个源程序由多个源文件组成时，非静态的全局变量在各个源文件中都是有效的。 而静态全局变量则限制了其作用域，
+		 即只在定义该变量的源文件内有效， 在同一源程序的其它源文件中不能使用它。由于静态全局变量的作用域局限于一个源文件内，只能为该源文件内的函数公用，因此可以避免在其它源文件中引起错误。
+　　	   	  static全局变量只初使化一次，防止在其他文件单元中被引用; 　
+	2.  static局部变量和普通局部变量有什么区别 ？
+		普通局部变量：①在{}内定义的变量就是局部变量
+			       ②只有执行到定义变量的这个语句，系统才会给这个变量分配空间
+			       ③当离开了{}，这个普通局部变量就自动释放
+			       ④不同的{}中，变量的名字可以相同
+			       ⑤普通局部变量不初始化，值为随机数
+			       ⑥就近原则
+		静态局部变量：①静态局部变量，是在编译阶段就已经分配空间，函数没有调用前它就已经存在
+			       ②当离开了{}，静态局部变量不会释放，只有程序结束，静态局部变量才会释放
+			       ③静态局部变量的作用域在当前的{}，离开此{}，变量就不能再使用
+		    	       ④静态局部变量如果不初始化，它的值为0
+		 	       ⑤静态局部变量的初始化语句只执行一次，但可以赋值多次
+		区别：
+ 　	　	（1）内存分配与释放：普通局部变量：只有执行到定义变量语句时才分配空间，离开作用域{}，自动释放空间
+			                   static局部变量：在编译阶段，变量空间已经分配，整个程序结束才释放 
+　	               （2）初始化：普通局部变量：
+		                     static局部变量只被初始化一次，下一次依据上一次结果值； 　
+	3.  static函数与普通函数有什么区别？
+　　 	    static函数与普通函数作用域不同,仅在本文件。
+	    只在当前源文件中使用的函数应该说明为内部函数(static修饰的函数)，内部函数应该在当前源文件中说明和定义。对于可在当前源文件以外使用的函数，应该在一个头文件中说明，要使用这些函数的源文件要包含这个头文件.
+33.堆栈溢出原因
+             （1）函数调用层数太深。函数递归调用时，系统要在栈中不断保存函数调用时的现场和产生的变量，如果递归调用太深，就会造成栈溢出，此时递归无法正确返回。再有，当函数调用的层次过深时也可能导致栈无法容纳这些调用的返回地址而造成栈溢出。
+             （2）动态申请空间之后没有释放。由于C语言中没有垃圾资源自动回收机制，因此需要程序主动释放已经不再使用的动态地址空间。申请的动态空间是堆空间，动态空间使用不当会造成堆溢出。
+34.如何引用一个已经定义过的全局变量
+	（1）通过引用头文件，如果用引用头文件方式来引用某个在头文件中声明的全局变理，假定你将那个变量写错了，那么在编译期间会报错，
+	（2）用extern关键字，如果你用extern方式引用时，假定你犯了同样的错误，那么在编译期间不会报错，而在连接期间报错。
+35.全局变量可不可以定义在可被多个.C文件包含的头文件中？为什么？
+	可以，但必须在不同的的.c文件中以static形式来声明同名的全局变量
+
+36.队列和栈的区别
+	队列先进先出，栈后进先出。
+
+37堆和栈的区别
+
+38.用宏定义写出swap（x，y），即交换两数
+	#define swap1(x,y)   do{x=x+y;y=x-y;x=x-y;}while(0)
+	#define swap(x, y) (x)=(x)+(y);(y)=(x)–(y);(x)=(x)–(y);
+
+39.写一个“标准”宏，这个宏输入两个参数并返回较小的一个
+	#define Min(x,y) ((x)<(y)?(x):(y))
+
+40.带参宏与带参函数的区别
+参数类型、处理时间、占用存储空间、运行时间、程序长度
+
+42.main函数为什么要返回1
+	main 函数的返回值用于说明程序的退出状态。如果返回 0，则代表程序正常退出，否则代表程序异常退出，具体的值是某中具体出错信息。
+	exit和return区别：
+   		 1）exit用于在程序运行的过程中随时结束程序，exit的参数是返回给OS的。main函数结束时也会隐式地调用exit函数。exit函数运行时首先会执行由atexit()函数登记的函数，然后会做一些自身的清理工作，同时刷新所有输出流、关闭所有打开的流并且关闭通过标准I/O函数tmpfile()创建的临时文件。exit是结束一个进程，它将删除进程使用的内存空间，同时把错误信息返回父进程,而return是返回函数值并退出函数。通常情况：exit(0)表示程序正常, exit(1)和exit(-1)表示程序异常退出，exit(2)表示表示系统找不到指定的文件。在整个程序中，只要调用exit就结束（当前进程或者在main时候为整个程序）。
+		 2）return是语言级别的，它表示了调用堆栈的返回；return( )是当前函数返回，当然如果是在主函数main, 自然也就结束当前进程了，如果不是，那就是退回上一层调用。在多个进程时。如果有时要检测上个进程是否正常退出。就要用到上个进程的返回值，依次类推。而exit是系统调用级别的，它表示了一个进程的结束。
+		 3）exit函数是退出应用程序，并将应用程序的一个状态返回给OS，这个状态标识了应用程序的一些运行信息。
+		 4）和机器和操作系统有关的一般是： 0为正常退出，非0为非正常退出；
+43.已知一个数组table，用一个宏定义，求出数据的元素个数。
+	#define NUM(table) (sizeof(table)/sizeod(table[0]))
+
+49.什么是预编译，何时需要预编译
+	什么是预编译
+		预编译又称为预处理 , 是做些代码文本的替换工作。
+		处理以# 开头的指令 , 比如拷贝 #include 包含的文件代码，#define 宏定义的替换 ， 条件编译等，就是为编译做的预备工作的阶段。
+		C 编译系统在对程序进行通常的编译之前，首先进行预处理
+	何时需要预编译？
+		1.总是使用不经常改动的大型代码体
+		2.程序由多个模块组成，所有模块都使用一组标准的包含文件和相同的编译选项。在这种情况下，可以将所有包含文件预编译为一个“预编译头”
+
+50.用两个栈实现一个队列的功能？要求给出算法和思路
+	设两个栈A,B，刚开始时均为空
+	入队：直接将新元素压入栈A中
+	出队：先判断栈B是否为空
+	          若不为空，将栈B的栈顶元素直接弹出
+	          若为空，则先现将栈A中的元素一次pop并push到栈B，，如果此时栈B仍为空，则没有元素可以出队，队列为空，否则，直接弹出
+
+51.对于一个频繁使用的短小函数,在C语言中应用什么实现,在C++中应用什么实现?
+	C语言：宏定义
+	c++：内联函数inline
+
+52. 用预处理指令#define 声明一个常数，用以表明1年中有多少秒
+	#define SECOND_PER_YEAR (60*60*24*365)UL
+	#define SECOND_PER_YEAR (60*60*24*365UL)
+
+54.在 C++  程序中调用被 C 编译器编译后的函数，为什么要加 extern “C”？
+
+55.两个 for 循环的优缺点
+	for(i=0;i<n;++i)
+	{
+	     if(condition)
+	     {
+		dosomething()；
+	      }
+	      else
+		dootherthing（）；
+	}
+	优点：程序简洁
+	缺点：多执行了n-1次逻辑判断，并且打断了循环的流水线作业，使得编译器不能对循环进行优化处理，降低了效率
+	if(condition)
+	{
+	     for(i=0;i<n;++i)
+		dosomething()；
+	 else
+	       for(i=0;i<n;++i)
+		dootherthing（）；
+	}
+	优点：循环的效率高
+	缺点：程序不简洁
+61.
+62.#define SQUARE(a)((a)*(a))
+       int a=5;
+       int b;
+       b=SQUARE(a++);
+      宏在预编译时会以替换的形式展开，仅仅会替换。涉及到宏的地方，不要用++ --，标准中对此没有规定，因此最终结果将会依赖于不同的编译器。执行程序的答案可能是25、也有可能是36。
+70.字符串反序
+	int main()
+	{
+	       char *src = "hello,world";
+	       int len = strlen(src);
+	       char *dest = (char *)malloc(len + 1)；    //要问\0分配空间
+	       char *d = dest;
+	       char *s = &src[len-1];                            //src指向字符串的最后一个字符
+	       while(len-- != 0)
+	       {
+		*d++ = *s--;
+	       }
+	       *d = '\0';     //字符串尾部加结束标记
+	        printf("%s\n",dest);
+                        free(dest);   //使用完应当释放空间，避免内存泄漏
+	        return 0;       
+	}
+71.判断某一个数是否为2的若干次幂
+	int main()
+	{
+	      int a;
+	      scanf("%d",&a);
+	      printf("%c",(a)&(a-1)?'n':'y');
+	      return 0;
+	}
+72.中断服务函数4大注意点
+	1. 中断服务函数不能有返回值；
+	2. 中断服务函数不能传入参数；
+	3. 中断服务函数要短小精悍；
+	4. 中断服务函数中不能使用printf等glibc函数，会带来重入性和性能问题；
+	解析：首先，中断源连接到硬件，由硬件来触发产生中断，即：中断源提出中断申请，而中断申请一般由硬件电路产生，申请提出时间是随机的，因此中断的产生是随机的，也就是说，中断服务函数的调用是硬件级别的。当中断产生时，pc指针强制跳转到相应的中断服务函数入口执行中断服务函数。
+	1）关于返回值，需要进行入栈出栈操作。由于中断是随机的，且由硬件告知，并不是由某段代码调用，所以，如果有返回值那么返回值将返回给谁？显然，这是毫无意义的！也就是说，如果中断服务函数有返回值，返回时将返回值压入栈中后，那么何时出栈、如何出栈？
+  	2）关于传入参数，这和返回值类似，也需要入栈出栈，那么什么时候入栈，谁给它传递参数？
+  	3）至于ISR要短小精悍就更好理解了。假设存在一个中断，其中断产生的次数较为频繁，而它对应ISR耗时较长，那么对于中断的响应就会无限的延迟，从而会错过很多中断请求；
+  	4）关于printf函数带来的重入性和性能问题，需要了解像printf这样的glibc函数，其采用的是缓冲机制，该缓冲区域是共享的，可以理解为全局变量。当某个中断发生时，向缓冲区中写入某些内容，而恰巧此时来了一个更高级的中断，它同样调用了printf函数，也向缓冲区中写入某些内容，此时，缓冲区中的内容就混乱了。
+73. void foo(void) 
+         { 
+	 unsigned int a = 6; 
+	int b = -20; 
+	(a+b > 6)? puts("> 6") : puts("<= 6");     //输出是“>6”
+         }    
+         当表达式中存在有符号类型和无符号类型时所有的数都自动转换为无符号类型。因此-20变成了一个非常大的正整数，所以该表达式计算出的结果大于6。
+74.unsigned int zero = 0; 
+        unsigned int compzero = 0xFFFF; 
+        /*1‘s complement of zero */
+       对于一个int型不是16位的处理器为说，上面的代码是不正确的。应编写如下：unsigned int compzero = ~0;
+75.       char *ptr; 
+	     puts("Got a null pointer"); 
+	else 
+	     puts("Got a valid pointer");     //输出
+	malloc申请一段长度为0的空间，malloc依然会返回一段地址，还有一段地址空间，所以ptr不等于NULL。
+	malloc这个函数，会有一个阈值，申请小于这个阈值的空间，那么会返回这个阈值大小的空间。这个阈值会随着编译器的不同而不同
+	malloc规定不可以申请一个负数，如果申请一个负数，此时malloc出错，返回null
+76.strcpy的实现
+	char *my_strcpy(char *dest,const char *src)
+	{
+	       assert(dest != NULL || src !=NULL);
+	       char *ret = dest;
+	       while((*dest++ = *src++) != '\0');
+	       return ret;
+	}
+	1.const 修饰：源字符串参数用const修饰，防止修改源字符串
+	2.空指针检查：
+	3.返回目标地址：不能忘记保存原始的目标地址
+	4.‘\0’：while((*dest++ = *src++) != '\0')中，最后将‘\0’赋给了dest
+		循环写成while (*src!='\0') {*dst++=*src++;}，循环体结束后，dst字符串的末尾没有正确地加上'\0'。
+	5.为什么要返回char *？返回dst的原始值使函数能够支持链式表达式，比如int l=strlen(my_strcpy(strA,strB));
+	6.假如考虑dst和src内存重叠的情况，strcpy该怎么实现?
+		void *my_memcpy(char *dst, const char* src, int cnt)
+		{
+    			assert(dst != NULL && src != NULL);
+  	 		 char *ret = dst; 
+    			if (dst >= src && dst <= src+cnt-1) //内存重叠，从高地址开始复制
+    			{
+    				 dst = dst+cnt-1;
+  				 src = src+cnt-1;
+        				while (cnt--)
+           				       *dst-- = *src--;
+        			}
+   			 else    //正常情况，从低地址开始复制
+  			{
+       				 while (cnt--)
+           				      *dst++ = *src++;
+   			 } 
+   			return ret;
+			
+		}
+		char * strcpy(char *dst,const char *src)
+		{
+   			 assert(dst != NULL && src != NULL);
+ 			char *ret = dst;
+ 			my_memcpy(dst, src, strlen(src)+1);
+			return ret;
+		}
+77二分查找
+	基本思想：所谓的二分查找法，其实是一种有序的查找方法，也称折半查找（Binary Search），如果是无序的则要先进行排序操作。
+		目标值通过与中间元素比较，可分为三种情况： 
+		第一种情况：目标值与中间元素相等，查找结束； 
+		第二种情况：目标值比中间元素大，则把后半部分的中间元素与目标值比较； 
+		第二种情况：目标值比中间元素小，则把前半部分的中间元素与目标值比较； 
+		这三步一直循环，直到查找结束。
+	int bin_search(int *arr,int len,int target)
+	{
+	         int first = 0,last = len-1,mid;
+	         int counter = 0;   //记录查找次数
+	         while(first <= last)
+	         {
+		counter++;
+		mid = (first+last)/2;
+		if(target < arr[mid])
+		{
+		         last = mid -1;
+		}
+		else if(target > arr[mid])
+		{
+		          first = mid +1;
+		}
+		else 
+		{
+			printf("查找次数：%d\n",counter);
+			return mid;
+		}
+	         }
+	         printf("not found\n");
+	         return -1;
+	}
+78.请编写一个 C 函数，该函数给出一个字节中被置 1 的位的个数	
+	unsigned int TestAsOne0(char log)
+	{
+	        int i;
+	        unsigned int num =0;
+	        for(i = 0; i < 8; ++i)
+	        {
+	  	if((log>>i)&0x1)
+		         num++;
+	         }
+	         return num;
+	}
+	也可以判断是不是2的正整数次幂
+		if(num == 1) 则是2的正整数次幂
+		也可以用x&(x-1)是否为0，若为0，则是
+	int bit1count(char x)
+	{
+	        int count = 0;
+	        while(x)
+	        {
+		x  &= (x-1);
+		count++;
+	        }
+	        return count;
+	}
+79.字符串转换成整数
+	int  my_atoi(char *str)
+	{
+	     char *temp = str;
+	     int isNegarive = 0;
+	     int num = 0
+	     if(*temp == '-')
+	     {
+		isNegarive = 1;
+		temp++;	
+	      }
+	      if(*temp == '+')
+	     {
+		isNegarive = 0;
+		temp++;	
+	      }
+	      
+	      char c;
+	      while(*temp++ != '\0')
+	      {	
+		num = num*10 + （*temp - '0');
+	       }
+	        if(isNegarive == 1)
+		return 0-num;
+	        else
+		return num;
+	}
+80.整数转换成字符串
+	void my_itoa(int num,char str[])
+	{
+	        int temp = 0,i = 0；
+	        char c;
+	        int isNegative = 0;
+	        if(num < 0)
+	        {
+		isNegative = 1;   //负数
+		num = 0-num;
+ 	        }	  
+	        while(num != 0)
+	        {
+		temp = num %10;
+		c = temp + '0';
+	      	s[i++] = c;
+	  	num = num / 10; 
+	        }
+	        s[i] = '\0';
+	        
+	        int min = 0,max = i-1;
+	        while(min < max)     //倒置
+	        {
+		c = s[min];
+		s[min] = s[max];
+		s[max] = c;
+		max--;
+		min++;
+	         }
+	         if(isNegative == 1)
+	         {
+		int len = 0;
+		for(len = i; len >=0; len--)
+		{
+		       s[len+1] = s[len];
+		}
+		s[0] = '-';
+	          }
+	}
+81.strcmp的实现
+	int my_strcmp(const  char *str1,const char *str2)
+	{
+	      assert((NULL != str1) && (NULL != str2));
+	      int ret = 0;
+	      while(!(ret=*(unsigned char *)str1 - *(unsigned char *)str2) && )
+	      {
+		str1++;
+		str2++;
+	       }
+	       if(ret > 0)
+	       	return ret;
+	       if(ret < 0)
+	     	return -1;
+	       return ret;
+	}
+	这个函数要注意一下几点
+		①使用*(unsigned char*)str1而不是用*str1。这是因为传入的参数为有符号数，有符号字符值的范围是-128~127，无符号字符值的范围是0~255，而字符串的ASCII没有负值，若不转化为无符号数这回在减法实现时出现错误。
+		   例如 str1的值为1，str2的值为255。
+		   作为无符号数计算时ret = -254,结果为负值，正确
+		   作为有符号数计算时ret = 2,结果为正值，错误
+		②While循环中ret=*(unsigned char*)str1-*(unsigned char*)str2) && *str1，最后与上str1也可以换成str2，因为前面已经做了相减，无论哪个先为‘\0’都会退出。因为最后与上str1是为了判断str1是否结束，即是否为‘\0’。
+
+82.字符串逆序
+	1.原地逆序
+	char* reverse(char* str)
+	{
+	       if(src == NULL )
+		return NULL;
+	       char *p = str;
+	       char *q =str;
+	       while(*q != '\0')
+		q++;
+	       q--;
+	       while(p < q)
+	       {
+		char t = *p;
+		*p = *q;
+		*q = t;
+		p++;
+		q--;
+	       }
+	       /*
+	        int len =strlen(str);
+	        char ch;
+	        for(i=0;i<len/2;++i)
+	        {
+		ch = str[i];
+		str[i] = str[len-1-i];
+		str[len-1-i] =ch;
+	        }
+	         return str;
+	       */
+	       return src;     
+	}
+	2.递归逆序
+	void reverse(char *str)
+	{
+	       char temp = *str;   //temp保存字符串第一个字符
+	       int len = strlen(str);  
+	       *str = *(str+len-1);  //将‘\0’的前一个字符赋给第一个
+	       *(str+len-1) = '\0'    //将'\0'的前一个元素先赋成'\0'
+	       if(strllen(str) > 1)     //字符串长度大于1，递归 
+	       {
+		reverse(str+1);
+	       }
+	       *(str+len-1) = temp; //全部递归完成后，将'\0'还原成原来的中间元素
+	}
+	int main()
+	{
+	       char str[] = "hello world!";
+	       reverse(str);
+	       printf("%s\n",str);
+	       return 0;
+	}
+83.
+
+
+84.找最长子串
+	void find_chindstr(char *str,char *dest)
+	{
+	        if(src == NULL || dest == NULL)
+		return ;
+	        int i=0,j=0,maxlen=0,start=0;
+	        int len = strlen(str);
+	        for(i=0;i<len; ++i)
+	        {
+		for(j=i+1;j<=len;++j)
+		{
+	   	         if(str[i] != str[j])
+		         {  
+			if(maxlen < j-i)
+			{
+			      maxlen = j-i;
+			      start = i;
+			}
+			  i = j-1;
+		                  break;
+		          }
+		}
+	         }
+	         strncpy(dest,src+start,maxlen);
+	         dest[maxlen]='\0';
+	}
+
+85.判断单向链表是否有环
+	思路：用两个指针遍历这个单向链表，第一个指针p1，每次都一步，第二个指针p2，每次走两步，当p2指针追上p1指针，就表示有环路
+	int testLinkRing(Link *head)
+	{
+	        if(head == NULL)
+		return -1;    
+	        Link *p1=head,*p2 = head;
+	        while(p1 = NULL && p2 != NULL)
+	        {
+		p1=p1->next;
+		p2=p2->next->next;
+		if(p1 == p2)
+	 	       return 1;      //有环
+	         }
+	         return 0;
+	}
+	补充：
+	
+86.
+87.实现双向链表删除一个节点P，在节点P后插入一个节点
+	#define ElemType int     //双向链表数据结构
+	typedef struct DulNode
+	{
+	       ElemType data;
+	       struct DulNode *prior;
+	       struct DulNode *next; 
+	}DulNode,*DulLinkList;
+	void ListInsert_Dul(DulLinkList *L,int i,ElemType e)    //在第i个节点p之后插入数据域是e结点s
+	{
+	       DulNode *p;
+	       p = GetElem_Dul(L,i);      //在L中确定第i个元素的位置指针p
+	       DulNode *s = malloc(sizeof(DulNode));      //创建新节点
+	       s->data = e;         //初始化新节点
+	       s->next = NULL;
+	        s->prior = p;        //①插入
+	        s->next = p->next;     //②   ②和③可以互换
+	        p->next->prior=s;     //③
+	        p->next=s;                 //④
+	}
+	void ListDelete_Dul(DulLinkList *L,int i)  //删除第i个结点
+	{
+	          DulNode *p;
+	          p = GetElem_Dul(L,i);      //在L中确定第i个元素的位置指针p
+	          
+	           p->prior->next = p->next;
+	           p->next->prior->p->prior;
+	           free(p);
+	}
+88.单链表反向
+	方法一：遍历
+	void reverse(test *head)
+	{
+	       if(head == NULL)
+		return ;
+	       test *pre = NULL,*temp = NULL;
+	       test *curr = head;
+	       while(cur != NULL)
+	       {
+		temp=curr->next;
+		curr->next = pre;
+		pre =curr;
+	    	curr = temp;
+	       }
+	       return pre;
+	}
+	方法二：递归
+	test* reverse(test *head)
+	{
+	      if(head == NULL || head->next == NULL)
+		return head;
+	      test* newNode = reverse(head->next);
+	      head->next->next= head;
+	      return newNode;
+	}
+89.将二维数组行列元素互换，存到另一个数组中
+	main()
+	{
+	       int i,j;
+	       int a[2][3] = {{},{1,2,3},{4,5,6}};
+	       int b[3][2] = {0};
+	       for(i=0;i<2;++i)
+	       {
+		for(j=0;j<3;++j)
+		{
+		       b[j][i] = a[i][j];
+		}
+	       }
+	}
+90.输入一行字符，统计其中有多少个单词
+	void replace(char *a)   //将，？:都用空格替换
+	{
+	       int i,j;
+	       int len = strlen(a);
+	       for(i=0;i<len;++i)
+	       {
+		if(a[i] = ','||a[i]=='?'||a[i] == ':'||a[i]=='.')
+		        a[i] = ' ';
+	       }
+	       for(i=0;i<len;++i)    //将两个连续空格删除一个
+	       {
+		if(a[i] == ' ')
+		{
+	   	        if(a[i+1] == ' ')
+		        {
+			for(j=i;j<len;++j)
+			       a[j] = a[j+1];
+		        }
+		}
+	       }
+	}
+	void lower(char *a)
+	{
+	         int i;
+	         int len = strlen(a);
+	         for(i=0;i<len;++i)
+	         {
+		if(a[i] <='Z' && a[i] >= 'A')
+		         a[i] += 'a' - 'A';
+	         }
+	}
+	int fix(char *a)        //计算伪单词数量
+	{
+	       int i,j;
+	       int check =0;    //伪单词数量
+	       int flag = 0;     //伪单词标志位
+	       while(a[i] != '\0')
+	       {
+		flag = 0;
+		while(a[i] != ' ' && i < strlen(a))    //i < strlen(a)保证在最后一个单词时，i指向字符串结束符时,flag不置1
+		{
+		        if(a[i] >= 'a' && a[i] <= 'z')
+		        	i++;
+		        else 
+		        {
+			flag = 1;
+			i++;
+		         }
+		         if (flag == 1)
+			check ++;
+		         i++;
+		}
+	       }
+	       return check;
+	}
+	int count(char *s)
+	{
+	       int i,ret = 0;
+	       int len = strlen(a);
+	       for(i=0;i<len;++i)
+	       {
+		if(a[i] == ' ')
+		     ret++;       //当字符串最后一位为空格，单词数就等于空格数
+	       }
+	       if(a[len-1] != ' ')      //如果字符串最后一位不是空格，单词+1
+		ret++;
+	       int check = fix(a);
+	       return ret -= check;
+	}
+	int main()
+	{
+	      char str[] = "I am a student of 21, %$2 and you?";        //char str[] = "I am a student of 21, %$2 and you";
+	       replace(str);
+	       lower(str);
+	       int check = fix(str);
+	       int num = count(str);
+	      printf("word num = %d\n",num);
+	      return 0;
+	}
+91.memcpy的实现
+	1.不考虑内存重叠（单个字节拷贝）
+	void *memcpy(void *dest,const void*src,int count)
+	{
+	      if(dest ==NULL  || src == NULL)
+		return ;
+	      char *pdest = (char *)dest;
+	      char *psrc = (char *)psrc;
+	      while(count--)
+	      {
+		*pdest = *psrc;
+		pdest++;
+		psrc++;
+	      }
+	      return dest;
+	}
+	四个字节拷贝
+	void *memcpy(void *dest,const void*src,int count)
+	{
+	      if(dest ==NULL  || src == NULL)
+		return ;
+	      int *pdest = (int *)dest;
+	      int *psrc = (int *)psrc;
+	      char *temp1 = NULL;
+	      char *temp2 = NULL;
+	      int c1= n/4;
+	      int c2 = n%4;
+	      if(pdest>=psc 7&pdest>=(char *)psrc+n-1)
+	      {
+		temp1 = (char *)pdest+n-1;
+		tem[2 = (char *)psrc+n-1;
+		while(c2--)
+		      *temp1-- = *temp2--;
+		temp1++;
+		temp2++;
+		pdest = (int*)temp1;
+		psrc = (in *)temp2;
+		while(c1--)
+		      *pdest--*psrc--;
+	      }
+	      {
+		while(c1--)
+		     *pdest++ = *psrc--;
+		temp1 = (char *)pdest;
+		temp2 = (char *)psrc;
+		while(c2--)
+		      *temp1++ = *temp2++;
+	      }
+	      return dest;
+	}
+	
+92.1、2、3、4能组成多少个互不相同且无重复数字的三位数？都是多少？ 
+	int main()
+	{
+	      int i,j,k;
+	      for(i=1;i<=4;++i)
+	      {	
+		for(j=1;j<=4;++j)
+		{
+		       for(k=1;k<=4;++k)
+		       {
+			if(i!=j&&i!=k&&j!=k)
+		 	{
+			        printf("%d,%d,%d",i,j,k);
+			}
+		        }
+		}
+	      }
+	}
+93.取一个整数a从右端开始的4～7位
+	
+94.打印杨辉三角形
+	int main()
+	{
+	       int i,j,k,a,n=0,a[N][N];
+	       while(n<=0||n>N)
+	       {
+		printf("请输入要打印的行数：");
+		scanf(("%d",&n);
+	       }
+	       for(i=1;i<=n;++i)
+	       	a[i][1] = a[i][i] = 1;
+	       for(i=3;i<=n;++i)
+	       {
+		for(j=2;j<=i-1;++j)
+		{
+		        a[i][j]=a[i-1][j-1]+a[i-1][j];
+		}
+               	       }
+	       for(i=1;i<=n;++i)
+	       {
+		for(k=1;k<=n-i;++k)
+		        printf("   ");
+		for(j=1;j<=i;++j)
+		        printf("%6d",a[i][j]);
+		printf("\n");
+ 	       }
+	}
+
+96.求字符串长度
+97.809*??=800*??+9*??+1 其中??代表的两位数,8*??的结果为两位数，9*??的结果为3位数。求??代表的两位数，及809*??后的结果
+98.某个公司采用公用电话传递数据，数据是四位的整数，在传递过程中是加密的，加密规则如下  ：
+     每位数字都加上5,然后用和除以10的余数代替该数字，再将第一位和第四位交换，第二位和第三位交换。
+	int main()
+	{
+	      int a,i,t;
+	      int aa[4] = {0};
+	      pritnf("please a number:\n");
+	      scanf("%d",&a);
+	      aa[0] = a %10;     //个位
+	      aa[1] = a%100/10;     //十位
+	      aa[2] = a%1000/100； //百位
+	      aa[3]  =a/1000;
+	      for(i=0;i<=3;++i)
+	      {
+		aa[i] += 5;
+		aa[i] %= 10；
+	      }
+	      for(i=0;i<=1;++i)
+	      {
+		t=aa[i];
+		aa[i] = aa[3-i];
+		aa[3-i] = t;
+	      }
+	      for(i=3;i>=0;++i)
+	      {
+		printf("%d",aa[i]);
+	      }	      
+	}
+99.计算字符串中子串出现次数
+	int substr_num(const char *str,const char *substr)
+	{
+	       int n = 0;
+	       char *p,*r;
+	       while(*str != '\0')
+	       {
+		p=str;
+		r=substr;
+		while(*r != '\0')
+		{
+		        if(*r == *p)
+		        {
+			r++;
+			p++;
+		         }
+		         else
+			break;
+		}
+		if(*r == '\0')
+		{
+		        n++；	
+		}
+	     	str++;
+	        }
+	        return n;
+	}
+100.有两个磁盘文件A和B,各存放一行字母，要求把这两个文件中的信息合并（按字母顺序排列），输出到一个新文件C中。
+	int main()
+	{
+	      FILE* fp1,fp2,fp3;
+	      char ch,str[100];
+	      int n=0,i,j;
+	      fp1 = fopen("A","r");
+	      fp2 = fopen("B","r");
+	      fp3 = fopen("C","w");
+	      if(fp1 == NULL || fp2 == NULL ||fp3 == NULL)
+	      {
+		perror("fopen   error");
+	                exit(1);
+	      }
+	      printf("A contents are:\n");
+	      for(i=0;(ch = fgetc(fp1))!=EOF;++i)
+	      {
+		str[i] = ch;
+	  	putchar(ch);
+	       }
+	       putchar('\0');
+	      printf("B contents are:\n");
+	      for(;(ch = fgetc(fp2))!=EOF;++i)
+	      {
+		str[i] = ch;
+	  	putchar(ch);
+	       }
+	       putchar('\n');
+	       fclose(fp1);
+	       fclose(fp2);
+	       n=i;
+	       for(i =0;i<n-1;++i)
+	       {
+		for(j=i+1;j<n;++j)
+		{
+	 	         if(str[i] > str[j])
+		         {
+			ch = str[i];
+			str[i] = str[j];
+			str[j] = ch;
+		          }
+		}
+	       }
+	       printf("C contents are:\n");
+	       for(i=0;i<n;++i)
+	       {
+		putc(str[i],fp3);
+	        }
+	        fclose(fp3);
+	        return 0;
+	}
+
+	

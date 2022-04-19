@@ -1,0 +1,4 @@
+--cpu ARM920T "b.o" --strict --scatter "b.sct" 
+--autoat --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\b.map" -o "b.axf"

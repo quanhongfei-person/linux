@@ -1,0 +1,910 @@
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
+	<head>
+	<title></title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta http-equiv="pragma" content="no-cache"/>
+	<meta http-equiv="cache-control" content="no-cache"/>
+	<meta http-equiv="expires" content="0"/>
+	<meta http-equiv="content-style-type" content="text/css"/>
+	<meta http-equiv="content-script-type" content="text/javascript"/>
+	<script>
+	window.$BG_LANG='zh';
+	</script>
+	<script type="text/javascript" src="/eams/static/scripts/jquery/jquery,jquery.ui.core.js?bg=3.4.3"></script>
+	<script type="text/javascript" src="/eams/static/scripts/plugins/jquery-form,jquery-history,jquery-colorbox,jquery-chosen.js?bg=3.4.3"></script>
+	<script type="text/javascript" src="/eams/static/js/plugins/jquery.subscribe,/js/struts2/jquery.struts2,jquery.ui.struts2.js?bg=3.4.3"></script>
+	<script type="text/javascript" src="/eams/static/scripts/beangle/beangle,beangle-ui.js?bg=3.4.3"></script>
+	<script type="text/javascript">var App = {contextPath:"/eams"};jQuery(document).ready(function () {jQuery.struts2_jquery.version="3.6.1";beangle.contextPath=App.contextPath;jQuery.scriptPath = App.contextPath+"/static/";jQuery.struts2_jquerySuffix = "";jQuery.ajaxSettings.traditional = true;jQuery.ajaxSetup ({cache: false});});</script>
+	<script type="text/javascript" src="/eams/static/scripts/my97/WdatePicker-4.72.js?compress=no"></script>
+	<link id="jquery_theme_link" rel="stylesheet" href="/eams/static/themes/smoothness/jquery-ui.css?s2j=3.6.1" type="text/css"/>
+	<link id="beangle_theme_link" href="/eams/static/themes/default/beangle-ui,colorbox,chosen.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="/eams/static/css/foundation.css" type="text/css"/>
+	
+	<script src="/eams/static/scripts/require.config.js?v=3"></script>
+	<script>
+	require.baseUrl="/eams/static/scripts";
+	</script>
+	<script src="/eams/static/scripts/require.js"></script>
+	<script type="text/javascript" src="/eams/static/scripts/require.js"></script>
+	
+	<!-- backbone & underscore -- fontend MVC framework -->
+	<script type="text/javascript" src="/eams/static/scripts/underscore.min.js"></script>
+	<script type="text/javascript" src="/eams/static/scripts/backbone.min.js"></script>
+	<script type="text/javascript" src="/eams/static/scripts/underscore.string.min.js"></script>
+	<script>
+	require(['underscore.string'], function(_s) {
+	_.str = _s;
+	_.mixin(_.str.exports());
+	});
+	</script>
+	
+	
+	</head>
+	<body>
+	
+	<div id="toolbar5425597761"></div>
+	<script type="text/javascript">
+	bar = bg.ui.toolbar("toolbar5425597761",'学生成绩表打印');
+	bar.addPrint("打印"); 
+	bar.addClose(); 
+	
+	bar.addHr();
+	</script><script>
+	function SetPrintSettings(){}
+	function exportToExcel(){alert("Not Support!");}
+	function exportToWord(){alert("Not Support!");}
+	function setTopMargin(margin){}
+	function setLeftMargin(margin){}
+	function setRightMargin(margin){}
+	function setBottomMargin(margin){}
+	//flag:true纵向;flase横向;
+	function setPortrait(flag){}
+	</script>
+	<style type="text/css" media="print">
+	@page{
+	size: auto; /* auto is the initial value */
+	margin: 0mm; /* this affects the margin in the printer settings */
+	}
+	body {
+	background-color:#FFFFFF;
+	margin: 0px; /* this affects the margin on the content before sending to printer */
+	}
+	</style> 
+	<script>
+	SetPrintSettings();
+	</script>
+	
+	<style> 
+	.tableStyle { font-size:12px; border-collapse:collapse; width:100%; 
+	table-layout:fixed;/* 只有定义了表格的布局算法为fixed，下面td的定义才能起作用。 */ 
+	} 
+	.tableStyleTitle{font-weight:bold;} 
+	.tableStyleTd { border: solid #000 1px; text-align:center; height:18px; 
+	text-overflow: ellipsis; 
+	word-break:keep-all;/* 不换行 */ 
+	white-space:nowrap;/* 不换行 */ 
+	overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */ 
+	} 
+	/* 表头可以换行 */ 
+	.tableStyleTh { border: solid #000 1px; text-align:center; height:18px;} 
+	.tableEndTd {font-size:12px; border-right: #000 1px solid;border-left: #000 1px solid; } 
+	</style> 
+	<h2 style="text-align:center;">西安石油大学学生成绩单</h2> 
+	<table align="center" style="width:95%; font-size:12px"> 
+	<tr> 
+	<td>院（系）:电子工程学院</td> 
+	<td>学制:4</td> 
+	<td>培养层次:本科</td> 
+	<td>入学时间:2015年09月</td> 
+	<td>毕业时间:2019年07月</td> 
+	</tr> 
+	<tr> 
+	<td>专业:自动化</td> 
+	<td colspan="2">班级:自1503</td> 
+	<td>学号:201505060321</td> 
+	<td>姓名:权红飞</td> 
+	</tr> 
+	</table> 
+	
+	<table class="tableStyle" align="center" style="width:95%; font-size:10px;table-layout:fixed;" > 
+	<tr> 
+	<td width="50%"> 
+	<table class="tableStyle" cellspacing="0" cellpadding="0"> 
+	<tr align="center" class="tableStyleTitle"> 
+	<td class="tableStyleTh" width="28%">课程/环节</td> 
+	<td class="tableStyleTh" width="8%" align="center">课程性质</td> 
+	<td class="tableStyleTh" width="6%">学分</td> 
+	<td class="tableStyleTh" width="8%">成绩</td> 
+	<td class="tableStyleTh" width="8%">学分绩点</td> 
+	</tr> 
+	
+	<tr> 
+	<td colspan="5" class="tableStyleTd">2015-2016第1学期</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">军事理论</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	优秀 
+	</td> 
+	<td class="tableStyleTd"> 
+	4.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学语文</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	及格 
+	</td> 
+	<td class="tableStyleTd"> 
+	3.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学体育（1）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	优秀 
+	</td> 
+	<td class="tableStyleTd"> 
+	4.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学计算机基础</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	90 
+	</td> 
+	<td class="tableStyleTd"> 
+	4.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">计算机操作实践</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	优秀 
+	</td> 
+	<td class="tableStyleTd"> 
+	4.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学英语Ⅰ（1）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">4.0</td> 
+	<td class="tableStyleTd"> 
+	82 
+	</td> 
+	<td class="tableStyleTd"> 
+	12.25 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">思政课基础</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">3.5</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	12.25 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">高等数学Ⅰ（1）</td> 
+	<td class="tableStyleTd">选修课</td> 
+	<td class="tableStyleTd">5.5</td> 
+	<td class="tableStyleTd"> 
+	71 
+	</td> 
+	<td class="tableStyleTd"> 
+	11.55 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">普通化学</td> 
+	<td class="tableStyleTd">选修课</td> 
+	<td class="tableStyleTd">2.5</td> 
+	<td class="tableStyleTd"> 
+	61 
+	</td> 
+	<td class="tableStyleTd"> 
+	2.75 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">军事技能训练</td> 
+	<td class="tableStyleTd">实践课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td colspan="5" class="tableStyleTd">2015-2016第2学期</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">心理健康教育</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">0.5</td> 
+	<td class="tableStyleTd"> 
+	中等 
+	</td> 
+	<td class="tableStyleTd"> 
+	1.25 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学物理Ⅰ（1）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">3.5</td> 
+	<td class="tableStyleTd"> 
+	89 
+	</td> 
+	<td class="tableStyleTd"> 
+	13.65 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">物理实验Ⅰ（1）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	中等 
+	</td> 
+	<td class="tableStyleTd"> 
+	5.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学体育（2）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	88 
+	</td> 
+	<td class="tableStyleTd"> 
+	3.80 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">自动化专业概论</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	及格 
+	</td> 
+	<td class="tableStyleTd"> 
+	1.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">工程制图</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">3.0</td> 
+	<td class="tableStyleTd"> 
+	73 
+	</td> 
+	<td class="tableStyleTd"> 
+	6.90 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">C语言程序设计</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">3.0</td> 
+	<td class="tableStyleTd"> 
+	77 
+	</td> 
+	<td class="tableStyleTd"> 
+	8.10 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学英语Ⅰ（2）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">4.0</td> 
+	<td class="tableStyleTd"> 
+	73 
+	</td> 
+	<td class="tableStyleTd"> 
+	9.20 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学生职业规划与就业指导</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	优秀 
+	</td> 
+	<td class="tableStyleTd"> 
+	4.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">形势与政策</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">思政课纲要</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	中等 
+	</td> 
+	<td class="tableStyleTd"> 
+	5.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">高等数学Ⅰ（2）</td> 
+	<td class="tableStyleTd">选修课</td> 
+	<td class="tableStyleTd">5.5</td> 
+	<td class="tableStyleTd"> 
+	64 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.70 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">金工实习</td> 
+	<td class="tableStyleTd">实践课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td colspan="5" class="tableStyleTd">2016-2017第1学期</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学物理Ⅰ（2）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">3.5</td> 
+	<td class="tableStyleTd"> 
+	76 
+	</td> 
+	<td class="tableStyleTd"> 
+	9.10 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">物理实验Ⅰ（2）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.5</td> 
+	<td class="tableStyleTd"> 
+	中等 
+	</td> 
+	<td class="tableStyleTd"> 
+	3.75 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">线性代数</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">2.5</td> 
+	<td class="tableStyleTd"> 
+	75 
+	</td> 
+	<td class="tableStyleTd"> 
+	6.25 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">复变函数</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	66 
+	</td> 
+	<td class="tableStyleTd"> 
+	3.20 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学体育（3）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	3.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电路分析基础</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">4.0</td> 
+	<td class="tableStyleTd"> 
+	79 
+	</td> 
+	<td class="tableStyleTd"> 
+	11.60 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学英语Ⅰ（3）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">4.0</td> 
+	<td class="tableStyleTd"> 
+	81 
+	</td> 
+	<td class="tableStyleTd"> 
+	12.40 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">思政课原理</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">3.5</td> 
+	<td class="tableStyleTd"> 
+	76 
+	</td> 
+	<td class="tableStyleTd"> 
+	9.10 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">[B自开]食品安全与营养</td> 
+	<td class="tableStyleTd">任选课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td colspan="5" class="tableStyleTd">2016-2017第2学期</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">概率论与数理统计</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">3.0</td> 
+	<td class="tableStyleTd"> 
+	84 
+	</td> 
+	<td class="tableStyleTd"> 
+	10.20 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">积分变换与场论</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	82 
+	</td> 
+	<td class="tableStyleTd"> 
+	6.40 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学体育（4）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	90 
+	</td> 
+	<td class="tableStyleTd"> 
+	4.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电子技术基础（模拟）Ⅰ</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">3.5</td> 
+	<td class="tableStyleTd"> 
+	71 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.35 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电子工程实验（1）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	3.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">信号与系统</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">4.0</td> 
+	<td class="tableStyleTd"> 
+	70 
+	</td> 
+	<td class="tableStyleTd"> 
+	8.00 
+	</td> 
+	</tr> 
+	</table> 
+	</td> 
+	<td width="50%"> 
+	<table class="tableStyle" cellspacing="0" cellpadding="0"> 
+	<tr align="center" class="tableStyleTitle"> 
+	<td class="tableStyleTh" width="28%">课程/环节</td> 
+	<td class="tableStyleTh" width="8%" align="center">课程性质</td> 
+	<td class="tableStyleTh" width="6%">学分</td> 
+	<td class="tableStyleTh" width="8%">成绩</td> 
+	<td class="tableStyleTh" width="8%">学分绩点</td> 
+	</tr> 
+	
+	<tr> 
+	<td class="tableStyleTd">思政课概论</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">5.0</td> 
+	<td class="tableStyleTd"> 
+	65 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">石油工业概论</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">大学英语Ⅰ（4）</td> 
+	<td class="tableStyleTd">通识教育课</td> 
+	<td class="tableStyleTd">3.0</td> 
+	<td class="tableStyleTd"> 
+	83 
+	</td> 
+	<td class="tableStyleTd"> 
+	9.90 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">[D自开]公共关系与人际关系</td> 
+	<td class="tableStyleTd">任选课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td colspan="5" class="tableStyleTd">2017-2018第1学期</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电子工程实验（2）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.5</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	5.25 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电子技术基础（数字）Ⅰ</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">3.5</td> 
+	<td class="tableStyleTd"> 
+	73 
+	</td> 
+	<td class="tableStyleTd"> 
+	8.05 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">自动控制理论Ⅰ（1）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">4.5</td> 
+	<td class="tableStyleTd"> 
+	85 
+	</td> 
+	<td class="tableStyleTd"> 
+	15.75 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">工程检测技术Ⅰ</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	78 
+	</td> 
+	<td class="tableStyleTd"> 
+	5.60 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">自动化专业英语（1）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.5</td> 
+	<td class="tableStyleTd"> 
+	71 
+	</td> 
+	<td class="tableStyleTd"> 
+	3.15 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电机学Ⅰ</td> 
+	<td class="tableStyleTd">专业课</td> 
+	<td class="tableStyleTd">4.0</td> 
+	<td class="tableStyleTd"> 
+	71 
+	</td> 
+	<td class="tableStyleTd"> 
+	8.40 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电工电子实训（1）</td> 
+	<td class="tableStyleTd">专业课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	中等 
+	</td> 
+	<td class="tableStyleTd"> 
+	2.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">[C自开]我国十大油田开发历史</td> 
+	<td class="tableStyleTd">任选课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">自动控制理论课程设计</td> 
+	<td class="tableStyleTd">实践环节</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	及格 
+	</td> 
+	<td class="tableStyleTd"> 
+	1.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td colspan="5" class="tableStyleTd">2017-2018第2学期</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">自动控制理论Ⅰ（2）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.5</td> 
+	<td class="tableStyleTd"> 
+	80 
+	</td> 
+	<td class="tableStyleTd"> 
+	4.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">自动化专业英语（2）</td> 
+	<td class="tableStyleTd">必修课</td> 
+	<td class="tableStyleTd">1.5</td> 
+	<td class="tableStyleTd"> 
+	中等 
+	</td> 
+	<td class="tableStyleTd"> 
+	3.75 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">微机原理及应用</td> 
+	<td class="tableStyleTd">专业课</td> 
+	<td class="tableStyleTd">4.0</td> 
+	<td class="tableStyleTd"> 
+	77 
+	</td> 
+	<td class="tableStyleTd"> 
+	10.80 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电力电子技术</td> 
+	<td class="tableStyleTd">专业课</td> 
+	<td class="tableStyleTd">3.0</td> 
+	<td class="tableStyleTd"> 
+	80 
+	</td> 
+	<td class="tableStyleTd"> 
+	9.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电工电子实训（2）</td> 
+	<td class="tableStyleTd">专业课</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	优秀 
+	</td> 
+	<td class="tableStyleTd"> 
+	4.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">自动化仪表与过程控制</td> 
+	<td class="tableStyleTd">专业课</td> 
+	<td class="tableStyleTd">3.5</td> 
+	<td class="tableStyleTd"> 
+	68 
+	</td> 
+	<td class="tableStyleTd"> 
+	6.30 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电气控制与PLC</td> 
+	<td class="tableStyleTd">专业课</td> 
+	<td class="tableStyleTd">2.5</td> 
+	<td class="tableStyleTd"> 
+	79 
+	</td> 
+	<td class="tableStyleTd"> 
+	7.25 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">[D自开]普通逻辑</td> 
+	<td class="tableStyleTd">任选课</td> 
+	<td class="tableStyleTd">2.0</td> 
+	<td class="tableStyleTd"> 
+	中等 
+	</td> 
+	<td class="tableStyleTd"> 
+	5.00 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电力电子技术课程设计</td> 
+	<td class="tableStyleTd">实践环节</td> 
+	<td class="tableStyleTd">1.0</td> 
+	<td class="tableStyleTd"> 
+	良好 
+	</td> 
+	<td class="tableStyleTd"> 
+	3.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">电装实习</td> 
+	<td class="tableStyleTd">实践环节</td> 
+	<td class="tableStyleTd">3.0</td> 
+	<td class="tableStyleTd"> 
+	优秀 
+	</td> 
+	<td class="tableStyleTd"> 
+	13.50 
+	</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	<tr> 
+	<td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td><td class="tableStyleTd">&nbsp;</td> 
+	</tr> 
+	</table> 
+	</td> 
+	</tr> 
+	</table> 
+	<table class="tableStyle" align="center" style="width:95%; font-size:10px"> 
+	<tr> 
+	<td width="25%" class="tableStyleTd">毕业设计(论文)题目</td> 
+	<td width="75%" style="text-align:left;" class="tableStyleTd" colspan="3"></td> 
+	</tr> 
+	<tr> 
+	<td width="25%" class="tableStyleTd">毕业设计(论文)成绩</td> 
+	<td width="25%" class="tableStyleTd"></td> 
+	<td width="25%" class="tableStyleTd">毕业设计(论文)学分</td> 
+	<td width="25%" class="tableStyleTd">16</td> 
+	</tr> 
+	<tr> 
+	<td width="50%" class="tableEndTd" colspan="2" >院系（盖章）</td> 
+	<td width="50%" class="tableEndTd" colspan="2" >教务处（盖章）</td> 
+	</tr> 
+	<tr> 
+	<td width="50%" align="right" style="border-bottom: #000 1px solid;" class="tableEndTd" colspan="2" >2018年10月09日</td> 
+	<td width="50%" align="right" style="border-bottom: #000 1px solid;" class="tableEndTd" colspan="2" >年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</td> 
+	</tr> 
+	</table> 
+	<div style="margin-top:5px;" class="ajax_container"></div>
+	
+	
+	<script defer="defer" language="Javascript"> 
+	setLeftMargin(5.0); 
+	setTopMargin(10.0); 
+	setRightMargin(5.0); 
+	setBottomMargin(10.0); 
+	</script> 
+	</body>
+	</html>
+	

@@ -1,0 +1,178 @@
+1.格式
+<!DOCTYPE html> 
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>中文测试。。。。</title>
+	</head>
+	<body>
+		这里是测试body测试内容。。。
+	</body>
+</html>
+2.标签 在body内
+<h1></h1>双标签 标题 ，加粗，换行  1-6 ---》小
+<p></p> 双标签  段落，有换行功效
+<hr> 单标签  左到右分割符
+<!--    -->注释
+
+
+3，元素的属性
+给元素提供更多的属性，大部分的元素属性
+语法：<标签 属性1=参数1>
+1）align left，right，center
+2) bgcolor ，body的属性设置网页的背景色
+<body bgcolor="0x00ff1234">
+4,文本元素属性
+b 元素 <b>内容</b> 加粗
+br 换行<br> 如果是p标签中间有间隔
+i元素， 字体倾斜<i></i>
+del元素 删除文字<del></del>
+strong  强调一段文字，效果类似 b标签
+u元素，下划线<u></u>
+small元素， 超小字体<small></small>
+sub 下标<sub></sub>
+sup  上标<sup></sup>
+<br>h<sub>2</sub>0
+		<br>100m<sup>2</sup>
+ruby,拼音，<ruby>二姐 <rt>(er) (jie)<rt></ruby>，可能部分浏览器不支持。
+make 元素 <mark> </mark> 加黄色背景
+
+5超链接
+5种形式
+1，链接外部网站
+2，链接本地文件
+3，图片链接
+4，电子邮件链接打开电子邮件
+5，下载文件链接
+
+		<a href="http://www.baidu.com">baidu</a>
+		<br><a href="1.html">1111</a>
+		<br><a href="1.html"><img src="abc.jpg"></a>
+		<br><a href="mailto:123@13.com">contract me</a>
+		<br><a href="abc.jpg">下载</a>
+上面的方法在打开新网页时，老的网页会关闭
+target 属性
+_self :当前位置打开 默认值
+_blank 新窗口中打开
+<a href="http://www.baidu.com" target="_blank">baidu</a>
+锚点
+<a href="#1">锚点1</a>
+		<a href="#2">锚点2</a>
+		<a href="#3">锚点3</a>
+		<br><br><br><br><br><br><br><br><br><br>
+		<br><br><br><br><br><br><br><br><br><br>
+		<br><br><br><br><br><br><br><br><br><br>
+		<a id="1">锚点1
+		<br><br><br><br><br><br><br><br><br><br>
+		<br><br><br><br><br><br><br><br><br><br>
+		<br><br><br><br><br><br><br><br><br><br>
+		<a id="2">锚点2
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+		<br><br><br><br><br><br><br><br><br><br>
+		<br><br><br><br><br><br><br><br><br><br>
+		<a id="3">锚点3
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+6 img 单标签
+src 图像来源
+alt 如果不能正确打开，显示的文字
+width, heigh
+<img src="abc.jpg" alt="美女" width="100" height="200"> px
+<img src="abc.jpg" alt="美女" width="50%" height="200%">
+百分比是相对于网页而言的， 高度百分比无效的
+	
+7列表
+有序列，无需序列
+自定义列表
+无序列表 前面无数字
+<ul>
+		<li>列表1</li>
+		<li>列表2</li>
+		<li>列表3</li>
+		<li>列表4</li>
+</ul>
+有个type属性 文字最前面的符号
+disc 黑色实心圆
+circle 白色空心圆
+square 黑色方块
+有序列，前面有数字
+
+<ol>
+		<li>列表1</li>
+		<li>列表2</li>
+		<li>列表3</li>
+		<li>列表4</li>
+</ol>
+其中可以放文字，图片，或链接
+有type属性，设置排序使用什么数字
+start 开始值，后面的++；
+8 	表格
+表格的构成，
+	table，外框
+	tr 行
+	td 列
+	<table>
+		<tr><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td></tr>
+		<table>
+		3行 3列
+表格的属性
+ border 边框粗细
+ th,是tr的属性，列标题，自动居中，加粗
+ colspan，横向合并单元格，需要 整形参数
+	<tr><th colspan="3">name</th></tr> 
+表格的合并
+rowspan ,列项合并，整数参数
+caption 给表格加标题 子属性
+表格还有3个字属性
+thead 都是双标签
+tbody
+tfoot
+这些属性，后期主要和css，js配合使用
+9 html 实体
+用于输出一些特殊的字符
+有些特殊的字符不能直接在网页中直接显示的
+
+10 style 元素，html样式
+引入样式的三种方法
+1），外部样式 需要css
+<link rel="stylesheet" type="text/css" href="">
+2)内部样式 <style type="text/css" ></style>
+样式需要放在<head></head>之间，这个属于布局。
+3).内联样式<p style="color:red"></p> 单独的设置一个
+
+
+11. div布局 需要配合css样式设置
+9.html
+12 通用属性
+每个元素都用
+	id属性，指定元素的标识符，唯一性。
+	class 指定类型名，归类，统一设置共同的属性
+	title 当鼠标移动到元素的时候显示的内容
+	dir 用于控制显示输出的方向
+	<bdo dir="rtl">123456</bdo>
+	style 样式设置
+	
+12，表单	传递参数，数据
+<form>
+</form>
+	<!-- 表单中重要的字元素 input button -->
+<!-- 属性 action，指定表单发送的地址 -->
+<!-- 属性 method 发送的方式 get，post -->
+<!--get方法 数据会附加到url的后面传递给服务器 默认-->
+<!--post，将数据包大包发给服务器，等候服务器来读取 -->
+13，input元素，（输入框）他是表单的一个字属性
+	指定表单中的内容项，比如输入内容的文本框
+	可以指定表单属性，也可以放在表单的外面。
+	input元素的属性：
+		type，指定输入框的类型，text单行文本，password密码，submit提交按钮，
+		reset，重置按键，button按键，普通的按键需要和特定的时间关联。
+		image：图片式按键
+		hidden:隐藏字段，该内容不显示在页面上，提交其他的一些变量。
+		email: 是一个邮箱类型，新特性，可能支持有差异
+		required:表示内容必须填写，不然不能提交。
+	name：名称，输入内容识别名称，传递参数时候的参数名称
+	value： 默认值，输入框默认填入的内容，
+	maxlength，指定最大长度
+	placeholder,设置提示信息的。
